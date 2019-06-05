@@ -1,0 +1,28 @@
+table;champs;type;description
+serveur;id;integer;identifiant d'un serveur
+;owner_id;integer;identifiant de proprietaire du serveur
+;;;
+moderateur;uid;integer;identifiant du membre moderateur
+;username;varchar;nom du moderateur
+;;;
+channels;id;integer;identifiant du channel
+;type;integer;type de channel (voice, text, ...)
+;;;
+cmd;id;integer;identifiant de la command
+;command;varchar;command et ses parametres, on se servira de regex pour l'identification des commandes par la suite
+;type;varchar;type de la sanction (AVERTIR, MUTE, SOURD, KICK, BAN)
+;;;
+channel_concerne;channel_id;integer;identifiant du channel
+;cmd_id;integer;identifiant de la command
+;;;
+role_moderateur;id;integer;identifiant du role de moderateur (type)
+;name;varchar;nom de ce role
+;;;
+role_cmd;role_id;integer;identifiant du role de moderateur
+;cmd_ir;integer;identifiant de la command
+;;;
+sanction_membre;id;integer;identifiant de la sanction
+;user;integer;identifiant d'un utilisateur discord
+;date;datetime;date de la sanction
+;duration;datetime;dure de cette sanction (NULL s'il n'y a pas de duree)
+;reason;varchar;raison de la sanction

@@ -9,7 +9,7 @@ CREATE TABLE role_moderateur (
 );
 
 CREATE TABLE moderateur (
-	id INTEGER PRIMARY KEY,
+	uid INTEGER PRIMARY KEY,
 	username VARCHAR(30) NOT NULL,
 	serveur_id INTEGER NOT NULL,
 	role_id INTEGER NOT NULL,

@@ -22,7 +22,7 @@ CREATE TABLE command (
 	command VARCHAR(200) NOT NULL
 );
 
-CREATE TABLE sanction_membre (
+CREATE TABLE sanction (
 	id INTEGER PRIMARY KEY,
 	reason TEXT,
 	duration DATETIME DEFAULT NULL,

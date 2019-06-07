@@ -16,6 +16,7 @@ sanction_membre;id;integer;identifiant de la sanction
 ;date;datetime;date de la sanction
 ;duration;datetime;dure de cette sanction (NULL s'il n'y a pas de duree)
 ;reason;varchar;raison de la sanction
+;cmd;varchar;commande effectué pour cette sanction
 ;;;
 custom_command;id;integer;identifiant de la commande personnalisée
 ;command;varchar;command et ses parametres

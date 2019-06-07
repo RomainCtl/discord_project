@@ -31,7 +31,7 @@ CREATE TABLE sanction (
 	author INTEGER NOT NULL,
 	serveur_id INTEGER NOT NULL,
 	cmd VARCHAR NOT NULL,
-	FOREIGN KEY (author) REFERENCES moderateur(id),
+	FOREIGN KEY (author) REFERENCES moderateur(uid),
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
 );
 
@@ -54,6 +54,12 @@ CREATE TABLE role_custom_cmd (
 	PRIMARY KEY (role_id, cmd_id),
 	FOREIGN KEY (cmd_id) REFERENCES custom_command(id),
 	FOREIGN KEY (role_id) REFERENCES role(id)
+);
+
+CREATE TABLE panel_white_list (
+	uid INTEGER PRIMARY KEY,
+	serveur_id INTEGER NOT NULL,
+	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
 );
 
 

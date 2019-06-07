@@ -31,7 +31,7 @@ CREATE TABLE sanction_membre (
 	author INTEGER NOT NULL,
 	cmd_id INTEGER NOT NULL,
 	serveur_id INTEGER NOT NULL,
-	FOREIGN KEY (cmd_id) REFERENCES command(id),
+	cmd VARCHAR NOT NULL,
 	FOREIGN KEY (author) REFERENCES moderateur(id),
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
 );

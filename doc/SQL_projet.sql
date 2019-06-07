@@ -41,8 +41,19 @@ SELECT DISTINCT sm1.user FROM sanction AS sm1
 INNER JOIN sanction AS sm2
 ON sm1.user = sm2.user AND sm1.id <> sm2.id
 WHERE sm1.serveur_id <> sm2.serveur_id
-AND sm1.date BETWEEN strftime('YYYY-MM-DD HH:MM:SS.SSS', sm2.date) AND strftime('YYYY-MM-DD HH:MM:SS.SSS', sm2.date);
+AND sm1.date BETWEEN strftime('YYYY-MM-DD HH:MM:SS.SSS', sm2.date, '-1 day') AND strftime('YYYY-MM-DD HH:MM:SS.SSS', sm2.date, '+1 day');
 
 -- 17 - Récupérer la liste de joueur ayant des sanctions similaires sur différents serveur
-SELECT DISTINCT sm1.user FROM sanction AS sm1
-INNER JOIN sanction AS sm2 ON sm1.user = sm2.user AND sm1.id <> sm2.id
+
+--- Sans prise en compte de la date
+SELECT sm1.user, sm1.duration, sm1.date, sm1.cmd, sm2.user, sm2.duration, sm2.date, sm2.cmd FROM sanction AS sm1
+INNER JOIN sanction AS sm2 ON sm1.user = sm2.user AND sm1.id <> sm2.id AND sm1.serveur_id <> sm2.serveur_id
+WHERE SUBSTR(sm1.cmd, 1, 4) = SUBSTR(sm2.cmd, 1, 4)
+AND sm1.duration BETWEEN sm2.duration*0.6 AND sm2.duration*1.4;
+
+--- Avec prise en compte de la date (equivalence sur 2 semaines)
+SELECT sm1.user, sm1.duration, sm1.date, sm1.cmd, sm2.user, sm2.duration, sm2.date, sm2.cmd FROM sanction AS sm1
+INNER JOIN sanction AS sm2 ON sm1.user = sm2.user AND sm1.id <> sm2.id AND sm1.serveur_id <> sm2.serveur_id
+WHERE SUBSTR(sm1.cmd, 1, 4) = SUBSTR(sm2.cmd, 1, 4)
+AND sm1.duration BETWEEN sm2.duration*0.6 AND sm2.duration*1.4
+AND sm1.date BETWEEN strftime('YYYY-MM-DD HH:MM:SS.SSS', sm2.date, '-7 day') AND strftime('YYYY-MM-DD HH:MM:SS.SSS', sm2.date, '+7 day');

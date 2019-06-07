@@ -53,6 +53,6 @@ CREATE TABLE role_custom_cmd (
 	role_id INTEGER NOT NULL,
 	cmd_id INTEGER NOT NULL,
 	PRIMARY KEY (role_id, cmd_id),
-	FOREIGN KEY (cmd_id) REFERENCES command(id),
+	FOREIGN KEY (cmd_id) REFERENCES custom_command(id),
 	FOREIGN KEY (role_id) REFERENCES role(id)
 );

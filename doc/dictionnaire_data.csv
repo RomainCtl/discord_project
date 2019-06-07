@@ -11,7 +11,7 @@ command;id;integer;identifiant de la command
 role_moderateur;id;integer;identifiant du role de moderateur (type)
 ;name;varchar;nom de ce role
 ;;;
-sanction_membre;id;integer;identifiant de la sanction
+sanction;id;integer;identifiant de la sanction
 ;user;integer;identifiant d'un utilisateur discord
 ;date;datetime;date de la sanction
 ;duration;datetime;dure de cette sanction (NULL s'il n'y a pas de duree)

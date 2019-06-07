@@ -56,6 +56,12 @@ CREATE TABLE role_custom_cmd (
 	FOREIGN KEY (role_id) REFERENCES role(id)
 );
 
+CREATE TABLE panel_white_list (
+	uid INTEGER PRIMARY KEY,
+	serveur_id INTEGER NOT NULL,
+	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
+);
+
 
 INSERT INTO serveur VALUES (1,35),(2,64);
 

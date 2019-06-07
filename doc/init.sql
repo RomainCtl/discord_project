@@ -17,17 +17,11 @@ CREATE TABLE moderateur (
 	FOREIGN KEY (role_id) REFERENCES role_moderateur(id)
 );
 
-CREATE TABLE channel (
-	id INTEGER PRIMARY KEY,
-	type INTEGER NOT NULL,
-	serveur_id INTEGER NOT NULL,
-	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
-);
 
-CREATE TABLE cmd (
+
+CREATE TABLE command (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	commande VARCHAR(200) NOT NULL,
-	type VARCHAR(30) NOT NULL CHECK (type IN ("BAN", "KICK", "MUTE", "SOURD", "AVERTISSEMENT"))
+	commande VARCHAR(200) NOT NULL
 );
 
 CREATE TABLE sanction_membre (
@@ -39,23 +33,21 @@ CREATE TABLE sanction_membre (
 	author INTEGER NOT NULL,
 	cmd_id INTEGER NOT NULL,
 	serveur_id INTEGER NOT NULL,
-	FOREIGN KEY (cmd_id) REFERENCES cmd(id),
+	FOREIGN KEY (cmd_id) REFERENCES command(id),
 	FOREIGN KEY (author) REFERENCES moderateur(id),
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
 );
 
-CREATE TABLE channel_concerne (
-	channel_id INTEGER NOT NULL,
-	cmd_id INTEGER NOT NULL,
-	PRIMARY KEY(channel_id, cmd_id),
-	FOREIGN KEY (channel_id) REFERENCES channel(id),
-	FOREIGN KEY (cmd_id) REFERENCES cmd(id)
+CREATE TABLE custom_command(
+	id INTEGER NOT NULL,
+	commande VARCHAR NOT NULL,
+	PRIMARY KEY (id)
 );
 
 CREATE TABLE role_cmd (
 	role_id INTEGER NOT NULL,
 	cmd_id INTEGER NOT NULL,
 	PRIMARY KEY (role_id, cmd_id),
-	FOREIGN KEY (cmd_id) REFERENCES cmd(id),
+	FOREIGN KEY (cmd_id) REFERENCES command(id),
 	FOREIGN KEY (role_id) REFERENCES role(id)
 );

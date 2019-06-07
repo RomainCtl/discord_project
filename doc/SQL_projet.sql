@@ -20,10 +20,10 @@ INSERT INTO sanction_membre (reason, duration, user, author, cmd_id) VALUES
 SELECT sm.* FROM sanction_membre AS sm INNER JOIN 
 
 -- 07 - Récupérer la liste des joueurs dont les sanctions sont toujours actives sur un serveur Discord.
-
--- 08 - Récupérer la liste des joueurs étant connectés sur au moins deux serveurs Discords.
+SELECT username FROM sanction_membre WHERE duration > date();
 
 -- 09 - Récupérer les sanctions liées à un joueur, et leur nombre.
+SELECT * FROM sanction_membre
 
 -- 10 - Récupérer la liste de sanctions infligées à un joueur par un modérateur.
 
@@ -32,7 +32,5 @@ SELECT sm.* FROM sanction_membre AS sm INNER JOIN
 -- 13 - Afficher la liste de sanctions infligées sur un serveur
 
 -- 15 - Récupérer les joueurs ayant des sanctions sur plusieurs serveurs.
-
--- 16 - Récupérer la liste de joueur ayant des sanctions sur différents serveurs partageant une temporalité commune.
 
 -- 17 - Récupér

@@ -33,9 +33,6 @@ SELECT * FROM sanction WHERE user = 41771983423143937 and author = 1277198342314
 SELECT * FROM sanction WHERE author = 12771983423143989;
 SELECT COUNT(*) FROM sanction WHERE author = 12771983423143989 GROUP BY author;
 
--- 13 - Afficher la liste de sanctions infligées sur un serveur
--- C'est la meme que la 6 ? (ou le type de sanction ?)
-
 -- 15 - Récupérer les joueurs ayant des sanctions sur plusieurs serveurs.
 SELECT user FROM sanction WHERE COUNT(serveur_id) > 1 GROUP BY user;
 

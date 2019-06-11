@@ -5,7 +5,9 @@ CREATE TABLE serveur (
 
 CREATE TABLE role (
 	id INTEGER PRIMARY KEY,
-	name VARCHAR(30) NOT NULL
+	name VARCHAR(30) NOT NULL,
+	serveur_id INTEGER NOT NULL,
+	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
 );
 
 CREATE TABLE moderateur (

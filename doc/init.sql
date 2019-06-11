@@ -73,12 +73,13 @@ INSERT INTO moderateur VALUES (35, "Vault Boy",1,4),(42, "Mary Sue", 2, 2),(64, 
 
 INSERT INTO command VALUES (1,"!ban @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),(2,"!kick @<user> <reason:text> [-c <channels:list>]");
 
-INSERT INTO sanction VALUES (1, "Troll", NULL, CURRENT_TIMESTAMP, 85, 35, 1, "!ban @85 Troll"),
-							(2, "Troll", NULL, CURRENT_TIMESTAMP, 85, 42, 2, "!ban @85 Troll"),
+INSERT INTO sanction VALUES (1, "Troll", NULL, CURRENT_TIMESTAMP, ".*audio", 85, 35, 1, "!ban @85 Troll"),
+							(2, "Troll", NULL, CURRENT_TIMESTAMP, ".*texte", 85, 42, 2, "!ban @85 Troll"),
 							(3, "Annoyed me", "0-0-1 00:00:00", CURRENT_TIMESTAMP, 15, 64, 2, "!mute @15 Annoyed me -d 0-0-1 00:00:00"),
 							(4, "Test", "0-0-1 12:00:00", CURRENT_TIMESTAMP, 39, 64, 1, "!mute @39 Test -d 0-0-1 12:00:00");
 
-INSERT INTO custom_command VALUES (1,"!ban @<user> <reason:text> -d <duration> <3600 -c <channel> IN (chan1,chan2,*general)"),(2,"!mute @<user> <reason:text> -d <duration> >60 -c <channel> NOT IN (.text)");
+INSERT INTO custom_command VALUES (1,"!ban @<user> <reason:text> -d <duration> <3600 -c <channel> IN (chan1,chan2,*general)", "test"),
+								  (2,"!mute @<user> <reason:text> -d <duration> >60 -c <channel> NOT IN (.text)", "test");
 
 INSERT INTO role_cmd VALUES (4,1),(2,2);
 

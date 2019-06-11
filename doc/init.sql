@@ -11,6 +11,7 @@ CREATE TABLE role (
 CREATE TABLE moderateur (
 	uid INTEGER PRIMARY KEY,
 	username VARCHAR(30) NOT NULL,
+	lock_is_delete BOOLEAN DEFAULT FALSE,
 	serveur_id INTEGER NOT NULL,
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
 );

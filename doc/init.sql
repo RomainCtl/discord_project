@@ -78,7 +78,25 @@ INSERT INTO role_moderateur VALUES (1, "Modérateur RP"),(2, "Modérateur"), (3,
 
 INSERT INTO moderateur VALUES (35, "Vault Boy",1,4),(42, "Mary Sue", 2, 2),(64, "Yolo18XXX", 2, 4), (64,"Yolo",1,2);
 
-INSERT INTO command VALUES (1,"!ban @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),(2,"!kick @<user> <reason:text> [-c <channels:list>]");
+INSERT INTO command VALUES
+(1,"!ban @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
+(2,"!kick @<user> <reason:text> [-c <channels:list>]"),
+(3,"!deaf @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
+(4,"!mute @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
+(5,"!warn @<user> <reason:text>"),
+(6,"!create (ban|kick|deaf|mute) -d <duration_restriction> -c <channels_restriction>"),
+(7,"!!cancel <id_sanction>"),
+(8,"!rankup @<user> <role_id>"),
+(9,"!derank @<user> <role_id>"),
+(10,"!addrole <name>"),
+(11,"!delrole <id>"),
+(12,"!role add <role_id> <command_id>"),
+(13,"!role del <role_id> <command_id>"),
+(14,"!getto @<user>"),
+(15,"!getfrom @<modo>"),
+(16,"!lock <channels:list>"),
+(17,"!delock <channels:list>"),
+(18,"!delmsg <channel> [-d <duration>, -u @<user>]");
 
 INSERT INTO sanction VALUES (1, "Troll", NULL, CURRENT_TIMESTAMP, 85, 35, 1, "!ban @85 Troll"),
 							(2, "Troll", NULL, CURRENT_TIMESTAMP, 85, 42, 2, "!ban @85 Troll"),

@@ -13,7 +13,7 @@ CREATE TABLE moderateur (
 	username VARCHAR(30) NOT NULL,
 	serveur_id INTEGER NOT NULL,
 	role_id INTEGER NOT NULL,
-	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
+	FOREIGN KEY (serveur_id) REFERENCES serveur(id),
 	FOREIGN KEY (role_id) REFERENCES role_moderateur(id)
 );
 
@@ -27,6 +27,7 @@ CREATE TABLE sanction (
 	reason TEXT,
 	duration DATETIME DEFAULT NULL,
 	date DATETIME DEFAULT CURRENT_TIMESTAMP,
+	channels VARCHAR DEFAULT NULL,
 	user INTEGER NOT NULL,
 	author INTEGER NOT NULL,
 	serveur_id INTEGER NOT NULL,
@@ -37,7 +38,8 @@ CREATE TABLE sanction (
 
 CREATE TABLE custom_command (
 	id INTEGER PRIMARY KEY,
-	command VARCHAR NOT NULL
+	command VARCHAR NOT NULL,
+	regex VARCHAR NOT NULL
 );
 
 CREATE TABLE role_cmd (

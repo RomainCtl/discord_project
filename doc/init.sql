@@ -3,7 +3,7 @@ CREATE TABLE serveur (
 	owner_id INTEGER NOT NULL
 );
 
-CREATE TABLE role_moderateur (
+CREATE TABLE role (
 	id INTEGER PRIMARY KEY,
 	name VARCHAR(30) NOT NULL
 );
@@ -12,9 +12,16 @@ CREATE TABLE moderateur (
 	uid INTEGER PRIMARY KEY,
 	username VARCHAR(30) NOT NULL,
 	serveur_id INTEGER NOT NULL,
+	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
+);
+
+CREATE TABLE role_moderateur (
+	uid_mod INTEGER NOT NULL,
 	role_id INTEGER NOT NULL,
-	FOREIGN KEY (serveur_id) REFERENCES serveur(id),
-	FOREIGN KEY (role_id) REFERENCES role_moderateur(id)
+	priority INTEGER DEFAULT 1,
+	PRIMARY KEY (uid_mod, role_id),
+	FOREIGN KEY (uid_mod) REFERENCES moderateur(uid),
+	FOREIGN KEY (role_id) REFERENCES role(id)
 );
 
 CREATE TABLE command (

@@ -4,7 +4,7 @@
 SELECT * FROM serveur;
 
 -- 02 - Récupérer l’ensemble des grades liés à la modération d’un serveur Discord.
-SELECT * FROM role_moderateur;
+SELECT * FROM role;
 
 -- 03 - Mettre à jour le rôle d’un membre à grade lié à la modération.
 UPDATE moderateur SET role_id = 1 WHERE moderateur.uid= 41771983423143937;

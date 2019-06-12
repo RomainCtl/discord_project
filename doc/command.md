@@ -56,4 +56,4 @@ il doit y avoir au moins une restriction et pour la creation d'un *kick*, il ne 
 * Récupérer toutes les sanctions donné par un modérateur :  `!getfrom @<modo>`
 * Vérouiller un ou des channel(s) :                         `!lock <channels:list>`  // meme parametre que pour les commandes de sanctions
 * Déverrouiller un ou des channel(s) :                      `!delock <channels:list>`
-* commande partie II 5) gestions salons 2) ??? TODO FIXME   `!hide ..?`
+* Supprimer les messages d'un channel                       `!delmsg <channel> [-d <duration>, -u @<user>]`

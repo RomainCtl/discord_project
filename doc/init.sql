@@ -6,6 +6,7 @@ CREATE TABLE serveur (
 CREATE TABLE role (
 	id INTEGER PRIMARY KEY,
 	name VARCHAR(30) NOT NULL,
+	priority INTEGER DEFAULT 1,
 	serveur_id INTEGER NOT NULL,
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
 );
@@ -13,7 +14,7 @@ CREATE TABLE role (
 CREATE TABLE moderateur (
 	uid INTEGER PRIMARY KEY,
 	username VARCHAR(30) NOT NULL,
-	lock_is_delete BOOLEAN DEFAULT FALSE,
+	lock_is_delete BOOLEAN DEFAULT 0, -- 0: false, 1: true
 	serveur_id INTEGER NOT NULL,
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
 );
@@ -21,7 +22,6 @@ CREATE TABLE moderateur (
 CREATE TABLE role_moderateur (
 	uid_mod INTEGER NOT NULL,
 	role_id INTEGER NOT NULL,
-	priority INTEGER DEFAULT 1,
 	PRIMARY KEY (uid_mod, role_id),
 	FOREIGN KEY (uid_mod) REFERENCES moderateur(uid),
 	FOREIGN KEY (role_id) REFERENCES role(id)
@@ -35,7 +35,7 @@ CREATE TABLE command (
 CREATE TABLE sanction (
 	id INTEGER PRIMARY KEY,
 	reason TEXT,
-	duration DATETIME DEFAULT NULL,
+	duration INTEGER DEFAULT NULL,
 	date DATETIME DEFAULT CURRENT_TIMESTAMP,
 	channels VARCHAR DEFAULT NULL,
 	user INTEGER NOT NULL,
@@ -75,40 +75,63 @@ CREATE TABLE panel_white_list (
 );
 
 
-INSERT INTO serveur VALUES (1,35),(2,64);
+INSERT INTO serveur (id, owner_id) VALUES
+(1,35),
+(2,64);
 
-INSERT INTO role_moderateur VALUES (1, "Modérateur RP"),(2, "Modérateur"), (3, "Modérateur vocal"), (4, "Administrateur");
+INSERT INTO role (id, name, priority, serveur_id) VALUES
+(1, "Modérateur", 1, 2),
+(2, "Modérateur RP", 3, 1),
+(3, "Modérateur", 1, 1),
+(4, "Modérateur vocal", 2, 1),
+(5, "Administrateur", 0, 1);
 
-INSERT INTO moderateur VALUES (35, "Vault Boy",1,4),(42, "Mary Sue", 2, 2),(64, "Yolo18XXX", 2, 4), (64,"Yolo",1,2);
+INSERT INTO moderateur (uid, username, lock_is_delete, serveur_id) VALUES
+(35, "Vault Boy", 0, 1),
+(42, "Mary Sue", 0, 2),
+(64, "Yolo18XXX", 0, 2),
+(72, "Yolo", 0, 1);
 
-INSERT INTO command VALUES
-(1,"!ban @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
-(2,"!kick @<user> <reason:text>"),
-(3,"!deaf @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
-(4,"!mute @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
-(5,"!warn @<user> <reason:text>"),
-(6,"!create (ban|kick|deaf|mute) -d <duration_restriction> -c <channels_restriction>"),
-(7,"!cancel <id_sanction>"),
-(8,"!rankup @<user> <role_id>"),
-(9,"!derank @<user> <role_id>"),
-(10,"!addrole <name>"),
-(11,"!delrole <id>"),
-(12,"!role add <role_id> <command_id>"),
-(13,"!role del <role_id> <command_id>"),
-(14,"!getto @<user>"),
-(15,"!getfrom @<modo>"),
-(16,"!lock <channels:list>"),
-(17,"!delock <channels:list>"),
-(18,"!delmsg <channel> [-d <duration>, -u @<user>]");
+INSERT INTO role_moderateur VALUES
+(35,5),
+(42,3),
+(64,5),
+(64,3);
 
-INSERT INTO sanction VALUES (1, "Troll", NULL, CURRENT_TIMESTAMP, ".*audio", 85, 35, 1, "!ban @85 Troll"),
-							(2, "Troll", NULL, CURRENT_TIMESTAMP, ".*texte", 85, 42, 2, "!ban @85 Troll"),
-							(3, "Annoyed me", "0-0-1 00:00:00", CURRENT_TIMESTAMP, 15, 64, 2, "!mute @15 Annoyed me -d 0-0-1 00:00:00"),
-							(4, "Test", "0-0-1 12:00:00", CURRENT_TIMESTAMP, 39, 64, 1, "!mute @39 Test -d 0-0-1 12:00:00");
+INSERT INTO command (command) VALUES
+("!ban @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
+("!kick @<user> <reason:text>"),
+("!deaf @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
+("!mute @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
+("!warn @<user> <reason:text>"),
+("!create (ban|kick|deaf|mute) -d <duration_restriction> -c <channels_restriction>"),
+("!cancel <id_sanction>"),
+("!rankup @<user> <role_id>"),
+("!derank @<user> <role_id>"),
+("!addrole <name>"),
+("!delrole <id>"),
+("!role add <role_id> <command_id>"),
+("!role del <role_id> <command_id>"),
+("!getto @<user>"),
+("!getfrom @<modo>"),
+("!lock <channels:list>"),
+("!delock <channels:list>"),
+("!delmsg <channel> [-d <duration>, -u @<user>]");
 
-INSERT INTO custom_command VALUES (1,"!ban @<user> <reason:text> -d <duration> <3600 -c <channel> IN (chan1,chan2,*general)", "test"),
-								  (2,"!mute @<user> <reason:text> -d <duration> >60 -c <channel> NOT IN (.text)", "test");
+INSERT INTO sanction (reason, duration, date, channels, user, author, serveur_id, cmd) VALUES
+("Troll", NULL, CURRENT_TIMESTAMP, ".*audio", 85, 35, 1, "!ban @85 Troll"),
+("Troll", NULL, CURRENT_TIMESTAMP, ".*texte", 85, 42, 2, "!ban @85 Troll"),
+("Annoyed me", 86400, CURRENT_TIMESTAMP, NULL, 15, 64, 2, "!mute @user3 Annoyed me -d 86400"),
+("Test", 3600, CURRENT_TIMESTAMP, NULL, 13, 64, 1, "!mute @user1 Test -d 3600");
 
-INSERT INTO role_cmd VALUES (4,1),(2,2);
+INSERT INTO custom_command (command, regex) VALUES
+("!ban @<user> <reason:text> -d <duration: time(sec)<3600> -c <channel: IN (chan1,chan2,*general)>", "^!ban[ ]+@([^ ]+)[ ]+((?:(?!-d|-c).)+)(-d[ ]+(3600|3[0-5][0-9]{2}|[0-2][0-9]{3}|[0-9]{0,3}))?([ ]*-c[ ]+(?:(chan1|chan2|\\*general|,))+)?[ ]*$"),
+("!mute @<user> <reason:text> -d <duration: time(sec)>60> -c <channel: NOT IN (.text)>", "^!ban[ ]+@([^ ]+)[ ]+((?:(?!-d|-c).)+)(-d[ ]+(3[6-9][0-9]{2}|[0-9]{4,}))?([ ]*-c[ ]+(?:(?!chan1|chan2|\\*general)[0-9a-z,.*])+)?[ ]*$");
 
-INSERT INTO role_custom_cmd VALUES (3,2),(1,2);
+INSERT INTO role_cmd VALUES
+(4,1),
+(2,2);
+
+INSERT INTO role_custom_cmd VALUES
+(3,2),
+(1,2);

@@ -115,7 +115,7 @@ Pour finir, notre solution doit proposer un panel d'administration accessible de
 > Sur les paramètres optionnels (duration et channels)
 
 ```
-duration (<|>|=) <time(sec)>
+duration (<|>) <time(sec)>
 channels [NOT] IN <channels:list>
 ```
 
@@ -131,7 +131,7 @@ il doit y avoir au moins une restriction et pour la creation d'un *kick*, il ne 
 !create kick -c IN (.text)
 
 // création d'une commande `mute` qui dure 60 secondes et qui n'est pas valable dans les channels textuel
-!create mute -d =60 -c NOT IN (.text)
+!create mute -d >60 -c NOT IN (.text)
 ```
 
 ## Requêtes minimales

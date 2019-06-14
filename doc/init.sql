@@ -1,3 +1,4 @@
+/* TABLES */
 CREATE TABLE serveur (
 	id INTEGER PRIMARY KEY,
 	owner_id INTEGER NOT NULL
@@ -74,7 +75,38 @@ CREATE TABLE panel_white_list (
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
 );
 
+/* VIEWS */
+-- toutes les commandes d'un rôle (custom et normal)
+CREATE VIEW command_role AS
+SELECT role_id, cmd.*, "" AS regex FROM command AS cmd INNER JOIN role_cmd ON cmd_id=cmd.id
+UNION SELECT role_id, cmd.* FROM custom_command AS cmd INNER JOIN role_custom_cmd ON cmd_id=cmd.id;
 
+-- Sanctions en cours
+CREATE VIEW active_sanction AS
+SELECT * FROM sanction + WHERE duration <> NULL OR duration + strftime('%s', date) > strftime('%s', 'now');
+
+-- liste des ban
+CREATE VIEW ban AS
+SELECT * FROM sanction WHERE SUBSTR(cmd, 2, 3) = "ban";
+
+-- liste des kick
+CREATE VIEW kick AS
+SELECT * FROM sanction WHERE SUBSTR(cmd, 2, 4) = "kick";
+
+-- liste des deaf
+CREATE VIEW deaf AS
+SELECT * FROM sanction WHERE SUBSTR(cmd, 2, 4) = "deaf";
+
+-- liste des mute
+CREATE VIEW mute AS
+SELECT * FROM sanction WHERE SUBSTR(cmd, 2, 4) = "mute";
+
+-- liste des warn
+CREATE VIEW warn AS
+SELECT * FROM sanction WHERE SUBSTR(cmd, 2, 4) = "warn";
+
+
+/* INSERTS */
 INSERT INTO serveur (id, owner_id) VALUES
 (1,35),
 (2,64);
@@ -130,7 +162,8 @@ INSERT INTO custom_command (command, regex) VALUES
 
 INSERT INTO role_cmd VALUES
 (4,1),
-(2,2);
+(2,2),
+(1,4);
 
 INSERT INTO role_custom_cmd VALUES
 (3,2),

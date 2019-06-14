@@ -20,7 +20,7 @@ INSERT INTO sanction (reason, duration, user, author, cmd_id, serveur_id) VALUES
 SELECT sm.* FROM sanction AS sm INNER JOIN serveur ON serveur.id = serveur_id WHERE serveur_id = 1;
 
 -- 07 - Récupérer la liste des joueurs dont les sanctions sont toujours actives sur un serveur Discord.
-SELECT sm.user FROM sanction AS sm INNER JOIN serveur ON serveur.id = serveur_id WHERE serveur_id = 1 AND duration <> NULL OR duration + strftime('%s', date) < strftime('%s', 'now');
+SELECT user FROM active_sanction WHERE serveur_id = 1; -- on utilise la view
 
 -- 09 - Récupérer les sanctions liées à un joueur, et leur nombre.
 SELECT * FROM sanction WHERE user = 41771983423143937;

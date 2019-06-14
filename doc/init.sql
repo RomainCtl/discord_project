@@ -106,7 +106,10 @@ CREATE VIEW warn AS
 SELECT * FROM sanction WHERE SUBSTR(cmd, 2, 4) = "warn";
 
 
-/* INSERTS */
+/* Pas de procedure stockee ou de fonctions en SQLite */
+
+
+/* INSERTS DATA Example */
 INSERT INTO serveur (id, owner_id) VALUES
 (1,35),
 (2,64);

@@ -1,3 +1,6 @@
+CREATE SCHEMA IF NOT EXISTS bot_moderation;
+SET search_path TO bot_moderation; -- use schema
+
 /* TABLES */
 CREATE TABLE serveur (
 	id INTEGER PRIMARY KEY,
@@ -5,109 +8,170 @@ CREATE TABLE serveur (
 );
 
 CREATE TABLE role (
-	id INTEGER PRIMARY KEY,
+	id SERIAL PRIMARY KEY,
 	name VARCHAR(30) NOT NULL,
 	priority INTEGER DEFAULT 1,
 	serveur_id INTEGER NOT NULL,
-	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
+	UNIQUE(name, serveur_id),
+	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE CASCADE
 );
 
 CREATE TABLE moderateur (
-	uid INTEGER PRIMARY KEY,
-	username VARCHAR(30) NOT NULL,
-	lock_is_delete BOOLEAN DEFAULT 0, -- 0: false, 1: true
-	serveur_id INTEGER NOT NULL,
-	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
+	id INTEGER PRIMARY KEY,
+	username VARCHAR(30) NOT NULL
 );
 
 CREATE TABLE role_moderateur (
-	uid_mod INTEGER NOT NULL,
+	id_mod INTEGER NOT NULL,
 	role_id INTEGER NOT NULL,
-	PRIMARY KEY (uid_mod, role_id),
-	FOREIGN KEY (uid_mod) REFERENCES moderateur(uid),
-	FOREIGN KEY (role_id) REFERENCES role(id)
+	PRIMARY KEY (id_mod, role_id),
+	FOREIGN KEY (id_mod) REFERENCES moderateur(id) ON DELETE CASCADE,
+	FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE
 );
 
-CREATE TABLE command (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	command VARCHAR(200) NOT NULL
+CREATE TABLE staff (
+	id_mod INTEGER NOT NULL,
+	serveur_id INTEGER NOT NULL,
+	PRIMARY KEY (id_mod, serveur_id),
+	FOREIGN KEY (id_mod) REFERENCES moderateur(id) ON DELETE CASCADE,
+	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE CASCADE
 );
 
 CREATE TABLE sanction (
-	id INTEGER PRIMARY KEY,
+	id SERIAL PRIMARY KEY,
 	reason TEXT,
 	duration INTEGER DEFAULT NULL,
-	date DATETIME DEFAULT CURRENT_TIMESTAMP,
-	channels VARCHAR DEFAULT NULL,
-	user INTEGER NOT NULL,
-	author INTEGER NOT NULL,
-	serveur_id INTEGER NOT NULL,
+	date TIMESTAMP DEFAULT now(),
+	channels VARCHAR(200) DEFAULT NULL,
+	victim INTEGER NOT NULL,
+	author INTEGER,
+	serveur_id INTEGER,
 	cmd VARCHAR NOT NULL,
-	FOREIGN KEY (author) REFERENCES moderateur(uid),
-	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
+	FOREIGN KEY (author) REFERENCES moderateur(id) ON DELETE RESTRICT,
+	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE SET NULL -- nous gardons les sanctions meme si le serveur est supprimé
 );
 
-CREATE TABLE custom_command (
-	id INTEGER PRIMARY KEY,
+CREATE TABLE command (
+	id SERIAL PRIMARY KEY,
 	command VARCHAR NOT NULL,
-	regex VARCHAR NOT NULL
+	regex VARCHAR NOT NULL,
+	serveur_id INTEGER DEFAULT NULL, -- les commandes globales
+	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE CASCADE
 );
 
 CREATE TABLE role_cmd (
 	role_id INTEGER NOT NULL,
 	cmd_id INTEGER NOT NULL,
 	PRIMARY KEY (role_id, cmd_id),
-	FOREIGN KEY (cmd_id) REFERENCES command(id),
-	FOREIGN KEY (role_id) REFERENCES role(id)
-);
-
-CREATE TABLE role_custom_cmd (
-	role_id INTEGER NOT NULL,
-	cmd_id INTEGER NOT NULL,
-	PRIMARY KEY (role_id, cmd_id),
-	FOREIGN KEY (cmd_id) REFERENCES custom_command(id),
-	FOREIGN KEY (role_id) REFERENCES role(id)
+	FOREIGN KEY (cmd_id) REFERENCES command(id) ON DELETE CASCADE,
+	FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE
 );
 
 CREATE TABLE panel_white_list (
-	uid INTEGER PRIMARY KEY,
+	user_id INTEGER NOT NULL,
 	serveur_id INTEGER NOT NULL,
-	FOREIGN KEY (serveur_id) REFERENCES serveur(id)
+	PRIMARY KEY (user_id, serveur_id),
+	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE CASCADE
 );
 
 /* VIEWS */
--- toutes les commandes d'un rôle (custom et normal)
-CREATE VIEW command_role AS
-SELECT role_id, cmd.*, "" AS regex FROM command AS cmd INNER JOIN role_cmd ON cmd_id=cmd.id
-UNION SELECT role_id, cmd.* FROM custom_command AS cmd INNER JOIN role_custom_cmd ON cmd_id=cmd.id;
 
 -- Sanctions en cours
 CREATE VIEW active_sanction AS
-SELECT * FROM sanction + WHERE duration <> NULL OR duration + strftime('%s', date) > strftime('%s', 'now');
+SELECT * FROM sanction WHERE duration <> NULL OR date + duration *interval'1 second' > now();
 
 -- liste des ban
 CREATE VIEW ban AS
-SELECT * FROM sanction WHERE SUBSTR(cmd, 2, 3) = "ban";
+SELECT * FROM sanction WHERE substring(cmd, 2, 3) = 'ban';
 
 -- liste des kick
 CREATE VIEW kick AS
-SELECT * FROM sanction WHERE SUBSTR(cmd, 2, 4) = "kick";
+SELECT * FROM sanction WHERE substring(cmd, 2, 4) = 'kick';
 
 -- liste des deaf
 CREATE VIEW deaf AS
-SELECT * FROM sanction WHERE SUBSTR(cmd, 2, 4) = "deaf";
+SELECT * FROM sanction WHERE substring(cmd, 2, 4) = 'deaf';
 
 -- liste des mute
 CREATE VIEW mute AS
-SELECT * FROM sanction WHERE SUBSTR(cmd, 2, 4) = "mute";
+SELECT * FROM sanction WHERE substring(cmd, 2, 4) = 'mute';
 
 -- liste des warn
 CREATE VIEW warn AS
-SELECT * FROM sanction WHERE SUBSTR(cmd, 2, 4) = "warn";
+SELECT * FROM sanction WHERE substring(cmd, 2, 4) = 'warn';
 
 
-/* Pas de procedure stockee ou de fonctions en SQLite */
+/* FUNCTIONS */
 
+-- un moderateur peut utiliser une commande ?
+CREATE OR REPLACE FUNCTION user_can_use_cmd(IN userid INTEGER, IN cmdid INTEGER, IN serveurid INTEGER)
+RETURNS boolean AS $$
+BEGIN
+	PERFORM * FROM serveur WHERE id=serveurid AND owner_id=userid;
+	IF FOUND THEN
+		PERFORM * FROM command WHERE serveur_id IS NULL OR serveur_id=serveurid;
+	ELSE
+		PERFORM * FROM role
+		INNER JOIN role_moderateur AS rm ON id=rm.role_id
+		INNER JOIN role_cmd AS rc ON id=rc.role_id
+		WHERE serveur_id=serveurid AND id_mod=userid;
+	END IF;
+	IF FOUND THEN
+		RETURN TRUE;
+	ELSE
+		RETURN FALSE;
+	END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+/* TRIGGERS */
+
+-- check coherence serveur_id entre role et cmd
+CREATE OR REPLACE FUNCTION check_role_cmd() RETURNS trigger AS $$
+DECLARE serv_id INTEGER;
+BEGIN
+	SELECT serveur_id INTO serv_id FROM command WHERE id=new.cmd_id;
+	PERFORM * FROM role WHERE id=new.role_id AND (serveur_id=serv_id OR serv_id IS NULL);
+	--SELECT serveur_id INTO serv_id FROM role WHERE id=new.role_id;
+	--PERFORM * FROM command WHERE id=new.cmd_id AND serveur_id=serv_id OR serveur_id IS NULL;
+	IF NOT FOUND THEN
+		RAISE EXCEPTION 'Impossible d''ajouter une commande à un rôle s''ils proviennent d''un serveur différent !';
+	END IF;
+	RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trig_check_role_cmd
+BEFORE INSERT
+ON role_cmd FOR EACH ROW EXECUTE PROCEDURE check_role_cmd();
+
+-- check coherence serveur_id entre staff et role
+CREATE OR REPLACE FUNCTION check_role_moderateur() RETURNS trigger AS $$
+DECLARE serv_id INTEGER;
+BEGIN
+	SELECT serveur_id INTO serv_id FROM staff AS s WHERE s.id_mod=new.id_mod;
+	PERFORM * FROM role WHERE id=new.role_id AND serveur_id=serv_id;
+	IF NOT FOUND THEN
+		RAISE EXCEPTION 'Impossible d''ajouter un role à un moderateur s''ils proviennent d''un serveur différent !';
+	END IF;
+	RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trig_check_role_moderateur
+BEFORE INSERT
+ON role_moderateur FOR EACH ROW EXECUTE PROCEDURE check_role_moderateur();
+
+-- remove modo from staff => remove all role_moderateur from this serveur
+CREATE OR REPLACE FUNCTION staff_remove() RETURNS trigger AS $$
+BEGIN
+	DELETE FROM role_moderateur USING role WHERE id=role_id AND serveur_id=old.serveur_id AND id_mod=old.id_mod;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trig_staff_remove
+AFTER DELETE
+ON staff FOR EACH ROW EXECUTE PROCEDURE staff_remove();
 
 /* INSERTS DATA Example */
 INSERT INTO serveur (id, owner_id) VALUES
@@ -115,59 +179,60 @@ INSERT INTO serveur (id, owner_id) VALUES
 (2,64);
 
 INSERT INTO role (id, name, priority, serveur_id) VALUES
-(1, "Modérateur", 1, 2),
-(2, "Modérateur RP", 3, 1),
-(3, "Modérateur", 1, 1),
-(4, "Modérateur vocal", 2, 1),
-(5, "Administrateur", 0, 1);
+(1, 'Modérateur', 1, 2),
+(2, 'Modérateur RP', 3, 1),
+(3, 'Modérateur', 1, 1),
+(4, 'Modérateur vocal', 2, 1);
 
-INSERT INTO moderateur (uid, username, lock_is_delete, serveur_id) VALUES
-(35, "Vault Boy", 0, 1),
-(42, "Mary Sue", 0, 2),
-(64, "Yolo18XXX", 0, 2),
-(72, "Yolo", 0, 1);
+INSERT INTO moderateur (id, username) VALUES
+(35, 'Vault Boy'),
+(42, 'Mary Sue'),
+(64, 'Yolo18XXX'),
+(72, 'Yolo');
+
+INSERT INTO staff (id_mod, serveur_id) VALUES
+(35, 2),
+(42, 2),
+(64, 1),
+(72, 1);
 
 INSERT INTO role_moderateur VALUES
-(35,5),
-(42,3),
-(64,5),
+(35,1),
+(42,1),
+(64,2),
 (64,3);
 
-INSERT INTO command (command) VALUES
-("!ban @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
-("!kick @<user> <reason:text>"),
-("!deaf @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
-("!mute @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
-("!warn @<user> <reason:text>"),
-("!create (ban|kick|deaf|mute) -d <duration_restriction> -c <channels_restriction>"),
-("!cancel <id_sanction>"),
-("!rankup @<user> <role_id>"),
-("!derank @<user> <role_id>"),
-("!addrole <name>"),
-("!delrole <id>"),
-("!role add <role_id> <command_id>"),
-("!role del <role_id> <command_id>"),
-("!getto @<user>"),
-("!getfrom @<modo>"),
-("!lock <channels:list>"),
-("!delock <channels:list>"),
-("!delmsg <channel> [-d <duration>, -u @<user>]");
+INSERT INTO command (command, regex, serveur_id) VALUES
+('!ban @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]', '', NULL),
+('!kick @<user> <reason:text>', '', NULL),
+('!deaf @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]', '', NULL),
+('!mute @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]', '', NULL),
+('!warn @<user> <reason:text>', '', NULL),
+('!create (ban|kick|deaf|mute) -d <duration_restriction> -c <channels_restriction>', '', NULL),
+('!cancel <id_sanction>', '', NULL),
+('!rankup @<user> <role_id>', '', NULL),
+('!derank @<user> <role_id>', '', NULL),
+('!addrole <name>', '', NULL),
+('!delrole <id>', '', NULL),
+('!role add <role_id> <command_id>', '', NULL),
+('!role del <role_id> <command_id>', '', NULL),
+('!getto @<user>', '', NULL),
+('!getfrom @<modo>', '', NULL),
+('!lock <channels:list>', '', NULL),
+('!delock <channels:list>', '', NULL),
+('!delmsg <channel> [-d <duration>, -u @<user>]', '', NULL),
+('!ban @<user> <reason:text> -d <duration: time(sec)<3600> -c <channel: IN (chan1,chan2,*general)>', '^!ban[ ]+@([^ ]+)[ ]+((?:(?!-d|-c).)+)(-d[ ]+(3600|3[0-5][0-9]{2}|[0-2][0-9]{3}|[0-9]{0,3}))?([ ]*-c[ ]+(?:(chan1|chan2|\\*general|,))+)?[ ]*$', 1),
+('!mute @<user> <reason:text> -d <duration: time(sec)>60> -c <channel: NOT IN (.text)>', '^!ban[ ]+@([^ ]+)[ ]+((?:(?!-d|-c).)+)(-d[ ]+(3[6-9][0-9]{2}|[0-9]{4,}))?([ ]*-c[ ]+(?:(?!chan1|chan2|\\*general)[0-9a-z,.*])+)?[ ]*$', 1);
 
-INSERT INTO sanction (reason, duration, date, channels, user, author, serveur_id, cmd) VALUES
-("Troll", NULL, CURRENT_TIMESTAMP, ".*audio", 85, 35, 1, "!ban @85 Troll"),
-("Troll", NULL, CURRENT_TIMESTAMP, ".*texte", 85, 42, 2, "!ban @85 Troll"),
-("Annoyed me", 86400, CURRENT_TIMESTAMP, NULL, 15, 64, 2, "!mute @user3 Annoyed me -d 86400"),
-("Test", 3600, CURRENT_TIMESTAMP, NULL, 13, 64, 1, "!mute @user1 Test -d 3600");
-
-INSERT INTO custom_command (command, regex) VALUES
-("!ban @<user> <reason:text> -d <duration: time(sec)<3600> -c <channel: IN (chan1,chan2,*general)>", "^!ban[ ]+@([^ ]+)[ ]+((?:(?!-d|-c).)+)(-d[ ]+(3600|3[0-5][0-9]{2}|[0-2][0-9]{3}|[0-9]{0,3}))?([ ]*-c[ ]+(?:(chan1|chan2|\\*general|,))+)?[ ]*$"),
-("!mute @<user> <reason:text> -d <duration: time(sec)>60> -c <channel: NOT IN (.text)>", "^!ban[ ]+@([^ ]+)[ ]+((?:(?!-d|-c).)+)(-d[ ]+(3[6-9][0-9]{2}|[0-9]{4,}))?([ ]*-c[ ]+(?:(?!chan1|chan2|\\*general)[0-9a-z,.*])+)?[ ]*$");
+INSERT INTO sanction (reason, duration, channels, victim, author, serveur_id, cmd) VALUES
+('Troll', NULL, '.*audio', 85, 35, 1, '!ban @85 reason'),
+('Troll', NULL, '.*texte', 85, 42, 2, '!ban @85 other reason'),
+('Annoyed me', 86400, NULL, 15, 64, 2, '!mute @user3 Annoyed me -d 86400'),
+('Test', 3600, NULL, 13, 64, 1, '!mute @user1 Test -d 3600');
 
 INSERT INTO role_cmd VALUES
 (4,1),
 (2,2),
-(1,4);
-
-INSERT INTO role_custom_cmd VALUES
-(3,2),
-(1,2);
+(1,4),
+(3,19),
+(1,20);

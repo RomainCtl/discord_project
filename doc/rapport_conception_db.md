@@ -1,18 +1,19 @@
 # Rapport sur la conception de la BDD pour le projet 'Bot de modération Discord'
 
-> Pour des raisons de portabilitée, nous avons choisi d'utiliser le SGBD __SQLite__.
+> Pour des raisons de portabilitée, nous avons choisi d'utiliser le SGBD __PostgreSQL__.
 
 Nous avons tout d'abord analysé le cahier des charges afin de définir les données nécessaire à notre bot. \
 Le bot peut être présent sur plusieurs serveur, il faut donc différencier ces serveurs, nous avons créé une table '__serveur__'. Nous avons choisi de ne sauvegarder que l'identifant de ce serveur et l'identifiant du propriétaire. \
-Un serveur possède un staff, qui correspond à la table '__moderateur__', nous sauvegardons l'identifiant de cet utilisateur et son username. \
+Un serveur possède un staff, et un moderateur peut être présent dans plusieurs staff. C'est pour cela qu'il y a une relation *..* entre la table '__moderateur__' et la table '__serveur__'. Nous sauvegardons l'identifiant de cet utilisateur et son username. \
 Un serveur possède une liste de sanction, la table '__sanction__', avec la raison, la durée, la date de saisie, la liste des channels (*voir partie __Syntaxe du paramètre `channels`__ de ce rapport*) où la sanction est effective, l'utilisateur concerné et la commande effectué par le modérateur. \
-Le bot propose une liste de commande prédéfini (*voir partie __Listes des commandes globale__ de ce rapport*), il y a donc une table __command__. \
-Il est possible de créer des commandes personnalisées sur un serveur, contrairement aux commandes 'globales', ces commandes sont liées à un serveur, la table '__custom_command__' correspond à cette demande. \
+Le bot propose une liste de commande prédéfini (*voir partie __Listes des commandes globale__ de ce rapport*), et les utilisateurs peuvent créer des commandes personnalisées, il y a donc une table __command__. \
 Enfin, il peut exister plusieurs rôles pour un staff sur un même serveur, ce rôle permet d'avoir accès à certaines commandes (globales ou lié à un serveur). Et un membre du staff (table '__moderateur__') peut avoir plusieurs rôle (table '__role__') avec une même commande. Nous avons alors rajouté un attribut '*priority*' dans la table '__role__' afin de créer un système de hiérarchie des rôle. Si un moderateur possède deux rôle avec un priority équivalente et deux commandes identique (sauf pour l'effet), le premier sera pris en compte. \
 Pour finir, notre solution doit proposer un panel d'administration accessible depuis notre site web. Pour s'y connecter, nous utiliserons une WhiteList (table '__panel_white_list__') et le compte Discord de l'utilisateur. Cette WhiteList sera alimenté par le propriétaire du serveur en question.
 
 ## Schéma associatif de la base de données
 ![schema_associatif](./schema_associatif.png)
+
+![legend](./legend.png)
 
 ## Dictionnaire de données
 | table | champs | type | description |
@@ -20,33 +21,33 @@ Pour finir, notre solution doit proposer un panel d'administration accessible de
 | __serveur__ | id | integer | identifiant d'un serveur |
 |  | owner_id | integer | identifiant de proprietaire du serveur |
 |  |  |  |  |
-| __moderateur__ | uid | integer | identifiant du membre moderateur |
+| __moderateur__ | id | integer | identifiant du membre moderateur |
 |  | username | varchar | nom du moderateur |
-|  | lock_is_delete | boolean | lock qui defini si le moderateur appartient toujours au staff ou non |
 |  |  |  |  |
 | __command__ | id | integer | identifiant de la command |
 |  | command | varchar | command et ses parametres, on se servira de regex pour l'identification des commandes par la suite |
+|  | regex | varchar | regex permettant de reconnaitre la commande pour le bot |
 |  |  |  |  |
 | __role__ | id | integer | identifiant du role de moderateur (type) |
 |  | name | varchar | nom de ce role |
 |  | priority | integer | priorité du role (plus l'entier est petit, plus il sera considéré comme important) |
 |  |  |  |  |
 | __sanction__ | id | integer | identifiant de la sanction |
-|  | user | integer | identifiant d'un utilisateur discord |
-|  | date | datetime | date de la sanction |
-|  | duration | datetime | dure de cette sanction (NULL s'il n'y a pas de duree) |
+|  | victim | integer | identifiant d'un utilisateur discord |
+|  | date | timestamp | date de la sanction |
+|  | duration | timestamp | dure de cette sanction (NULL s'il n'y a pas de duree) |
 |  | reason | varchar | raison de la sanction |
 |  | channels | varchar | liste des channels où la sanction pren de l'effet |
 |  | cmd | varchar | commande effectué pour cette sanction |
 |  |  |  |  |
-| __custom_command__ | id | integer | identifiant de la commande personnalisée |
-|  | command | varchar | command et ses parametres |
-|  | regex | varchar | regex permettant de reconnaitre la commande pour le bot |
+| __panel_white_list__ | uid | integer | identifiant de l'utilisateur pouvant accéder au panel d'administration web |
 
 ## Schéma logique
 ![schema_logique](./schema_logique.png)
 
-> Vous pourrez trouver le fichier de création de cette base de données dans le fichier `init.sql` joint à ce rapport.
+![legend](./legend.png)
+
+> Vous pourrez trouver le fichier de création de ce schéma de base de données dans le fichier `init.sql` joint à ce rapport (le fichier fourni également des données en exemple).
 
 
 ## Listes des commandes globale
@@ -104,7 +105,6 @@ Pour finir, notre solution doit proposer un panel d'administration accessible de
 ... .audio
 ... chan1,*staff
 ```
-<br/><br/>
 
 ## Commandes Personnalisées
 
@@ -134,6 +134,6 @@ il doit y avoir au moins une restriction et pour la creation d'un *kick*, il ne 
 !create mute -d >60 -c NOT IN (.text)
 ```
 
-## Requêtes minimales
+## Requêtes utiles
 
 > Voir le fichier `sql_request.sql` joint à ce rapport.

@@ -2,25 +2,23 @@ table;champs;type;description
 serveur;id;integer;identifiant d'un serveur
 ;owner_id;integer;identifiant de proprietaire du serveur
 ;;;
-moderateur;uid;integer;identifiant du membre moderateur
+moderateur;id;integer;identifiant du membre moderateur
 ;username;varchar;nom du moderateur
-;lock_is_delete;boolean;lock qui defini si le moderateur appartient toujours au staff ou non
 ;;;
 command;id;integer;identifiant de la command
 ;command;varchar;command et ses parametres, on se servira de regex pour l'identification des commandes par la suite
+;regex;varchar;regex permettant de reconnaitre la commande pour le bot
 ;;;
 role;id;integer;identifiant du role de moderateur (type)
 ;name;varchar;nom de ce role
 ;priority;integer;priorité du role (plus l'entier est petit, plus il sera considéré comme important)
 ;;;
 sanction;id;integer;identifiant de la sanction
-;user;integer;identifiant d'un utilisateur discord
-;date;datetime;date de la sanction
-;duration;datetime;dure de cette sanction (NULL s'il n'y a pas de duree)
+;victim;integer;identifiant d'un utilisateur discord
+;date;timestamp;date de la sanction
+;duration;timestamp;dure de cette sanction (NULL s'il n'y a pas de duree)
 ;reason;varchar;raison de la sanction
 ;channels;varchar;liste des channels où la sanction pren de l'effet
 ;cmd;varchar;commande effectué pour cette sanction
 ;;;
-custom_command;id;integer;identifiant de la commande personnalisée
-;command;varchar;command et ses parametres
-;regex;varchar;regex permettant de reconnaitre la commande pour le bot
+panel_white_list;uid;integer;identifiant de l'utilisateur pouvant accéder au panel d'administration web

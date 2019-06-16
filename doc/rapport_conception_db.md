@@ -18,10 +18,10 @@ Pour finir, notre solution doit proposer un panel d'administration accessible de
 ## Dictionnaire de données
 | table | champs | type | description |
 |:-:|:-:|:-:|:--|
-| __serveur__ | id | integer | identifiant d'un serveur |
-|  | owner_id | integer | identifiant de proprietaire du serveur |
+| __serveur__ | id | bigint | identifiant d'un serveur |
+|  | owner_id | bigint | identifiant de proprietaire du serveur |
 |  |  |  |  |
-| __moderateur__ | id | integer | identifiant du membre moderateur |
+| __moderateur__ | id | bigint | identifiant du membre moderateur |
 |  | username | varchar | nom du moderateur |
 |  |  |  |  |
 | __command__ | id | integer | identifiant de la command |
@@ -40,7 +40,7 @@ Pour finir, notre solution doit proposer un panel d'administration accessible de
 |  | channels | varchar | liste des channels où la sanction pren de l'effet |
 |  | cmd | varchar | commande effectué pour cette sanction |
 |  |  |  |  |
-| __panel_white_list__ | uid | integer | identifiant de l'utilisateur pouvant accéder au panel d'administration web |
+| __panel_white_list__ | user_id | bigint | identifiant de l'utilisateur pouvant accéder au panel d'administration web |
 
 ## Schéma logique
 ![schema_logique](./schema_logique.png)

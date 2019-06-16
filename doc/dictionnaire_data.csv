@@ -1,8 +1,8 @@
 table;champs;type;description
-serveur;id;integer;identifiant d'un serveur
-;owner_id;integer;identifiant de proprietaire du serveur
+serveur;id;bigint;identifiant d'un serveur
+;owner_id;bigint;identifiant de proprietaire du serveur
 ;;;
-moderateur;id;integer;identifiant du membre moderateur
+moderateur;id;bigint;identifiant du membre moderateur
 ;username;varchar;nom du moderateur
 ;;;
 command;id;integer;identifiant de la command
@@ -21,4 +21,4 @@ sanction;id;integer;identifiant de la sanction
 ;channels;varchar;liste des channels où la sanction pren de l'effet
 ;cmd;varchar;commande effectué pour cette sanction
 ;;;
-panel_white_list;uid;integer;identifiant de l'utilisateur pouvant accéder au panel d'administration web
+panel_white_list;user_id;bigint;identifiant de l'utilisateur pouvant accéder au panel d'administration web

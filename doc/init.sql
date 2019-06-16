@@ -3,35 +3,35 @@ SET search_path TO bot_moderation; -- use schema
 
 /* TABLES */
 CREATE TABLE serveur (
-	id INTEGER PRIMARY KEY,
-	owner_id INTEGER NOT NULL
+	id BIGINT PRIMARY KEY,
+	owner_id BIGINT NOT NULL
 );
 
 CREATE TABLE role (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(30) NOT NULL,
 	priority INTEGER DEFAULT 1,
-	serveur_id INTEGER NOT NULL,
+	serveur_id BIGINT NOT NULL,
 	UNIQUE(name, serveur_id),
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE CASCADE
 );
 
 CREATE TABLE moderateur (
-	id INTEGER PRIMARY KEY,
+	id BIGINT PRIMARY KEY,
 	username VARCHAR(30) NOT NULL
 );
 
 CREATE TABLE role_moderateur (
 	id_mod INTEGER NOT NULL,
-	role_id INTEGER NOT NULL,
+	role_id BIGINT NOT NULL,
 	PRIMARY KEY (id_mod, role_id),
 	FOREIGN KEY (id_mod) REFERENCES moderateur(id) ON DELETE CASCADE,
 	FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE
 );
 
 CREATE TABLE staff (
-	id_mod INTEGER NOT NULL,
-	serveur_id INTEGER NOT NULL,
+	id_mod BIGINT NOT NULL,
+	serveur_id BIGINT NOT NULL,
 	PRIMARY KEY (id_mod, serveur_id),
 	FOREIGN KEY (id_mod) REFERENCES moderateur(id) ON DELETE CASCADE,
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE CASCADE
@@ -43,9 +43,9 @@ CREATE TABLE sanction (
 	duration INTEGER DEFAULT NULL,
 	date TIMESTAMP DEFAULT now(),
 	channels VARCHAR(200) DEFAULT NULL,
-	victim INTEGER NOT NULL,
-	author INTEGER,
-	serveur_id INTEGER,
+	victim BIGINT NOT NULL,
+	author BIGINT NOT NULL,
+	serveur_id BIGINT,
 	cmd VARCHAR NOT NULL,
 	FOREIGN KEY (author) REFERENCES moderateur(id) ON DELETE RESTRICT,
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE SET NULL -- nous gardons les sanctions meme si le serveur est supprimé
@@ -55,7 +55,7 @@ CREATE TABLE command (
 	id SERIAL PRIMARY KEY,
 	command VARCHAR NOT NULL,
 	regex VARCHAR NOT NULL,
-	serveur_id INTEGER DEFAULT NULL, -- les commandes globales
+	serveur_id BIGINT DEFAULT NULL, -- les commandes globales
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE CASCADE
 );
 
@@ -68,8 +68,8 @@ CREATE TABLE role_cmd (
 );
 
 CREATE TABLE panel_white_list (
-	user_id INTEGER NOT NULL,
-	serveur_id INTEGER NOT NULL,
+	user_id BIGINT NOT NULL,
+	serveur_id BIGINT NOT NULL,
 	PRIMARY KEY (user_id, serveur_id),
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE CASCADE
 );
@@ -235,4 +235,4 @@ INSERT INTO role_cmd VALUES
 (2,2),
 (1,4),
 (3,19),
-(1,20);
+(2,20);

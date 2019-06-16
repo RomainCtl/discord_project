@@ -108,7 +108,7 @@ CREATE OR REPLACE FUNCTION user_can_use_cmd(IN userid INTEGER, IN cmdid INTEGER,
 RETURNS boolean AS $$
 BEGIN
 	PERFORM * FROM serveur WHERE id=serveurid AND owner_id=userid;
-	IF FOUND THEN
+	IF FOUND THEN -- le owner peut utiliser toutes les commandes de son serveur
 		PERFORM * FROM command WHERE serveur_id IS NULL OR serveur_id=serveurid;
 	ELSE
 		PERFORM * FROM role
@@ -116,11 +116,7 @@ BEGIN
 		INNER JOIN role_cmd AS rc ON id=rc.role_id
 		WHERE serveur_id=serveurid AND id_mod=userid;
 	END IF;
-	IF FOUND THEN
-		RETURN TRUE;
-	ELSE
-		RETURN FALSE;
-	END IF;
+	RETURN FOUND;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -132,8 +128,6 @@ DECLARE serv_id INTEGER;
 BEGIN
 	SELECT serveur_id INTO serv_id FROM command WHERE id=new.cmd_id;
 	PERFORM * FROM role WHERE id=new.role_id AND (serveur_id=serv_id OR serv_id IS NULL);
-	--SELECT serveur_id INTO serv_id FROM role WHERE id=new.role_id;
-	--PERFORM * FROM command WHERE id=new.cmd_id AND serveur_id=serv_id OR serveur_id IS NULL;
 	IF NOT FOUND THEN
 		RAISE EXCEPTION 'Impossible d''ajouter une commande à un rôle s''ils proviennent d''un serveur différent !';
 	END IF;

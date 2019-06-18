@@ -2,25 +2,30 @@ CREATE SCHEMA IF NOT EXISTS bot_moderation;
 SET search_path TO bot_moderation; -- use schema
 
 /* TABLES */
+
+/* Serveur : l'id du serveur et de son propriétaire */
 CREATE TABLE serveur (
 	id BIGINT PRIMARY KEY,
 	owner_id BIGINT NOT NULL
 );
 
+/* Role : on définit les rôles propre à l'application, par défaut la priorité est élevé car le rôle n'est pas important de base */
 CREATE TABLE role (
 	id SERIAL PRIMARY KEY,
 	name VARCHAR(30) NOT NULL,
-	priority INTEGER DEFAULT 1,
+	priority INTEGER DEFAULT 5,
 	serveur_id BIGINT NOT NULL,
 	UNIQUE(name, serveur_id),
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE CASCADE
 );
 
+/* Moderateur : la liste des modérateurs que le bot reconnait */
 CREATE TABLE moderateur (
 	id BIGINT PRIMARY KEY,
 	username VARCHAR(30) NOT NULL
 );
 
+/* role_moderateur : le moderateur et le role qui lui est attribué */
 CREATE TABLE role_moderateur (
 	id_mod INTEGER NOT NULL,
 	role_id BIGINT NOT NULL,
@@ -29,6 +34,7 @@ CREATE TABLE role_moderateur (
 	FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE
 );
 
+/* Staff : le serveur auxquel le modérateur est rattaché. Un modérateur peut avoir plusieurs serveurs */
 CREATE TABLE staff (
 	id_mod BIGINT NOT NULL,
 	serveur_id BIGINT NOT NULL,
@@ -37,6 +43,7 @@ CREATE TABLE staff (
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE CASCADE
 );
 
+/* Sanction : on définit les punitions, avec toutes les informations nécessaire pour le bot pour la traiter */
 CREATE TABLE sanction (
 	id SERIAL PRIMARY KEY,
 	reason TEXT,
@@ -51,6 +58,7 @@ CREATE TABLE sanction (
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE SET NULL -- nous gardons les sanctions meme si le serveur est supprimé
 );
 
+/* Command : les types de commande original utilisable sur des serveurs spécifique */
 CREATE TABLE command (
 	id SERIAL PRIMARY KEY,
 	command VARCHAR NOT NULL,
@@ -59,6 +67,7 @@ CREATE TABLE command (
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE CASCADE
 );
 
+/* Role_cmd : a quel rôle une commande est liée */
 CREATE TABLE role_cmd (
 	role_id INTEGER NOT NULL,
 	cmd_id INTEGER NOT NULL,
@@ -67,6 +76,7 @@ CREATE TABLE role_cmd (
 	FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE
 );
 
+/* Panel_white_list : liste des personnes autorisées sur un serveur */
 CREATE TABLE panel_white_list (
 	user_id BIGINT NOT NULL,
 	serveur_id BIGINT NOT NULL,
@@ -74,6 +84,46 @@ CREATE TABLE panel_white_list (
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE CASCADE
 );
 
+<<<<<<< HEAD
+
+INSERT INTO serveur VALUES (1,35),(2,64);
+
+INSERT INTO role_moderateur VALUES (1, "Modérateur RP"),(2, "Modérateur"), (3, "Modérateur vocal"), (4, "Administrateur");
+
+INSERT INTO moderateur VALUES (35, "Vault Boy",1,4),(42, "Mary Sue", 2, 2),(64, "Yolo18XXX", 2, 4), (64,"Yolo",1,2);
+
+INSERT INTO command VALUES
+(1,"!ban @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
+(2,"!kick @<user> <reason:text> [-c <channels:list>]"),
+(3,"!deaf @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
+(4,"!mute @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
+(5,"!warn @<user> <reason:text>"),
+(6,"!create (ban|kick|deaf|mute) -d <duration_restriction> -c <channels_restriction>"),
+(7,"!!cancel <id_sanction>"),
+(8,"!rankup @<user> <role_id>"),
+(9,"!derank @<user> <role_id>"),
+(10,"!addrole <name>"),
+(11,"!delrole <id>"),
+(12,"!role add <role_id> <command_id>"),
+(13,"!role del <role_id> <command_id>"),
+(14,"!getto @<user>"),
+(15,"!getfrom @<modo>"),
+(16,"!lock <channels:list>"),
+(17,"!delock <channels:list>"),
+(18,"!delmsg <channel> [-d <duration>, -u @<user>]");
+
+INSERT INTO sanction VALUES (1, "Troll", NULL, CURRENT_TIMESTAMP, ".*audio", 85, 35, 1, "!ban @85 Troll"),
+							(2, "Troll", NULL, CURRENT_TIMESTAMP, ".*texte", 85, 42, 2, "!ban @85 Troll"),
+							(3, "Annoyed me", "0-0-1 00:00:00", CURRENT_TIMESTAMP, 15, 64, 2, "!mute @15 Annoyed me -d 0-0-1 00:00:00"),
+							(4, "Test", "0-0-1 12:00:00", CURRENT_TIMESTAMP, 39, 64, 1, "!mute @39 Test -d 0-0-1 12:00:00");
+
+INSERT INTO custom_command VALUES (1,"!ban @<user> <reason:text> -d <duration> <3600 -c <channel> IN (chan1,chan2,*general)", "test"),
+								  (2,"!mute @<user> <reason:text> -d <duration> >60 -c <channel> NOT IN (.text)", "test");
+
+INSERT INTO role_cmd VALUES (4,1),(2,2);
+
+INSERT INTO role_custom_cmd VALUES (3,2),(1,2);
+=======
 /* VIEWS */
 
 -- Sanctions en cours
@@ -230,3 +280,4 @@ INSERT INTO role_cmd VALUES
 (1,4),
 (3,19),
 (2,20);
+>>>>>>> 58c901526aa981cd1f34cecf39c12e5571e5e57c

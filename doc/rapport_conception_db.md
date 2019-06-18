@@ -93,18 +93,19 @@ Pour finir, notre solution doit proposer un panel d'administration accessible de
 
 ### Syntaxe du paramètre `channels`
 
-> Ce paramètre peut être un element (channel) ou une liste de channels séparé par une virgule \
-> Il peut également être un type de channel (vocal: `.audio`, textuel : `.test`) \
-> Et aussi une catégorie de channel (`*<name>`)
+> Ce paramètre peut être un element (channel) ou une liste de channels \
+> Il peut également être un type de channel (vocal: `.audio`, textuel : `.test`)
 
 #### Exemples
 ```S
-... chan1
-... chan1,chan2
-... chan1,.text
+... #chan1
+... #chan1 #chan2
+... #chan1 .text
 ... .audio
-... chan1,*staff
+... #chan1 <#12356486>
 ```
+
+> On ne peut pas identifier une catégorie de channel ou un channel vocal, il faut alors tout simplement faire clic droit - copier l'identifiant, puis utiliser la syntaxe suivant : `<#identifiant_ici>`
 
 ## Commandes Personnalisées
 
@@ -124,8 +125,8 @@ il doit y avoir au moins une restriction et pour la creation d'un *kick*, il ne 
 
 #### Exemple
 ```C
-// création d'une commande de `ban` d'une durée maximum de 1 heure (3600 sec) et valable au maximum sur les channels `chan1`,`chan2` et tous les channels de la catégorie `general`
-!create ban -d <3600 -c IN (chan1,chan2,*general)
+// création d'une commande de `ban` d'une durée maximum de 1 heure (3600 sec) et valable au maximum sur les channels `153648912`,`9845311` et tous les channels de la catégorie `897463245`
+!create ban -d <3600 -c IN (153648912,9845311,897463245)
 
 // Création d'une commande `kick` qui est valable sur les channels textuel
 !create kick -c IN (.text)

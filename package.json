@@ -1,0 +1,32 @@
+{
+  "name": "discord_project",
+  "version": "1.0.0",
+  "description": "Bot moderation discord and administration web panel",
+  "main": "./src/index.js",
+  "directories": {
+    "doc": "doc",
+    "test": "test"
+  },
+  "scripts": {
+    "pingpong": "node ./src/pingpong/index.js",
+    "debug": "nodemon ./src/index.js",
+    "run": "node ./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RomainCtl/discord_project.git"
+  },
+  "author": "Chantrel R Le Gal A",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RomainCtl/discord_project/issues"
+  },
+  "homepage": "https://github.com/RomainCtl/discord_project#readme",
+  "dependencies": {
+    "nodemon": "^1.19.1"
+  },
+  "nodemonConfig": {
+    "ignore": ["test/*", "doc/*"],
+    "delay": "2500"
+  }
+}

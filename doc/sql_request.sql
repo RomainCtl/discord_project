@@ -1,4 +1,4 @@
---Requete : (SQLITE3)
+--Requete : (PostgreSQL)
 
 -- 01 - Récupérer l’ensemble des serveurs Discord ayant invité le bot.
 SELECT * FROM serveur;

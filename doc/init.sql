@@ -84,46 +84,6 @@ CREATE TABLE panel_white_list (
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE CASCADE
 );
 
-<<<<<<< HEAD
-
-INSERT INTO serveur VALUES (1,35),(2,64);
-
-INSERT INTO role_moderateur VALUES (1, "Modérateur RP"),(2, "Modérateur"), (3, "Modérateur vocal"), (4, "Administrateur");
-
-INSERT INTO moderateur VALUES (35, "Vault Boy",1,4),(42, "Mary Sue", 2, 2),(64, "Yolo18XXX", 2, 4), (64,"Yolo",1,2);
-
-INSERT INTO command VALUES
-(1,"!ban @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
-(2,"!kick @<user> <reason:text> [-c <channels:list>]"),
-(3,"!deaf @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
-(4,"!mute @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]"),
-(5,"!warn @<user> <reason:text>"),
-(6,"!create (ban|kick|deaf|mute) -d <duration_restriction> -c <channels_restriction>"),
-(7,"!!cancel <id_sanction>"),
-(8,"!rankup @<user> <role_id>"),
-(9,"!derank @<user> <role_id>"),
-(10,"!addrole <name>"),
-(11,"!delrole <id>"),
-(12,"!role add <role_id> <command_id>"),
-(13,"!role del <role_id> <command_id>"),
-(14,"!getto @<user>"),
-(15,"!getfrom @<modo>"),
-(16,"!lock <channels:list>"),
-(17,"!delock <channels:list>"),
-(18,"!delmsg <channel> [-d <duration>, -u @<user>]");
-
-INSERT INTO sanction VALUES (1, "Troll", NULL, CURRENT_TIMESTAMP, ".*audio", 85, 35, 1, "!ban @85 Troll"),
-							(2, "Troll", NULL, CURRENT_TIMESTAMP, ".*texte", 85, 42, 2, "!ban @85 Troll"),
-							(3, "Annoyed me", "0-0-1 00:00:00", CURRENT_TIMESTAMP, 15, 64, 2, "!mute @15 Annoyed me -d 0-0-1 00:00:00"),
-							(4, "Test", "0-0-1 12:00:00", CURRENT_TIMESTAMP, 39, 64, 1, "!mute @39 Test -d 0-0-1 12:00:00");
-
-INSERT INTO custom_command VALUES (1,"!ban @<user> <reason:text> -d <duration> <3600 -c <channel> IN (chan1,chan2,*general)", "test"),
-								  (2,"!mute @<user> <reason:text> -d <duration> >60 -c <channel> NOT IN (.text)", "test");
-
-INSERT INTO role_cmd VALUES (4,1),(2,2);
-
-INSERT INTO role_custom_cmd VALUES (3,2),(1,2);
-=======
 /* VIEWS */
 
 -- Sanctions en cours
@@ -280,4 +240,3 @@ INSERT INTO role_cmd VALUES
 (1,4),
 (3,19),
 (2,20);
->>>>>>> 58c901526aa981cd1f34cecf39c12e5571e5e57c

@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/RomainCtl/discord_project#readme",
   "dependencies": {
+    "websocket": "^1.0.28",
     "nodemon": "^1.19.1"
   },
   "nodemonConfig": {

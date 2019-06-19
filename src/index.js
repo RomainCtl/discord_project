@@ -15,7 +15,9 @@ client.on('message', async message => {
     if(message.author.bot) return;
     //On ignore aussi les messages sans le préfix "!" :
     if(message.content.indexOf("!") !== 0) return;
-   
+    
+    
+
     console.log(message.content.substring(1,4));
 
     //En fonction des trois premier caractère après le message, on peut désigner quelles
@@ -195,7 +197,9 @@ client.on('message', async message => {
     }
 
     
-    
+    //On efface le message
+    //message.channel.sendMessage("The mine turtle has come in town, ready to ruin your day on the behalf of "+message.author);
+    //message.author.send('Thank you for summoning me !');
 
 });
 

@@ -47,7 +47,7 @@ var getfrom_regex = new RegExp('^!getfrom[ ]+<@([0-9]+)>[ ]*$','i');
 var lock_regex = new RegExp('^!lock[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*$','i');
 var delock_regex = new RegExp('^!delock[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*$','i');
 var delmsg_regex = new RegExp('^!delmsg[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*(-d[ ]+([0-9]+))?([ ]*-u[ ]+<@([0-9]+)>)?[ ]*$','i');
-var 
+
 
 //On donne la clé de not bot :
 

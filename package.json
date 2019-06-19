@@ -24,10 +24,14 @@
   "homepage": "https://github.com/RomainCtl/discord_project#readme",
   "dependencies": {
     "websocket": "^1.0.28",
+    "discord.js": "^11.5.1",
     "nodemon": "^1.19.1"
   },
   "nodemonConfig": {
-    "ignore": ["test/*", "doc/*"],
+    "ignore": [
+      "test/*",
+      "doc/*"
+    ],
     "delay": "2500"
   }
 }

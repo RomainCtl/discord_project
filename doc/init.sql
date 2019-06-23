@@ -114,7 +114,7 @@ SELECT * FROM sanction WHERE substring(cmd, 2, 4) = 'warn';
 /* FUNCTIONS */
 
 -- un moderateur peut utiliser une commande ?
-CREATE OR REPLACE FUNCTION user_can_use_cmd(IN userid INTEGER, IN cmdid INTEGER, IN serveurid INTEGER)
+CREATE OR REPLACE FUNCTION user_can_use_cmd(IN userid BIGINT, IN cmdid INTEGER, IN serveurid BIGINT)
 RETURNS boolean AS $$
 BEGIN
 	PERFORM * FROM serveur WHERE id=serveurid AND owner_id=userid;
@@ -206,25 +206,28 @@ INSERT INTO role_moderateur VALUES
 (64,2),
 (64,3);
 
+INSERT INTO command (id, command, regex, serveur_id) VALUES
+(1, '!ban @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]', '^!ban[ ]+<@([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+))?[ ]*$', NULL),
+(2, '!kick @<user> <reason:text>', '^!kick[ ]+<@([0-9]+)>[ ]+(.*)$', NULL),
+(3, '!deaf @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]', '^!deaf[ ]+<@([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)))?[ ]*$', NULL),
+(4, '!mute @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]', '^!mute[ ]+<@([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)))?[ ]*$', NULL),
+(5, '!warn @<user> <reason:text>', '^!warn[ ]+@([^ ]+)[ ]+(.*)$', NULL),
+(6, '!create (ban|kick|deaf|mute) -d <duration_restriction> -c <channels_restriction>', '^!create (ban|kick|deaf|mute)[ ]+(-d[ ]+(<|>)[ ]*([0-9]+))?([ ]*-c[ ]+((NOT[ ]+)?IN)[ ]+([0-9a-z,.*]+))?[ ]*$', NULL),
+(7, '!cancel <id_sanction>', '^!cancel[ ]+([0-9]+)[ ]*$', NULL),
+(8, '!rankup @<user> <role_id>', '^!rankup[ ]+<@([0-9]+)>[ ]+([0-9]+)[ ]*$', NULL),
+(9, '!derank @<user> <role_id>', '^!derank[ ]+<@([0-9]+)>[ ]+([0-9]+)[ ]*$', NULL),
+(10, '!addrole <name>', '^!addrole[ ]+([a-z]+)[ ]*$', NULL),
+(11, '!delrole <id>', '^!delrole[ ]+([0-9]+)[ ]*$', NULL),
+(12, '!role add <role_id> <command_id>', '^!role[ ]+add[ ]+([0-9]+)[ ]+([0-9]+)[ ]*$', NULL),
+(13, '!role del <role_id> <command_id>', '^!role[ ]+del[ ]+([0-9]+)[ ]+([0-9]+)[ ]*$', NULL),
+(14, '!getto @<user>', '^!getto[ ]+<@([0-9]+)>[ ]*$', NULL),
+(15, '!getfrom @<modo>', '^!getfrom[ ]+<@([0-9]+)>[ ]*$', NULL),
+(16, '!lock <channels:list>', '^!lock[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*$', NULL),
+(17, '!delock <channels:list>', '^!delock[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*$', NULL),
+(18, '!delmsg <channel> [-d <duration>, -u @<user>]', '^!delmsg[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*(-d[ ]+([0-9]+))?([ ]*-u[ ]+<@([0-9]+)>)?[ ]*$', NULL);
+
+
 INSERT INTO command (command, regex, serveur_id) VALUES
-('!ban @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]', '^!ban[ ]+<@([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+))?[ ]*$', NULL),
-('!kick @<user> <reason:text>', '^!kick[ ]+<@([0-9]+)>[ ]+(.*)$', NULL),
-('!deaf @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]', '^!deaf[ ]+<@([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)))?[ ]*$', NULL),
-('!mute @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]', '^!mute[ ]+<@([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)))?[ ]*$', NULL),
-('!warn @<user> <reason:text>', '^!warn[ ]+@([^ ]+)[ ]+(.*)$', NULL),
-('!create (ban|kick|deaf|mute) -d <duration_restriction> -c <channels_restriction>', '^!create (ban|kick|deaf|mute)[ ]+(-d[ ]+(<|>)[ ]*([0-9]+))?([ ]*-c[ ]+((NOT[ ]+)?IN)[ ]+([0-9a-z,.*]+))?[ ]*$', NULL),
-('!cancel <id_sanction>', '^!cancel[ ]+([0-9]+)[ ]*$', NULL),
-('!rankup @<user> <role_id>', '^!rankup[ ]+<@([0-9]+)>[ ]+([0-9]+)[ ]*$', NULL),
-('!derank @<user> <role_id>', '^!derank[ ]+<@([0-9]+)>[ ]+([0-9]+)[ ]*$', NULL),
-('!addrole <name>', '^!addrole[ ]+([a-z]+)[ ]*$', NULL),
-('!delrole <id>', '^!delrole[ ]+([0-9]+)[ ]*$', NULL),
-('!role add <role_id> <command_id>', '^!role[ ]+add[ ]+([0-9]+)[ ]+([0-9]+)[ ]*$', NULL),
-('!role del <role_id> <command_id>', '^!role[ ]+del[ ]+([0-9]+)[ ]+([0-9]+)[ ]*$', NULL),
-('!getto @<user>', '^!getto[ ]+<@([0-9]+)>[ ]*$', NULL),
-('!getfrom @<modo>', '^!getfrom[ ]+<@([0-9]+)>[ ]*$', NULL),
-('!lock <channels:list>', '^!lock[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*$', NULL),
-('!delock <channels:list>', '^!delock[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*$', NULL),
-('!delmsg <channel> [-d <duration>, -u @<user>]', '^!delmsg[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*(-d[ ]+([0-9]+))?([ ]*-u[ ]+<@([0-9]+)>)?[ ]*$', NULL),
 ('!ban @<user> <reason:text> -d <duration: time(sec)<3600> -c <channel: IN (chan1,chan2,*general)>', '^!ban[ ]+@([^ ]+)[ ]+((?:(?!-d|-c).)+)(-d[ ]+(3600|3[0-5][0-9]{2}|[0-2][0-9]{3}|[0-9]{0,3}))?([ ]*-c[ ]+(?:(chan1|chan2|\\*general|,))+)?[ ]*$', 1),
 ('!mute @<user> <reason:text> -d <duration: time(sec)>60> -c <channel: NOT IN (.text)>', '^!ban[ ]+@([^ ]+)[ ]+((?:(?!-d|-c).)+)(-d[ ]+(3[6-9][0-9]{2}|[0-9]{4,}))?([ ]*-c[ ]+(?:(?!chan1|chan2|\\*general)[0-9a-z,.*])+)?[ ]*$', 1);
 

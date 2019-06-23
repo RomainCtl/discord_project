@@ -58,11 +58,11 @@ client.on('connect', function(connection) {
         if (message.substring(0, 1) == '!') {
             // it's command
             switch (message) {
-                case (message.match(new RegExp('^!ping[ ]*$', 'i')) || {}).input:
+                case String( message.match( new RegExp('^!ping[ ]*$', 'i') ) ):
                     api.sendMessage(channel_id, 'Pong');
                     break;
                 default:
-                    console.log(message.match(new RegExp('^!ping[ ]*$', 'i')));
+                    console.log( message.match( new RegExp('^!ping[ ]*$', 'i') ) );
                     api.sendMessage(channel_id, "Commande inconnu !");
             }
         }

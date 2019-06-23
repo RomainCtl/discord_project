@@ -10,7 +10,7 @@
   "scripts": {
     "pingpong": "node ./src/pingpong/index.js",
     "debug": "nodemon ./src/index.js",
-    "run": "node ./src/index.js"
+    "start": "node ./src/index.js"
   },
   "repository": {
     "type": "git",
@@ -24,9 +24,10 @@
   "homepage": "https://github.com/RomainCtl/discord_project#readme",
   "dependencies": {
     "axios": "^0.19.0",
-    "websocket": "^1.0.28",
     "discord.js": "^11.5.1",
-    "nodemon": "^1.19.1"
+    "nodemon": "^1.19.1",
+    "pg": "^7.11.0",
+    "websocket": "^1.0.28"
   },
   "nodemonConfig": {
     "ignore": [

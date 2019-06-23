@@ -180,22 +180,22 @@ ON staff FOR EACH ROW EXECUTE PROCEDURE staff_remove();
 /* INSERTS global commands */
 
 INSERT INTO command (id, command, regex, serveur_id) VALUES
-(1, '!ban @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]', '^!ban[ ]+<@([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+))?[ ]*$', NULL),
+(1, '!ban @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]', '^!ban[ ]+<@\!?([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+))?[ ]*$', NULL),
 (2, '!kick @<user> <reason:text>', '^!kick[ ]+<@([0-9]+)>[ ]+(.*)$', NULL),
-(3, '!deaf @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]', '^!deaf[ ]+<@([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)))?[ ]*$', NULL),
-(4, '!mute @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]', '^!mute[ ]+<@([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)))?[ ]*$', NULL),
-(5, '!warn @<user> <reason:text>', '^!warn[ ]+@([^ ]+)[ ]+(.*)$', NULL),
+(3, '!deaf @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]', '^!deaf[ ]+<@\!?([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)))?[ ]*$', NULL),
+(4, '!mute @<user> <reason:text> [-d <duration:time(sec)>, -c <channels:list>]', '^!mute[ ]+<@\!?([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)))?[ ]*$', NULL),
+(5, '!warn @<user> <reason:text>', '^!warn[ ]+<@\!?([0-9]+)>[ ]+(.*)$', NULL),
 (6, '!create (ban|kick|deaf|mute) -d <duration_restriction> -c <channels_restriction>', '^!create (ban|kick|deaf|mute)[ ]+(-d[ ]+(<|>)[ ]*([0-9]+))?([ ]*-c[ ]+((NOT[ ]+)?IN)[ ]+([0-9a-z,.*]+))?[ ]*$', NULL),
 (7, '!cancel <id_sanction>', '^!cancel[ ]+([0-9]+)[ ]*$', NULL),
-(8, '!rankup @<user> <role_id>', '^!rankup[ ]+<@([0-9]+)>[ ]+([0-9]+)[ ]*$', NULL),
-(9, '!derank @<user> <role_id>', '^!derank[ ]+<@([0-9]+)>[ ]+([0-9]+)[ ]*$', NULL),
+(8, '!rankup @<user> <role_id>', '^!rankup[ ]+<@\!?([0-9]+)>[ ]+([0-9]+)[ ]*$', NULL),
+(9, '!derank @<user> <role_id>', '^!derank[ ]+<@\!?([0-9]+)>[ ]+([0-9]+)[ ]*$', NULL),
 (10, '!addrole <name>', '^!addrole[ ]+([a-z]+)[ ]*$', NULL),
 (11, '!delrole <id>', '^!delrole[ ]+([0-9]+)[ ]*$', NULL),
 (12, '!role add <role_id> <command_id>', '^!role[ ]+add[ ]+([0-9]+)[ ]+([0-9]+)[ ]*$', NULL),
 (13, '!role del <role_id> <command_id>', '^!role[ ]+del[ ]+([0-9]+)[ ]+([0-9]+)[ ]*$', NULL),
-(14, '!getto @<user>', '^!getto[ ]+<@([0-9]+)>[ ]*$', NULL),
-(15, '!getfrom @<modo>', '^!getfrom[ ]+<@([0-9]+)>[ ]*$', NULL),
+(14, '!getto @<user>', '^!getto[ ]+<@\!?([0-9]+)>[ ]*$', NULL),
+(15, '!getfrom @<modo>', '^!getfrom[ ]+<@\!?([0-9]+)>[ ]*$', NULL),
 (16, '!lock <channels:list>', '^!lock[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*$', NULL),
 (17, '!delock <channels:list>', '^!delock[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*$', NULL),
-(18, '!delmsg <channel> [-d <duration>, -u @<user>]', '^!delmsg[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*(-d[ ]+([0-9]+))?([ ]*-u[ ]+<@([0-9]+)>)?[ ]*$', NULL);
+(18, '!delmsg <channel> [-d <duration>, -u @<user>]', '^!delmsg[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*(-d[ ]+([0-9]+))?([ ]*-u[ ]+<@\!?([0-9]+)>)?[ ]*$', NULL);
 

@@ -30,14 +30,14 @@ INSERT INTO role_moderateur VALUES
 (64,3);
 
 INSERT INTO command (command, regex, serveur_id) VALUES
-('!ban @<user> <reason:text> -d <duration: time(sec)<3600> -c <channel: IN (chan1,chan2,*general)>', '^!ban[ ]+@([^ ]+)[ ]+((?:(?!-d|-c).)+)(-d[ ]+(3600|3[0-5][0-9]{2}|[0-2][0-9]{3}|[0-9]{0,3}))?([ ]*-c[ ]+(?:(chan1|chan2|\\*general|,))+)?[ ]*$', 1),
-('!mute @<user> <reason:text> -d <duration: time(sec)>60> -c <channel: NOT IN (.text)>', '^!ban[ ]+@([^ ]+)[ ]+((?:(?!-d|-c).)+)(-d[ ]+(3[6-9][0-9]{2}|[0-9]{4,}))?([ ]*-c[ ]+(?:(?!chan1|chan2|\\*general)[0-9a-z,.*])+)?[ ]*$', 1);
+('!ban @<user> <reason:text> -d <duration: time(sec)<3600> -c <channel: IN (chan1,chan2,*general)>', '^!ban[ ]+<@\!?([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+(3600|3[0-5][0-9]{2}|[0-2][0-9]{3}|[0-9]{0,3}))?([ ]*-c[ ]+(?:(15|56|98| ))+)?[ ]*$', 1),
+('!mute @<user> <reason:text> -d <duration: time(sec)>60> -c <channel: NOT IN (.text)>', '^!ban[ ]+<@\!?([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+(3[6-9][0-9]{2}|[0-9]{4,}))?([ ]*-c[ ]+(?:<#(?!15|56|98)[0-9]+>[ ]*)+)?[ ]*$', 1); -- CHECK si le regex pour les channels est bon (NOT IN <#15> <#56> <#98>)
 
 INSERT INTO sanction (reason, duration, channels, victim, author, serveur_id, cmd) VALUES
-('Troll', NULL, '.*audio', 85, 35, 1, '!ban @85 reason'),
-('Troll', NULL, '.*texte', 85, 42, 2, '!ban @85 other reason'),
-('Annoyed me', 86400, NULL, 15, 64, 2, '!mute @user3 Annoyed me -d 86400'),
-('Test', 3600, NULL, 13, 64, 1, '!mute @user1 Test -d 3600');
+('Troll', NULL, '.*audio', 85, 35, 1, '!ban <@85> reason'),
+('Troll', NULL, '.*texte', 85, 42, 2, '!ban <@85> other reason'),
+('Annoyed me', 86400, NULL, 15, 64, 2, '!mute <@user3> Annoyed me -d 86400'),
+('Test', 3600, NULL, 13, 64, 1, '!mute <@user1> Test -d 3600');
 
 INSERT INTO role_cmd VALUES
 (4,1),

@@ -35,10 +35,10 @@ client.on('ready', () => {
 
 client.on("guildCreate", guild => {
     // le bot rejoint une guild
-    console.log("Joined a new guild: " + guild.name);
+    console.log("Joined a new guild: " + guild.name +" | "+ guild.id);
 
     // insert or update serveur (guild)
-    db.query('INSERT INTO serveur VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET owner_id = $2;', [guild.id, guild.owner_id])
+    db.query('INSERT INTO serveur VALUES ($1, $2) ON CONFLICT (id) DO UPDATE SET owner_id = $2;', [guild.id, guild.ownerID])
     .then (res => {
         console.log(res);
     })
@@ -50,7 +50,7 @@ client.on("guildCreate", guild => {
 
 client.on("guildDelete", guild => {
     // le bot est supprimer d'une guild
-    console.log("Left a guild: " + guild.name);
+    console.log("Left a guild: " + guild.name +" | "+ guild.id);
 
     db.query('DELETE FROM serveur WHERE id=$1;', [guild.id])
     .then (res => {

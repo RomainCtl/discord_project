@@ -3,27 +3,27 @@ const db = require('../model');
 const global_cmd = {
     ban: {
         id: 1,
-        regex: new RegExp('^!ban[ ]+<@([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+))?[ ]*$', 'i'),
+        regex: new RegExp('^!ban[ ]+<@\!?([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+))?[ ]*$', 'i'),
         callfunc: require('./ban')
     },
     kick: {
         id: 2,
-        regex: new RegExp('^!kick[ ]+<@([0-9]+)>[ ]+(.*)$','i'),
+        regex: new RegExp('^!kick[ ]+<@\!?([0-9]+)>[ ]+(.*)$','i'),
         callfunc: ''
     },
     deaf: {
         id: 3,
-        regex: new RegExp('^!deaf[ ]+<@([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+))?[ ]*$','i'),
+        regex: new RegExp('^!deaf[ ]+<@\!?([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+))?[ ]*$','i'),
         callfunc: ''
     },
     mute: {
         id: 4,
-        regex: new RegExp('^!mute[ ]+<@([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+))?[ ]*$','i'),
+        regex: new RegExp('^!mute[ ]+<@\!?([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+([0-9]+))?([ ]*-c[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+))?[ ]*$','i'),
         callfunc: ''
     },
     warn: {
         id: 5,
-        regex: new RegExp('^!warn[ ]+@([^ ]+)[ ]+(.*)$','i'),
+        regex: new RegExp('^!warn[ ]+<@\!?([0-9]+)>[ ]+(.*)$','i'),
         callfunc: ''
     },
     create: {
@@ -38,12 +38,12 @@ const global_cmd = {
     },
     rankup: {
         id: 8,
-        regex: new RegExp('^!rankup[ ]+<@([0-9]+)>[ ]+([0-9]+)[ ]*$','i'),
+        regex: new RegExp('^!rankup[ ]+<@\!?([0-9]+)>[ ]+([0-9]+)[ ]*$','i'),
         callfunc: ''
     },
     derank: {
         id: 9,
-        regex: new RegExp('^!derank[ ]+<@([0-9]+)>[ ]+([0-9]+)[ ]*$','i'),
+        regex: new RegExp('^!derank[ ]+<@\!?([0-9]+)>[ ]+([0-9]+)[ ]*$','i'),
         callfunc: ''
     },
     addrole: {
@@ -68,12 +68,12 @@ const global_cmd = {
     },
     getto: {
         id: 14,
-        regex: new RegExp('^!getto[ ]+<@([0-9]+)>[ ]*$','i'),
+        regex: new RegExp('^!getto[ ]+<@\!?([0-9]+)>[ ]*$','i'),
         callfunc: ''
     },
     getfrom: {
         id: 15,
-        regex: new RegExp('^!getfrom[ ]+<@([0-9]+)>[ ]*$','i'),
+        regex: new RegExp('^!getfrom[ ]+<@\!?([0-9]+)>[ ]*$','i'),
         callfunc: ''
     },
     lock: {
@@ -88,7 +88,7 @@ const global_cmd = {
     },
     delmsg: {
         id: 18,
-        regex: new RegExp('^!delmsg[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*(-d[ ]+([0-9]+))?([ ]*-u[ ]+<@([0-9]+)>)?[ ]*$','i'),
+        regex: new RegExp('^!delmsg[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*(-d[ ]+([0-9]+))?([ ]*-u[ ]+<@\!?([0-9]+)>)?[ ]*$','i'),
         callfunc: ''
     }
 }

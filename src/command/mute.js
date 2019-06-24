@@ -9,6 +9,6 @@ module.exports = function(res, guild, channel, author, content, mentions) {
      var cible = Client.fetchUser(res[1]);
      const member = guild.member(cible);
 
-     member.addRole("mute", res[3]);
+     member.addRole("mute").catch(console.error);
     return {};
 }

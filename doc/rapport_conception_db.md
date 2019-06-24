@@ -73,7 +73,7 @@ Pour finir, notre solution doit proposer un panel d'administration accessible de
 * Retirer un role de moderation à un utilisateur :\
 `!derank @<user> <role_id>`
 * Ajouter un rôle (le créer) :\
-`!addrole <name>`
+`!addrole <name> <priority>`
 * Supprimer un rôle :\
 `!delrole <id>`
 * Ajouter une commande à un rôle :\

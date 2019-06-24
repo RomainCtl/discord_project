@@ -5,9 +5,10 @@ module.exports = function(res, guild, channel, author, content, mentions) {
     console.log("it's a ban");
     // TODO
     //On change la persmission du channel pour le verrouiller:
-    
+    let myRole = guild.roles.find(role => role.name === "everyone");
+
     channel.overwritePermissions(
-        "Fermer",//Il faudra rajouter un rôle Fermer pour indiquer que la chaine est fermer
+        myRole,//Il faudra rajouter un rôle Fermer pour indiquer que la chaine est fermer
         { 'SEND_MESSAGES': false },
         // optional 'reason' for permission overwrite
         'La discussion est terminé'

@@ -5,10 +5,5 @@ module.exports = function(res, guild, channel, author, content, mentions) {
     console.log("it's a ban");
     console.log(res);
     //TODO
-
-    
-    
-​
-
     return {};
 }

@@ -1,4 +1,5 @@
 const c_duration = "-d[ ]+($1)";
+const duration = "-d[ ]+([0-9]+)";
 
 class MyR {
     /**
@@ -90,7 +91,7 @@ class MinRegex extends MyR {
     parse_into_interval(num) {
         let result = [];
         let previous = num;
-        while (previous >= 0) {
+        while (previous > 0) {
             let p = this.prev(previous);
             result.push([previous, p]);
             previous = parseInt(p)-1;
@@ -148,13 +149,15 @@ class MaxRegex extends MyR {
 }
 
 class NumberRegexCreation {
-    create_regex_duration(text) {
-        if (text.substring(0,1) == "<") { // <3600 => $1="3600|3[0-5][0-9]{2}|[0-2][0-9]{3}|[0-9]{,3}"
+    create_regex(text) {
+        if (text == undefined) // no restriction
+            return duration;
+        else if (text.substring(0,1) == "<") { // <3600 => $1="3600|3[0-5][0-9]{2}|[0-2][0-9]{3}|[0-9]{,3}"
             return c_duration.replace('$1', MinRegex.run( parseInt( text.substr(1) ) ));
         } else if (text.substring(0,1) == ">") { // >3600 => $1="3[6-9][0-9]{2}|[4-9][0-9]{3}|[1-9][0-9]{4,}"
             return c_duration.replace('$1', MaxRegex.run( parseInt( text.substr(1) ) ));
         } else {
-            throw "bad expression";
+            throw new Error("bad expression");
         }
     }
 }

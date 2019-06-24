@@ -109,12 +109,12 @@ module.exports = {
                         return global_cmd[key].callfunc(match, guild, channel, author, content, mentions);
                     else
                         return {field: [{
-                            name: 'Message :',
-                            value: "Vous n'avez pas la permission d'executer cette commande !"
-                        },
-                        {
                             name: 'Command exécuté :',
                             value: content
+                        },
+                        {
+                            name: 'Erreur :',
+                            value: "Vous n'avez pas la permission d'executer cette commande !"
                         }]};
                 })
                 .catch( err => {
@@ -125,16 +125,18 @@ module.exports = {
 
         // return promise with reject if unknow command
         return new Promise( (resolve, reject) => {
-            reject(
-                {field: [{
-                    name: 'Message :',
-                    value: "Commande inconnu !"
-                },
-                {
-                    name: 'Command exécuté :',
-                    value: content
-                }]}
-            );
+            reject({
+                    field: [
+                    {
+                        name: 'Command exécuté :',
+                        value: content
+                    },
+                    {
+                        name: 'Erreur :',
+                        value: "Commande inconnu !"
+                    }
+                ]
+            });
         });
     }
 }

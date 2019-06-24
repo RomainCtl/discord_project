@@ -28,7 +28,7 @@ const global_cmd = {
     },
     create: {
         id: 6,
-        regex: new RegExp('^!create (ban|kick|deaf|mute)[ ]+(-d[ ]+(<|>)[ ]*([0-9]+))?([ ]*-c[ ]+((NOT[ ]+)?IN)[ ]+([0-9a-z,.*]+))?[ ]*$','i'),
+        regex: new RegExp('^!create (ban|kick|deaf|mute)[ ]+(-d[ ]+((<|>)[ ]*[0-9]+))?([ ]*-c[ ]+((NOT[ ]+)?IN[ ]+(<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+))?[ ]*$','i'),
         callfunc: require('./create')
     },
     cancel: {

@@ -1,3 +1,5 @@
+const c_duration = "-d[ ]+($1)";
+
 class MyR {
     /**
      * Check end of string match with pattern
@@ -145,15 +147,16 @@ class MaxRegex extends MyR {
     }
 }
 
-
-export default class NumberRegexCreation {
+class NumberRegexCreation {
     create_regex_duration(text) {
-        if (text.substring(0,1) == "<") {
-            return MinRegex.run( parseInt( text.substr(1) ) );
-        } else if (text.substring(0,1) == ">") {
-            return MaxRegex.run( parseInt( text.substr(1) ) );
+        if (text.substring(0,1) == "<") { // <3600 => $1="3600|3[0-5][0-9]{2}|[0-2][0-9]{3}|[0-9]{,3}"
+            return c_duration.replace('$1', MinRegex.run( parseInt( text.substr(1) ) ));
+        } else if (text.substring(0,1) == ">") { // >3600 => $1="3[6-9][0-9]{2}|[4-9][0-9]{3}|[1-9][0-9]{4,}"
+            return c_duration.replace('$1', MaxRegex.run( parseInt( text.substr(1) ) ));
         } else {
             throw "bad expression";
         }
     }
 }
+
+module.exports = NumberRegexCreation;

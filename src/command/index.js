@@ -48,7 +48,7 @@ const global_cmd = {
     },
     addrole: {
         id: 10,
-        regex: new RegExp('^!addrole[ ]+([a-z]+)[ ]*$','i'),
+        regex: new RegExp('^!addrole[ ]+([a-z]+)[ ]+([0-9]+)[ ]*$','i'),
         callfunc: require('./addrole')
     },
     delrole: {
@@ -94,6 +94,7 @@ const global_cmd = {
 }
 
 // TODO check les custom commands (les custom ban dans le callfunc de ban etc ...) (PS: sinon elles seront prise en "inconnu" ou en ban normal)
+// TODO command !help qui retourne toutes les commandes auquels on a acces
 
 module.exports = {
     check_and_run: (guild, channel, author, content, mentions) => {
@@ -103,7 +104,7 @@ module.exports = {
                 // check permission
                 return db.query('SELECT user_can_use_cmd($1, $2, $3)', [author.id, global_cmd[key].id, guild.id])
                 .then (res => {
-                    console.log(match);
+                    console.log(match); // FIXME delete this
                     if (res.rows[0].user_can_use_cmd)
                         return global_cmd[key].callfunc(match, guild, channel, author, content, mentions);
                     else

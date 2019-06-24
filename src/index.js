@@ -13,13 +13,11 @@ const defaultEmbed = {
 	fields: [
 		{
 			name: 'Message :',
-			value: '',
-			inline: false,
+			value: ''
 		},
 		{
 			name: 'Command exécuté :',
-			value: '',
-			inline: false,
+			value: ''
 		}
 	],
 	timestamp: new Date(),
@@ -72,17 +70,15 @@ client.on('message', msg => {
     cmd.check_and_run(msg.guild, msg.channel, msg.author, msg.content, msg.mentions)
     .then( res => {
         console.log(res);
-        if ('message' in res) {
-            defaultEmbed.fields[0].value = res.message;
-            defaultEmbed.fields[1].value = msg.content;
+        if ('field' in res) {
+            defaultEmbed.fields = res.field;
             msg.author.send({ embed: defaultEmbed });
         }
     })
     .catch( err => {
         console.log(err);
-        if ('message' in err) {
-            defaultEmbed.fields[0].value = err.message;
-            defaultEmbed.fields[1].value = msg.content;
+        if ('field' in err) {
+            defaultEmbed.fields = err.field;
             msg.author.send({ embed: defaultEmbed });
         }
     });

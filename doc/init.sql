@@ -147,6 +147,20 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- supprimer un role a un moderateur
+CREATE OR REPLACE FUNCTION derank_user(IN userid BIGINT, IN roleid INTEGER, IN serveurid BIGINT)
+RETURNS void AS $$
+BEGIN
+	DELETE FROM role_moderateur WHERE id_mod = userid AND role_id = roleid;
+
+	-- check if user have another role on this serveur, if not delete from staff
+	PERFORM * FROM role_moderateur INNER JOIN role ON role_id=id WHERE id_mod=userid AND serveur_id=serveurid;
+	IF NOT FOUND THEN
+		DELETE FROM staff WHERE id_mod=userid AND serveur_id=serveurid;
+	END IF;
+END;
+$$ LANGUAGE plpgsql;
+
 /* TRIGGERS */
 
 -- check coherence serveur_id entre role et cmd
@@ -187,6 +201,7 @@ ON role_moderateur FOR EACH ROW EXECUTE PROCEDURE check_role_moderateur();
 CREATE OR REPLACE FUNCTION staff_remove() RETURNS trigger AS $$
 BEGIN
 	DELETE FROM role_moderateur USING role WHERE id=role_id AND serveur_id=old.serveur_id AND id_mod=old.id_mod;
+	RETURN old;
 END;
 $$ LANGUAGE plpgsql;
 

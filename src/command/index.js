@@ -98,15 +98,23 @@ const global_cmd = {
 module.exports = {
     check_and_run: (guild, channel, author, content, mentions) => {
         for (let key in global_cmd) {
-            let res = content.match( global_cmd[key].regex );
-            if (res != null) {
+            let match = content.match( global_cmd[key].regex );
+            if (match != null) {
                 // check permission
-                return db.query('SELECT user_can_use_cmd($1, $2, $3)', [parseInt(author.id), global_cmd[key].id, parseInt(guild.id)])
+                return db.query('SELECT user_can_use_cmd($1, $2, $3)', [author.id, global_cmd[key].id, guild.id])
                 .then (res => {
+                    console.log(match);
                     if (res.rows[0].user_can_use_cmd)
-                        return global_cmd[key].callfunc(res, guild, channel, author, content, mentions);
+                        return global_cmd[key].callfunc(match, guild, channel, author, content, mentions);
                     else
-                        return {message: "Vous n'avez pas la permission d'executer cette commande !"};
+                        return {field: [{
+                            name: 'Message :',
+                            value: "Vous n'avez pas la permission d'executer cette commande !"
+                        },
+                        {
+                            name: 'Command exécuté :',
+                            value: content
+                        }]};
                 })
                 .catch( err => {
                     throw err;
@@ -116,7 +124,16 @@ module.exports = {
 
         // return promise with reject if unknow command
         return new Promise( (resolve, reject) => {
-            reject({message: "Commande inconnu !"});
+            reject(
+                {field: [{
+                    name: 'Message :',
+                    value: "Commande inconnu !"
+                },
+                {
+                    name: 'Command exécuté :',
+                    value: content
+                }]}
+            );
         });
     }
 }

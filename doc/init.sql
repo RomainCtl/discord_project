@@ -21,14 +21,13 @@ CREATE TABLE role (
 
 /* Moderateur : la liste des modérateurs que le bot reconnait */
 CREATE TABLE moderateur (
-	id BIGINT PRIMARY KEY,
-	username VARCHAR(30) NOT NULL
+	id BIGINT PRIMARY KEY
 );
 
 /* role_moderateur : le moderateur et le role qui lui est attribué */
 CREATE TABLE role_moderateur (
-	id_mod INTEGER NOT NULL,
-	role_id BIGINT NOT NULL,
+	id_mod BIGINT NOT NULL,
+	role_id INTEGER NOT NULL,
 	PRIMARY KEY (id_mod, role_id),
 	FOREIGN KEY (id_mod) REFERENCES moderateur(id) ON DELETE CASCADE,
 	FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE CASCADE
@@ -130,16 +129,34 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- ajouter un role a un moderateur
+CREATE OR REPLACE FUNCTION rankup_user(IN userid BIGINT, IN roleid INTEGER, IN serveurid BIGINT)
+RETURNS void AS $$
+BEGIN
+	-- check if exist in moderateur table
+	PERFORM * FROM moderateur WHERE id=userid;
+	IF NOT FOUND THEN
+		INSERT INTO moderateur VALUES (userid);
+	END IF;
+	-- check if exist in staff table
+	PERFORM * FROM staff WHERE id_mod=userid AND serveur_id=serveurid;
+	IF NOT FOUND THEN
+		INSERT INTO staff VALUES (userid, serveurid);
+	END IF;
+	INSERT INTO role_moderateur VALUES (userid, roleid);
+END;
+$$ LANGUAGE plpgsql;
+
 /* TRIGGERS */
 
 -- check coherence serveur_id entre role et cmd
 CREATE OR REPLACE FUNCTION check_role_cmd() RETURNS trigger AS $$
-DECLARE serv_id INTEGER;
+DECLARE serv_id BIGINT;
 BEGIN
 	SELECT serveur_id INTO serv_id FROM command WHERE id=new.cmd_id;
 	PERFORM * FROM role WHERE id=new.role_id AND (serveur_id=serv_id OR serv_id IS NULL);
 	IF NOT FOUND THEN
-		RAISE EXCEPTION 'Impossible d''ajouter une commande à un rôle s''ils proviennent d''un serveur différent !';
+		RAISE EXCEPTION 'Unknown role_cmd in serveur' USING DETAIL = 'Impossible d''ajouter une commande à un rôle s''ils proviennent d''un serveur différent !';
 	END IF;
 	RETURN new;
 END;
@@ -151,12 +168,12 @@ ON role_cmd FOR EACH ROW EXECUTE PROCEDURE check_role_cmd();
 
 -- check coherence serveur_id entre staff et role
 CREATE OR REPLACE FUNCTION check_role_moderateur() RETURNS trigger AS $$
-DECLARE serv_id INTEGER;
+DECLARE serv_id BIGINT;
 BEGIN
 	SELECT serveur_id INTO serv_id FROM staff AS s WHERE s.id_mod=new.id_mod;
 	PERFORM * FROM role WHERE id=new.role_id AND serveur_id=serv_id;
 	IF NOT FOUND THEN
-		RAISE EXCEPTION 'Impossible d''ajouter un role à un moderateur s''ils proviennent d''un serveur différent !';
+		RAISE EXCEPTION 'Unknown role_moderateur in serveur' USING DETAIL = 'Impossible d''ajouter un role à un moderateur s''ils proviennent d''un serveur différent !';
 	END IF;
 	RETURN new;
 END;

@@ -90,6 +90,11 @@ const global_cmd = {
         id: 18,
         regex: new RegExp('^!delmsg[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*(-d[ ]+([0-9]+))?([ ]*-u[ ]+<@\!?([0-9]+)>)?[ ]*$','i'),
         callfunc: require('./delmsg')
+    },
+    setLogChannel: {
+        id: 19,
+        regex: new RegExp('^!setlogchannel[ ]+(<#[0-9]+>)[ ]*$', 'i'),
+        callfunc: require('./setlogchannel')
     }
 }
 

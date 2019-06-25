@@ -6,7 +6,8 @@ SET search_path TO bot_moderation; -- use schema
 /* Serveur : l'id du serveur et de son propriétaire */
 CREATE TABLE serveur (
 	id BIGINT PRIMARY KEY,
-	owner_id BIGINT NOT NULL
+	owner_id BIGINT NOT NULL,
+	log_channel BIGINT DEFAULT NULL
 );
 
 /* Role : on définit les rôles propre à l'application, par défaut la priorité est élevé car le rôle n'est pas important de base */
@@ -231,5 +232,6 @@ INSERT INTO command (id, command, regex, serveur_id) VALUES
 (15, '!getfrom @<modo>', '', NULL),
 (16, '!lock <channels:list>', '', NULL),
 (17, '!delock <channels:list>', '', NULL),
-(18, '!delmsg <channel> [-d <duration>, -u @<user>]', '', NULL);
-ALTER SEQUENCE command_id_seq RESTART WITH 19;
+(18, '!delmsg <channel> [-d <duration>, -u @<user>]', '', NULL),
+(19, '!setlogchannel <channel>', '', NULL);
+ALTER SEQUENCE command_id_seq RESTART WITH 20;

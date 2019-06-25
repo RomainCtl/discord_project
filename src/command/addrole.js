@@ -2,7 +2,7 @@ const db  = require('../model');
 
 module.exports = function(match, guild, channel, author, content, mentions) {
     let fields = [{
-        name: 'Command exécuté :',
+        name: 'Commande exécuté :',
         value: content
     }];
     return db.query('INSERT INTO role (name, priority, serveur_id) VALUES ($1, $2, $3) RETURNING id;', [match[1], match[2], guild.id]) // res[1] = nom, res[2] priority

@@ -3,7 +3,7 @@ const db  = require('../model');
 module.exports = function(match, guild, channel, author, content, mentions) {
     let user = Array.from( mentions.users )[0][1];
     let fields = [{
-        name: 'Command exécuté :',
+        name: 'Commande exécuté :',
         value: content
     }];
     return db.query('SELECT * FROM sanction WHERE victim = $1 AND serveur_id = $2;', [user.id, guild.id])

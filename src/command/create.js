@@ -20,7 +20,7 @@ module.exports = function(match, guild, channel, author, content, mentions) {
         return new Promise( (resolve, reject) => {
             reject(
                 {field: [{
-                    name: 'Command exécuté :',
+                    name: 'Commande exécuté :',
                     value: content
                 },
                 {
@@ -50,7 +50,7 @@ module.exports = function(match, guild, channel, author, content, mentions) {
     .then( res => {
         let fields = [
             {
-                name: 'Command exécuté :',
+                name: 'Commande exécuté :',
                 value: content
             },
             {

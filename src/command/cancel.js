@@ -6,7 +6,7 @@ module.exports = function(res, guild, channel, author, content, mentions) {
     return db.query('DELETE FROM sanction WHERE id=$1 RETURNING *', [res[1]]) // res[1] = id with regex
     .then (res => {
         let fields = [{
-            name: 'Command exécuté :',
+            name: 'Commande exécuté :',
             value: content
         }];
         if (res.rowCount == 0) {

@@ -57,7 +57,9 @@ Le fichier index.js est disponible dans /src/
 
 Le fichier index.js dans ./src/command/ à pour but de traiter les commandes envoyés par un utilisateur. Il commence d'abord par vérifier si l'utilisateur est légitime dans sa demande en vérifiant s'il dispose des droits nécessaires. 
 
-S'il dispose des droits nécessaires la commande est passé au travers d'un moulinage de **Regex** afin de comprendre de quel commande il s'agit. Si la commande est trouvée, elle est immédiatement exécuter par l'appel d'une fonction **`callfunc()`** qui traitera la fonction reçu. Si le match() ne retourne rien, alors il ne s'agit pas d'une fonction et ce n'est pas traiter.  Une liste des commandes globale est disponibles ci-contre :
+S'il dispose des droits nécessaires la commande est passé au travers d'un moulinage de **Regex** afin de comprendre de quel commande il s'agit. Si la commande est trouvée, elle est immédiatement exécuter par l'appel d'une fonction **`callfunc()`** qui traitera la fonction reçu. 
+
+Si le match() ne retourne rien, alors il ne s'agit pas d'une fonction et ce n'est pas traiter.  Une liste des commandes globale est disponibles ci-contre :
 
 ### Listes des commandes globale
 

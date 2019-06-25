@@ -61,6 +61,7 @@ client.on("guildDelete", guild => {
 });
 
 client.on('message', msg => {
+    // TODO check si l'author est sanctionne et agir en consequence ! (s'il est mute ...)
     if (msg.author.bot) return; // it's a bot
     if (msg.content.substring(0,1) != '!') return; // it's not a command
 
@@ -82,6 +83,8 @@ client.on('message', msg => {
             msg.author.send({ embed: defaultEmbed });
         }
     });
+
+    // TODO create setTimeOut() pour la prochaine sanct, reado on each command
 });
 
 client.login(auth.token);

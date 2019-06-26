@@ -8,7 +8,7 @@ var chan_list_regex_creation = new ChanListRegexCreation(); // to create regex f
 const user = "<@\!?([0-9]+)>";
 const reason = "((?:(?!-d|-c).)+)";
 
-module.exports = function(match, guild, channel, author, content, mentions) {
+module.exports = function(match, guild, channel, author, content, mentions, bot) {
     let type = match[1], // ban, kick or ...
         duration_restriction = match[3], // <[entier] or >[entier] (or undefined)
         channels_restriction = match[6]; // IN [list] or NOT IN [list] (or undefined)

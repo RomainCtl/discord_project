@@ -1,6 +1,6 @@
 const db  = require('../model');
 
-module.exports = function(match, guild, channel, author, content, mentions) {
+module.exports = function(match, guild, channel, author, content, mentions, bot) {
     let user = Array.from( mentions.users )[0][1];
     let fields = [{
         name: 'Commande exécuté :',

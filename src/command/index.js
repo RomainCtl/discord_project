@@ -90,17 +90,25 @@ const global_cmd = {
         id: 18,
         regex: new RegExp('^!delmsg[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*(-d[ ]+([0-9]+))?([ ]*-u[ ]+<@\!?([0-9]+)>)?[ ]*$','i'),
         callfunc: require('./delmsg')
+    },
+    setLogChannel: {
+        id: 19,
+        regex: new RegExp('^!setlogchannel[ ]+(<#[0-9]+>)[ ]*$', 'i'),
+        callfunc: require('./setlogchannel')
     }
 }
 
 // TODO check les custom commands (les custom ban dans le callfunc de ban etc ...) (PS: sinon elles seront prise en "inconnu" ou en ban normal)
 // TODO command !help qui retourne toutes les commandes auquels on a acces
 
+// insert into sanction (reason, duration, channels, victim, author, serveur_id, s_type, discord_role) VALUES ('parceque', 3600, '<#1253> .text', 1235978421, 481855543950966785, 481862019042115585, 'BAN', NULL);
+
 module.exports = {
     check_and_run: (guild, channel, author, content, mentions) => {
         for (let key in global_cmd) {
             let match = content.match( global_cmd[key].regex );
             if (match != null) {
+                // TODO particular traitment for sanctions (ban, kic, deaf, mute)
                 // check permission
                 return db.query('SELECT user_can_use_cmd($1, $2, $3)', [author.id, global_cmd[key].id, guild.id])
                 .then (res => {

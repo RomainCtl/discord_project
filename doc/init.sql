@@ -6,7 +6,8 @@ SET search_path TO bot_moderation; -- use schema
 /* Serveur : l'id du serveur et de son propriétaire */
 CREATE TABLE serveur (
 	id BIGINT PRIMARY KEY,
-	owner_id BIGINT NOT NULL
+	owner_id BIGINT NOT NULL,
+	log_channel BIGINT DEFAULT NULL
 );
 
 /* Role : on définit les rôles propre à l'application, par défaut la priorité est élevé car le rôle n'est pas important de base */
@@ -43,6 +44,7 @@ CREATE TABLE staff (
 );
 
 /* Sanction : on définit les punitions, avec toutes les informations nécessaire pour le bot pour la traiter */
+CREATE TYPE sanction_type AS ENUM ('BAN', 'MUTE', 'DEAF', 'KICK', 'WARN');
 CREATE TABLE sanction (
 	id SERIAL PRIMARY KEY,
 	reason TEXT,
@@ -52,7 +54,8 @@ CREATE TABLE sanction (
 	victim BIGINT NOT NULL,
 	author BIGINT NOT NULL,
 	serveur_id BIGINT,
-	cmd VARCHAR NOT NULL,
+	s_type sanction_type NOT NULL,
+	discord_role VARCHAR() DEFAULT NULL, -- role cree sur le serveur discord pour la sanction (avec les restrictions)
 	-- FOREIGN KEY (author) REFERENCES moderateur(id) ON DELETE RESTRICT, -- author peut aussi etre le owner d'un serveur
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE SET NULL -- nous gardons les sanctions meme si le serveur est supprimé
 );
@@ -91,23 +94,23 @@ SELECT * FROM sanction WHERE duration <> NULL OR date + duration *interval'1 sec
 
 -- liste des ban
 CREATE VIEW ban AS
-SELECT * FROM sanction WHERE substring(cmd, 2, 3) = 'ban';
+SELECT * FROM sanction WHERE s_type = 'BAN';
 
 -- liste des kick
 CREATE VIEW kick AS
-SELECT * FROM sanction WHERE substring(cmd, 2, 4) = 'kick';
+SELECT * FROM sanction WHERE s_type = 'KICK';
 
 -- liste des deaf
 CREATE VIEW deaf AS
-SELECT * FROM sanction WHERE substring(cmd, 2, 4) = 'deaf';
+SELECT * FROM sanction WHERE s_type = 'DEAF';
 
 -- liste des mute
 CREATE VIEW mute AS
-SELECT * FROM sanction WHERE substring(cmd, 2, 4) = 'mute';
+SELECT * FROM sanction WHERE s_type = 'MUTE';
 
 -- liste des warn
 CREATE VIEW warn AS
-SELECT * FROM sanction WHERE substring(cmd, 2, 4) = 'warn';
+SELECT * FROM sanction WHERE s_type = 'WARN';
 
 
 /* FUNCTIONS */
@@ -229,5 +232,6 @@ INSERT INTO command (id, command, regex, serveur_id) VALUES
 (15, '!getfrom @<modo>', '', NULL),
 (16, '!lock <channels:list>', '', NULL),
 (17, '!delock <channels:list>', '', NULL),
-(18, '!delmsg <channel> [-d <duration>, -u @<user>]', '', NULL);
-ALTER SEQUENCE command_id_seq RESTART WITH 19;
+(18, '!delmsg <channel> [-d <duration>, -u @<user>]', '', NULL),
+(19, '!setlogchannel <channel>', '', NULL);
+ALTER SEQUENCE command_id_seq RESTART WITH 20;

@@ -2,7 +2,7 @@ const db  = require('../model');
 
 module.exports = function(match, guild, channel, author, content, mentions) {
     let fields = [{
-        name: 'Command exécuté :',
+        name: 'Commande exécuté :',
         value: content
     }];
     return db.query('SELECT rankup_user($1, $2, $3);', [match[1], match[2], guild.id]) // res[1] = user, res[2] role

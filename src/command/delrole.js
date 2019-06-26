@@ -2,7 +2,7 @@ const db  = require('../model');
 
 module.exports = function(match, guild, channel, author, content, mentions) {
     let fields = [{
-        name: 'Command exécuté :',
+        name: 'Commande exécuté :',
         value: content
     }];
     return db.query('DELETE FROM role WHERE id = $1 RETURNING name;', [match[1]]) // res[1] = id du role

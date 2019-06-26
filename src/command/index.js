@@ -104,7 +104,7 @@ const global_cmd = {
 // insert into sanction (reason, duration, channels, victim, author, serveur_id, s_type, discord_role) VALUES ('parceque', 3600, '<#1253> .text', 1235978421, 481855543950966785, 481862019042115585, 'BAN', NULL);
 
 module.exports = {
-    check_and_run: (guild, channel, author, content, mentions) => {
+    check_and_run: (guild, channel, author, content, mentions, bot) => {
         for (let key in global_cmd) {
             let match = content.match( global_cmd[key].regex );
             if (match != null) {
@@ -114,7 +114,7 @@ module.exports = {
                 .then (res => {
                     console.log(match); // FIXME delete this
                     if (res.rows[0].user_can_use_cmd)
-                        return global_cmd[key].callfunc(match, guild, channel, author, content, mentions);
+                        return global_cmd[key].callfunc(match, guild, channel, author, content, mentions, bot);
                     else
                         return {field: [{
                             name: 'Command exécuté :',

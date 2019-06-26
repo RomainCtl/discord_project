@@ -1,20 +1,33 @@
 const db  = require('../model');
+const lock = require('../model/roles/lock');
 
-module.exports = function(res, guild, channel, author, content, mentions) {
-    // client param is db client
-    console.log("it's a lock");
-    // TODO
-    //On change la persmission du channel pour le verrouiller:
-    let myRole = guild.roles.find(role => role.name === "everyone");
+module.exports = function(match, guild, channel, author, content, mentions, bot) {
+    //On change la persmission des channels pour les verrouiller:
 
-    channel.overwritePermissions(
-        myRole,//Il faudra rajouter un rôle Fermer pour indiquer que la chaine est fermer
-        { 'SEND_MESSAGES': false },
-        // optional 'reason' for permission overwrite
-        'La discussion est terminé'
-    )
-    // handle responses / errors
-    .then(console.log)
-    .catch(console.log);
-    return {};
+    let guild_channels = Array.from(guild.channels.values());
+    let match_chan = match[1].split(new RegExp('[ ]+', 'i'));
+
+    // ne prendre que les channels concernés
+    guild_channels = guild_channels.filter( chan => {
+        for (let i=0 ; i<match_chan.length ; i++)
+            if ((match_chan[i] == ".audio" && chan.type == "voice") || match_chan[i] == '<#'+chan.id+'>' || (match_chan[i] == ".text" && chan.type == "text") )
+                return true;
+        return false;
+    });
+
+    return Promise.all(Array.from(guild_channels, c => {
+        return lock.create_if_not_exist(guild, bot)
+        .then( () => {
+            return lock.lock_channel(c);
+        });
+    }))
+    .then( res => {
+        let result = [];
+        for (let i in res)
+            result = result.concat(res[i]);
+        return {field: result};
+    })
+    .catch( err => {
+        throw err;
+    });
 }

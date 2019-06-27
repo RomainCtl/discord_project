@@ -1,6 +1,6 @@
 const db  = require('../model');
 
-// FIXME remove role from victim (ex: mute etc... (add this role to db ?))
+// TODO remove overwrite permission on channels concerned from victim  (replacePermissionOverwrites)
 
 module.exports = function(res, guild, channel, author, content, mentions, bot) {
     return db.query('DELETE FROM sanction WHERE id=$1 RETURNING *', [res[1]]) // res[1] = id with regex
@@ -9,6 +9,7 @@ module.exports = function(res, guild, channel, author, content, mentions, bot) {
             name: 'Commande exécuté :',
             value: content
         }];
+        let victim_id = res.rows[0]['victim'];
         if (res.rowCount == 0) {
             // nothing to delete
             fields.push({
@@ -17,14 +18,44 @@ module.exports = function(res, guild, channel, author, content, mentions, bot) {
             });
             return {field: fields};
         } else {
-            // display deleted sanctions
-            for (let key in res.rows[0])
-                fields.push({
-                    name: key,
-                    value: res.rows[0][key],
-                    inline: true
-                });
-            return {field: fields};
+            switch (res.rows[0]['s_type']) {
+                case 'BAN':
+                    return guild.unban(victim_id)
+                    .then( () => {
+                        fields.push({
+                            name: 'Message :',
+                            value: "L'utilisateur <@"+victim_id+"> viens d'être unban !"
+                        });
+                        return {field: fields};
+                    })
+                    .catch(err => {
+                        throw err;
+                    });
+                case 'DEAF':
+                    return guild.member(victim_id).setDeaf(false)
+                    .then(() =>  {
+                        fields.push({
+                            name: 'Message :',
+                            value: "L'utilisateur <@"+victim_id+"> peut de nouveau entendre !"
+                        });
+                        return {field: fields};
+                    })
+                    .catch(err => {
+                        throw err;
+                    });
+                case 'MUTE':
+                    return guild.member(victim_id).setMute(false)
+                    .then(() =>  {
+                        fields.push({
+                            name: 'Message :',
+                            value: "L'utilisateur <@"+victim_id+"> peut de nouveau parler !"
+                        });
+                        return {field: fields};
+                    })
+                    .catch(err => {
+                        throw err;
+                    });
+            }
         }
     })
     .catch( err => {

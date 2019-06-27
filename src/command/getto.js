@@ -15,7 +15,7 @@ module.exports = function(match, guild, channel, author, content, mentions, bot)
        //On insère les résultats dans le tableau
         for (let i=0 ; i<res.rows.length ; i++) {
             let row = res.rows[i];
-            value+= '| '+row.id+' | '+row.reason+' | '+row.duration+' | '+row.date+' | '+row.channels+' | <@'+row.victim+'> | <@'+row.author+'> | '+row.serveur_id+' | '+row.s_type+' |\n";
+            value+= '| '+row.id+' | '+row.reason+' | '+row.duration+' | '+row.date+' | '+row.channels+' | <@'+row.victim+'> | <@'+row.author+'> | '+row.serveur_id+' | '+row.s_type+' |\n';
         }
         //On envoi les résultats :
         fields.push({

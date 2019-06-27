@@ -125,16 +125,12 @@ client.on('message', msg => {
     .then( res => {
         console.log(res);
         if ('field' in res) {
-            defaultEmbed.fields = res.field;
-            msg.author.send({ embed: defaultEmbed });
             log(log_channel, res.field, msg.author.username, msg.author.avatarURL);
         }
     })
     .catch( err => {
         console.log(err);
         if ('field' in err) {
-            defaultEmbed.fields = err.field;
-            msg.author.send({ embed: defaultEmbed });
             log(log_channel, err.field, msg.author.username, msg.author.avatarURL);
         }
     });

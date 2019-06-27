@@ -95,6 +95,11 @@ const global_cmd = {
         id: 19,
         regex: new RegExp('^!setlogchannel[ ]+(<#[0-9]+>)[ ]*$', 'i'),
         callfunc: require('./setlogchannel')
+    },
+    help: {
+        id: -1, // means that's not in db
+        regex: new RegExp('^!help[ ]*$'),
+        callfunc: require('./help')
     }
 }
 
@@ -109,25 +114,29 @@ module.exports = {
             let match = content.match( global_cmd[key].regex );
             if (match != null) {
                 // TODO particular traitment for sanctions (ban, kic, deaf, mute)
-                // check permission
-                return db.query('SELECT user_can_use_cmd($1, $2, $3)', [author.id, global_cmd[key].id, guild.id])
-                .then (res => {
-                    console.log(match); // FIXME delete this
-                    if (res.rows[0].user_can_use_cmd)
-                        return global_cmd[key].callfunc(match, guild, channel, author, content, mentions, bot);
-                    else
-                        return {field: [{
-                            name: 'Command exécuté :',
-                            value: content
-                        },
-                        {
-                            name: 'Erreur :',
-                            value: "Vous n'avez pas la permission d'executer cette commande !"
-                        }]};
-                })
-                .catch( err => {
-                    throw err;
-                });
+
+                if (global_cmd[key].id == -1)
+                    return global_cmd[key].callfunc(match, guild, channel, author, content, mentions, bot);
+                else {
+                    // check permission
+                    return db.query('SELECT user_can_use_cmd($1, $2, $3)', [author.id, global_cmd[key].id, guild.id])
+                    .then (res => {
+                        if (res.rows[0].user_can_use_cmd)
+                            return global_cmd[key].callfunc(match, guild, channel, author, content, mentions, bot);
+                        else
+                            return {field: [{
+                                name: 'Command exécuté :',
+                                value: content
+                            },
+                            {
+                                name: 'Erreur :',
+                                value: "Vous n'avez pas la permission d'executer cette commande !"
+                            }]};
+                    })
+                    .catch( err => {
+                        throw err;
+                    });
+                }
             }
         }
 

@@ -104,7 +104,6 @@ const global_cmd = {
 }
 
 // TODO check les custom commands (les custom ban dans le callfunc de ban etc ...) (PS: sinon elles seront prise en "inconnu" ou en ban normal)
-// TODO command !help qui retourne toutes les commandes auquels on a acces
 
 // insert into sanction (reason, duration, channels, victim, author, serveur_id, s_type) VALUES ('parceque', 3600, '<#1253> .text', 1235978421, 481855543950966785, 481862019042115585, 'BAN');
 
@@ -115,7 +114,7 @@ module.exports = {
             if (match != null) {
                 // TODO particular traitment for sanctions (ban, kic, deaf, mute)
 
-                if (global_cmd[key].id == -1)
+                if (global_cmd[key].id == -1) // commandes qui n'ont pas besoin d'etre en BDD (!help par exemple car tout le monde peut l'executer)
                     return global_cmd[key].callfunc(match, guild, channel, author, content, mentions, bot);
                 else {
                     // check permission

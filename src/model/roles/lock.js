@@ -52,6 +52,62 @@ class Lock {
             });
         }
     }
+    delock_channel(chan) {
+        if (this.guild == null || this.role == null) {
+            return new Promise( (resolve, reject) => {
+                reject({
+                    message: 'Always use \'create_if_not_exist\' function before use it !'
+                });
+            });
+        } else if (chan.type == "voice") { // channel de type voice
+            return chan.replacePermissionOverwrites({ // replace Permission Overwrite veut dire qu'il remet les permissions existante avant le lock
+                overwrites: [
+                    {id: this.role.id}
+                ]
+            }).then( chan => {
+                return [{
+                    name: 'Le channel de type '+chan.type,
+                    value: '<#'+chan.id+'> a été déverouillé avec succès !'
+                }];
+            }).catch( err => {
+                throw err;
+            });
+        }
+        else if (chan.type == "text") { // channel de type text
+            return chan.replacePermissionOverwrites({
+                overwrites: [
+                    {id: this.role.id}
+                ]
+            }).then( chan => {
+                return [{
+                    name: 'Le channel de type '+chan.type,
+                    value: '<#'+chan.id+'> a été déverouillé avec succès !'
+                }];
+            }).catch( err => {
+                throw err;
+            });
+        } else if (chan.type == 'category') { // si c'est une categorie (qui a donc plusieurs enfants)
+            let channels = Array.from( this.guild.channels.values() );
+            channels = channels.filter(c => c.parentID == chan.id); // select all children
+
+            return Promise.all( Array.from(channels, c => this.delock_channel(c)) ) // lock them (use promise)
+            .then( res => {
+                let fields = []; // group each field create by promises (this function (recusrive))
+                for (let i in res)
+                    fields.push(res[i][0]);
+                return fields;
+            })
+            .catch( err => {
+                throw err;
+            });
+        } else {
+            return new Promise(  (resolve, reject) => {
+                reject({
+                    message: 'Unknown channel type'
+                });
+            })
+        }
+    }
     lock_channel(chan) {
         if (this.guild == null || this.role == null) {
             return new Promise( (resolve, reject) => {

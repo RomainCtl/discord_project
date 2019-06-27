@@ -89,7 +89,7 @@ CREATE TABLE panel_white_list (
 
 -- Sanctions en cours
 CREATE VIEW active_sanction AS
-SELECT * FROM sanction WHERE duration <> NULL OR date + duration *interval'1 second' > now();
+SELECT * FROM sanction WHERE duration IS NOT NULL OR date + duration *interval'1 second' > now();
 
 -- liste des ban
 CREATE VIEW ban AS

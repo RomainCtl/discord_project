@@ -5,29 +5,11 @@ const db  = require('./model');
 
 const client = new Discord.Client();
 
-const defaultEmbed = {
-	color: 0x0099ff,
-	title: 'Alfred',
-    url: 'http://localhost/bot_panel',
-    author: {},
-	description: 'Bot modération',
-	fields: [],
-	timestamp: new Date()
-};
 const default_log_embed = {
 	color: 0x0099ff,
 	title: 'Alfred',
 	url: 'http://localhost/bot_panel',
-	fields: [
-		{
-			name: 'Commande exécuté :',
-			value: ''
-        },
-        {
-			name: 'Message :',
-			value: ''
-		}
-	],
+	fields: [],
 	timestamp: new Date(),
 	footer: {
 		text: 'Merci de votre confiance',
@@ -35,6 +17,15 @@ const default_log_embed = {
 	}
 };
 
+var timeout = null;
+
+/**
+ * to log data on log channel
+ * @param {TextChannel} channel
+ * @param {Object} fields
+ * @param {string} author_name
+ * @param {string} author_avatar
+ */
 function log(channel, fields, author_name, author_avatar){
     if (channel == null) return;
     default_log_embed.fields = fields;
@@ -42,11 +33,47 @@ function log(channel, fields, author_name, author_avatar){
     channel.send({embed: default_log_embed});
 }
 
+/**
+ * Function that remove all expired sanctions and that create timeout to the next sanctions to remove
+ */
+function auto_remove_sanction() {
+    if (timeout != null) client.clearTimeout(timeout);
+    db.query("SELECT id FROM sanction WHERE date + duration *interval'1 second' < now()")
+    .then( res => {
+        // retirer toutes les sanctions terminées
+        for (let i=0 ; i<res.rowCount ; i++) {
+            let id = res.rows[i].id;
+            require('./command/cancel')(['', id], guild, null, null, '!cancel '+id, null, null);
+        }
+
+        // set timeout before cancel next sanction
+        return db.query("SELECT EXTRACT(EPOCH FROM date + duration *interval'1 second' -now()) AS delay FROM sanction WHERE duration IS NOT NULL ORDER BY (date + duration *interval'1 second') DESC LIMIT 1;");
+    })
+    .then( res => {
+        if (res.rowCount == 1)
+            timeout = client.setTimeout(auto_remove_sanction, res.rows[0].delay);
+    })
+    .catch( err => {
+        console.log("============= TimeOut Error =============");
+        console.log(err);
+        timeout = client.setTimeout(auto_remove_sanction, 5000); // on error wait 5 sec and redo it..
+    });
+}
+
+/**
+ * Event triggered when bot is OP
+ */
 client.on('ready', () => {
     client.user.setActivity(`on ${client.guilds.size} servers`);
     console.log("Bot is connected");
+
+    // settimeout pour la prochaine sanction a retirer, reset a chaque commande (si une nouvelle sanction est cree)
+    auto_remove_sanction();
 });
 
+/**
+ * Event triggered when bot join new guild
+ */
 client.on("guildCreate", guild => {
     // le bot rejoint une guild
     console.log("Joined a new guild: " + guild.name +" | "+ guild.id);
@@ -62,6 +89,9 @@ client.on("guildCreate", guild => {
     });
 });
 
+/**
+ * Event triggered when bot leave a guild
+ */
 client.on("guildDelete", guild => {
     // le bot est supprimer d'une guild
     console.log("Left a guild: " + guild.name +" | "+ guild.id);
@@ -76,6 +106,9 @@ client.on("guildDelete", guild => {
     });
 });
 
+/**
+ * Event triggered when message is deleted on channel
+ */
 client.on('messageDelete', msg => {
     if (msg.author.bot) return; // it's a bot
     db.query('SELECT log_channel FROM serveur WHERE id=$1;', [msg.guild.id])
@@ -90,6 +123,10 @@ client.on('messageDelete', msg => {
         }
     }).catch(console.log);
 });
+
+/**
+ * Event triggered when message is updated
+ */
 client.on('messageUpdate', (old_msg, new_msg) => {
     if (new_msg.author.bot) return; // it's a bot
     db.query('SELECT log_channel FROM serveur WHERE id=$1;', [old_msg.guild.id])
@@ -105,7 +142,9 @@ client.on('messageUpdate', (old_msg, new_msg) => {
     }).catch(console.log);
 });
 
-
+/**
+ * Event triggered when message was send on channel
+ */
 client.on('message', msg => {
     if (msg.author.bot) return; // it's a bot
     var log_channel = null;
@@ -115,7 +154,6 @@ client.on('message', msg => {
         if (res.rowCount == 1) log_channel = client.channels.get(res.rows[0]['log_channel']);
     }).catch();
 
-    // TODO check si l'author est sanctionne et agir en consequence ! (s'il est mute ...)
     if (msg.content.substring(0,1) != '!') return; // it's not a command
 
     console.log({command: msg.content});
@@ -123,19 +161,23 @@ client.on('message', msg => {
     // une commande est envoyé sur le serveur (guild) par un joueur
     cmd.check_and_run(msg.guild, msg.channel, msg.author, msg.content, msg.mentions, client.user)
     .then( res => {
-        console.log(res);
-        if ('field' in res) {
+        // console.log(res);
+        if ('field' in res)
             log(log_channel, res.field, msg.author.username, msg.author.avatarURL);
-        }
+
+        // settimeout pour la prochaine sanction a retirer, reset a chaque commande (si une nouvelle sanction est cree)
+        auto_remove_sanction();
     })
     .catch( err => {
-        console.log(err);
-        if ('field' in err) {
+        // console.log(err);
+        if ('field' in err)
             log(log_channel, err.field, msg.author.username, msg.author.avatarURL);
-        }
-    });
 
-    // TODO create setTimeOut() pour la prochaine sanct, reado on each command
+        // settimeout pour la prochaine sanction a retirer, reset a chaque commande (si une nouvelle sanction est cree)
+        auto_remove_sanction();
+    });
 });
 
+
+/* Run bot (login to Discord API) */
 client.login(auth.token);

@@ -3,8 +3,8 @@ const deaf = require('../model/deaf');
 const mute = require('../model/mute');
 const ban = require('../model/ban');
 
-module.exports = function(res, guild, channel, author, content, mentions, bot) {
-    return db.query('DELETE FROM sanction WHERE id=$1 RETURNING *', [res[1]]) // res[1] = id with regex
+module.exports = function(match, guild, channel, author, content, mentions, bot) {
+    return db.query('DELETE FROM sanction WHERE id=$1 RETURNING *', [match[1]]) // match[1] = id with regex
     .then (res => {
         let fields = [{
             name: 'Commande exécuté :',

@@ -101,7 +101,7 @@ const global_cmd = {
 // TODO check les custom commands (les custom ban dans le callfunc de ban etc ...) (PS: sinon elles seront prise en "inconnu" ou en ban normal)
 // TODO command !help qui retourne toutes les commandes auquels on a acces
 
-// insert into sanction (reason, duration, channels, victim, author, serveur_id, s_type, discord_role) VALUES ('parceque', 3600, '<#1253> .text', 1235978421, 481855543950966785, 481862019042115585, 'BAN', NULL);
+// insert into sanction (reason, duration, channels, victim, author, serveur_id, s_type) VALUES ('parceque', 3600, '<#1253> .text', 1235978421, 481855543950966785, 481862019042115585, 'BAN');
 
 module.exports = {
     check_and_run: (guild, channel, author, content, mentions, bot) => {

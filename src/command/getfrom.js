@@ -1,11 +1,13 @@
 const db  = require('../model');
 
 module.exports = function(match, guild, channel, author, content, mentions) {
+    //On récupère une lsite des utilisateurs :
     let user = Array.from( mentions.users )[0][1];
     let fields = [{
         name: 'Commande exécuté :',
         value: content
     }];
+    //On va chercher dans la base de données les 
     return db.query('SELECT * FROM sanction WHERE author = $1 AND serveur_id = $2;', [user.id, guild.id])
     .then( res => {
         let value = "```MD\n| id | reason | duration | date | channels | victim | author | serveur_id | s_type | discord_role |\n";

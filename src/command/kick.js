@@ -1,30 +1,76 @@
 const db  = require('../model');
 
-module.exports = function(res, guild, channel, author, content, mentions, bot) {
-    // client param is db client
-    console.log("it's a kick");
-    // TODO
+const kick_embed = {
+	color: 0xFFD000,
+	title: 'Alfred',
+    url: 'http://localhost/bot_panel',
+    author: {},
+	fields: [],
+	timestamp: new Date(),
+	footer: {
+		text: 'Merci de votre confiance',
+		icon_url: '',
+	}
+};
 
-    //On récupère l'utilisateur de res :
-    var cible = Client.fetchUser(res[1]);
-    // 
-    const member = guild.member(cible);
-    if(member){
-        member.kick(res[3]).then(() => {
-            // We let the message author know we were able to kick the person
-            message.reply('Kick réussi');
-          }).catch(err => {
-            // An error happened
-            // This is generally due to the bot not being able to kick the member,
-            // either due to missing permissions or role hierarchy
-            message.reply('Kick échoué');
-            // Log the error
-            console.error(err);
-          });
-    }
-    else {
-        message.reply('L\'utilisateur n\'est pas dans la guilde !');
-    }
+module.exports = function(match, guild, channel, author, content, mentions, bot) {
+    let user_to_kick = guild.member(mentions.users.array()[0]);
 
-    return {};
+    kick_embed.fields = [{
+            name: "Attention !",
+            value: "Vous venez d'être **explusé** du serveur "+guild.name+" par un modérateur pour la raison suivante :\n \""+match[2]+'"'
+    }];
+    kick_embed.author = {name: author.name, icon_url: author.avatarURL}
+
+    if (user_to_kick.kickable) {
+        return user_to_kick.kick(match[2])
+        .then( res => {
+            return user_to_kick.send({embed: kick_embed})
+            .then( msg => {
+                return {field: [
+                    {
+                        name: 'Commande executé :',
+                        value: content
+                    }, {
+                        name: 'Message',
+                        value: "L'utilisateur <@"+user_to_kick.id+"> viens d'être kick !"
+                    }, {
+                        name: 'Raison',
+                        value: match[2]
+                    }
+                ]};
+            })
+            .catch( err => {
+                return {field: [
+                    {
+                        name: 'Commande exécuté :',
+                        value: content
+                    }, {
+                        name: 'Message',
+                        value: "L'utilisateur <@"+user_to_kick.id+"> viens d'être kick !"
+                    }, {
+                        name: "Mais aucun message n'a pu lui être envoyé !",
+                        value: err.message
+                    }
+                ]};
+            });
+        })
+        .catch(err => {
+            throw err;
+        });
+    } else {
+        return new Promise( (resvole, reject) => {
+            reject({
+                field: [
+                    {
+                        name: 'Commande executé :',
+                        value: content
+                    }, {
+                        name: 'Message :',
+                        value: "L'utilisateur <@"+user_to_kick.id+"> ne peut pas etre kick !"
+                    }
+                ]
+            });
+        });
+    }
 }

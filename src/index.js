@@ -135,7 +135,7 @@ client.on('message', msg => {
         if ('field' in err) {
             defaultEmbed.fields = err.field;
             msg.author.send({ embed: defaultEmbed });
-            log(log_channel, res.field, msg.author.username, msg.author.avatarURL);
+            log(log_channel, err.field, msg.author.username, msg.author.avatarURL);
         }
     });
 

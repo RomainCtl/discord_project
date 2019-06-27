@@ -32,7 +32,7 @@ module.exports = function(match, guild, channel, author, content, mentions, bot)
                     fetched = fetched.filter(m => m.createdTimestamp >= time_limit ); // filter all message older than 2 weeks
                 }
                 if (match[5] != undefined)
-                    fetched = fetched.filter(m => m.author.id == mentions.users.array()[0].id ); // message from specified user
+                    fetched = fetched.filter(m => m.author.id == match[5] ); // message from specified user
 
                 try {
                     await chan.bulkDelete(fetched);

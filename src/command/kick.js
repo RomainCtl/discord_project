@@ -13,6 +13,8 @@ const kick_embed = {
 	}
 };
 
+// TODO manage custom command too !
+
 module.exports = function(match, guild, channel, author, content, mentions, bot) {
     let user_to_kick = guild.member(mentions.users.array()[0]);
 
@@ -23,10 +25,16 @@ module.exports = function(match, guild, channel, author, content, mentions, bot)
     kick_embed.author = {name: author.name, icon_url: author.avatarURL}
 
     if (user_to_kick.kickable) {
-        return user_to_kick.kick(match[2])
-        .then( res => {
-            return user_to_kick.send({embed: kick_embed})
-            .then( msg => {
+        return user_to_kick.send({embed: kick_embed})
+        .then( () => {
+            return Promise.all([
+                user_to_kick.kick(match[2]),
+                db.query(
+                    'INSERT INTO sanction (reason, duration, channels, victim, author, serveur_id, s_type) VALUES ($1, $2, $3, $4, $5, $6, $7);',
+                    [match[2], null, null, user_to_kick.id, author.id, guild.id, 'KICK']
+                )
+            ])
+            .then( () => {
                 return {field: [
                     {
                         name: 'Commande executé :',

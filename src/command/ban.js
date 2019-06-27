@@ -1,4 +1,5 @@
 const db  = require('../model');
+const ban = require('../model/ban')
 
 const ban_embed = {
 	color: 0xFF0B00,
@@ -20,19 +21,34 @@ module.exports = function(match, guild, channel, author, content, mentions, bot)
     // match[4] => duration (number of days)
     // match[6] => channels restriction
 
+    let chan_list = Array.from(guild.channels.values());
     let duration = null;
-    let channels_r = null;
+    let match_chan = null;
     let options = {
         reason: match[2]
     };
+
     if (match[4] != undefined) {
-        duration = match[4] * 86400; // convert to sec
-        options['days'] = match[4];
+        duration = match[4];
+        options['days'] = match[4]/86400; // sec to day
     }
-    if (match[6] != undefined)
-        channels_r = match[6];
 
     let user_to_ban = guild.member(mentions.users.array()[0]);
+
+    // ne prendre que les channels concernés
+    if (match[6] != undefined) {
+        match_chan = match[6].split(new RegExp('[ ]+', 'i'));
+        chan_list = chan_list.filter( chan => {
+            for (let i=0 ; i<match_chan.length ; i++)
+                if ((match_chan[i] == ".audio" && chan.type == "voice") || match_chan[i] == '<#'+chan.id+'>' || (match_chan[i] == ".text" && chan.type == "text") )
+                    return true;
+            return false;
+        });
+        match_chan = match_chan.join(" ");
+    }
+
+    if (match_chan == null)
+        chan_list = []; // if no channel specified, ban discord
 
     ban_embed.fields = [{
             name: "Attention !",
@@ -44,10 +60,10 @@ module.exports = function(match, guild, channel, author, content, mentions, bot)
         return user_to_ban.send({embed: ban_embed})
         .then( () => {
             return Promise.all([
-                user_to_ban.ban(options),
+                ban.ban_user(guild, user_to_ban, chan_list, options),
                 db.query(
                     'INSERT INTO sanction (reason, duration, channels, victim, author, serveur_id, s_type) VALUES ($1, $2, $3, $4, $5, $6, $7);',
-                    [match[2], duration, channels_r, user_to_ban.id, author.id, guild.id, 'BAN']
+                    [match[2], duration, match_chan, user_to_ban.id, author.id, guild.id, 'BAN']
                 )
             ])
             .then( () => {

@@ -1,6 +1,7 @@
 const db  = require('../model');
 const deaf = require('../model/deaf');
 const mute = require('../model/mute');
+const ban = require('../model/ban');
 
 // TODO remove overwrite permission on channels concerned from victim  (replacePermissionOverwrites)
 
@@ -33,12 +34,13 @@ module.exports = function(res, guild, channel, author, content, mentions, bot) {
                             return true;
                     return false;
                 });
-            }
+            } else
+                chan_list = [];
 
             // delete sanctions
             switch (res.rows[0]['s_type']) {
                 case 'BAN':
-                    return guild.unban(victim_id)
+                    return ban.unban_user(guild, victim_id, chan_list)
                     .then( () => {
                         fields.push({
                             name: 'Message :',

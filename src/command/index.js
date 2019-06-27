@@ -88,7 +88,7 @@ const global_cmd = {
     },
     delmsg: {
         id: 18,
-        regex: new RegExp('^!delmsg[ ]+((<#[0-9]+>[ ]*|\.audio[ ]*|\.text[ ]*)+)[ ]*(-d[ ]+([0-9]+))?([ ]*-u[ ]+<@\!?([0-9]+)>)?[ ]*$','i'),
+        regex: new RegExp('^!delmsg[ ]+(<#[0-9]+>)[ ]*(-d[ ]+([0-9]+))?([ ]*-u[ ]+<@\!?([0-9]+)>)?[ ]*$','i'),
         callfunc: require('./delmsg')
     },
     setLogChannel: {

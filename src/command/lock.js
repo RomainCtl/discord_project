@@ -1,5 +1,5 @@
 const db  = require('../model');
-const lock = require('../model/roles/lock');
+const lock = require('../model/lock');
 
 module.exports = function(match, guild, channel, author, content, mentions, bot) {
     //On change la persmission des channels pour les verrouiller:

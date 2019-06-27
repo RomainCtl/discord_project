@@ -1,4 +1,6 @@
 const db  = require('../model');
+const deaf = require('../model/deaf');
+const mute = require('../model/mute');
 
 // TODO remove overwrite permission on channels concerned from victim  (replacePermissionOverwrites)
 
@@ -9,7 +11,6 @@ module.exports = function(res, guild, channel, author, content, mentions, bot) {
             name: 'Commande exécuté :',
             value: content
         }];
-        let victim_id = res.rows[0]['victim'];
         if (res.rowCount == 0) {
             // nothing to delete
             fields.push({
@@ -18,13 +19,30 @@ module.exports = function(res, guild, channel, author, content, mentions, bot) {
             });
             return {field: fields};
         } else {
+            let victim_id = res.rows[0]['victim'];
+            // get channels
+            let chan_list = Array.from(guild.channels.values());
+
+            // ne prendre que les channels concernés
+            let match_chan = res.rows[0]['channels'];
+            if (match_chan != null) {
+                match_chan = match_chan.split(new RegExp('[ ]+', 'i'));
+                chan_list = chan_list.filter( chan => {
+                    for (let i=0 ; i<match_chan.length ; i++)
+                        if ((match_chan[i] == ".audio" && chan.type == "voice") || match_chan[i] == '<#'+chan.id+'>' || (match_chan[i] == ".text" && chan.type == "text") )
+                            return true;
+                    return false;
+                });
+            }
+
+            // delete sanctions
             switch (res.rows[0]['s_type']) {
                 case 'BAN':
                     return guild.unban(victim_id)
                     .then( () => {
                         fields.push({
                             name: 'Message :',
-                            value: "L'utilisateur <@"+victim_id+"> viens d'être unban !"
+                            value: "L'utilisateur <@"+victim_id+"> viens d'être unban !\n *sur les channels :* "+chan_list.join(", ")
                         });
                         return {field: fields};
                     })
@@ -32,11 +50,11 @@ module.exports = function(res, guild, channel, author, content, mentions, bot) {
                         throw err;
                     });
                 case 'DEAF':
-                    return guild.member(victim_id).setDeaf(false)
+                    return deaf.undeaf_user(victim_id, chan_list)
                     .then(() =>  {
                         fields.push({
                             name: 'Message :',
-                            value: "L'utilisateur <@"+victim_id+"> peut de nouveau entendre !"
+                            value: "L'utilisateur <@"+victim_id+"> peut de nouveau entendre !\n *sur les channels :* "+chan_list.join(", ")
                         });
                         return {field: fields};
                     })
@@ -44,11 +62,11 @@ module.exports = function(res, guild, channel, author, content, mentions, bot) {
                         throw err;
                     });
                 case 'MUTE':
-                    return guild.member(victim_id).setMute(false)
+                    return mute.unmute_user(victim_id, chan_list)
                     .then(() =>  {
                         fields.push({
                             name: 'Message :',
-                            value: "L'utilisateur <@"+victim_id+"> peut de nouveau parler !"
+                            value: "L'utilisateur <@"+victim_id+"> peut de nouveau parler !\n *sur les channels :* "+chan_list.join(", ")
                         });
                         return {field: fields};
                     })

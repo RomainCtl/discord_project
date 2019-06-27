@@ -1,5 +1,11 @@
 const db  = require('../model');
 
+<<<<<<< HEAD
+module.exports = function(res, guild, channel, author, content, mentions, bot) {
+    // client param is db client
+    console.log("it's a warn");
+    // TODO
+=======
 const warn_embed = {
 	color: 0xFFD000,
 	title: 'Alfred',
@@ -12,6 +18,7 @@ const warn_embed = {
 		icon_url: '',
 	}
 };
+>>>>>>> 4b0f18962beac7eada0960fb5cde777cc6156a0f
 
 module.exports = function(match, guild, channel, author, content, mentions, bot) {
     let user_to_warn = mentions.users.array()[0];

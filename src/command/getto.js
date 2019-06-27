@@ -12,7 +12,7 @@ module.exports = function(match, guild, channel, author, content, mentions, bot)
         value += "|:--:|:------:|:--------:|:----:|:--------:|:------:|:------:|:----------:|:------:|\n";
         for (let i=0 ; i<res.rows.length ; i++) {
             let row = res.rows[i];
-            value+= '| '+row.id+' | '+row.reason+' | '+row.duration+' | '+row.date+' | '+row.channels+' | <@'+row.victim+'> | <@'+row.author+'> | '+row.serveur_id+' | '+row.s_type+' |\n";
+            value+= '| '+row.id+' | '+row.reason+' | '+row.duration+' | '+row.date+' | '+row.channels+' | <@'+row.victim+'> | <@'+row.author+'> | '+row.serveur_id+' | '+row.s_type+' |\n';
         }
         fields.push({
             name: 'Resultat :',

@@ -55,7 +55,6 @@ CREATE TABLE sanction (
 	author BIGINT NOT NULL,
 	serveur_id BIGINT,
 	s_type sanction_type NOT NULL,
-	discord_role VARCHAR() DEFAULT NULL, -- role cree sur le serveur discord pour la sanction (avec les restrictions)
 	-- FOREIGN KEY (author) REFERENCES moderateur(id) ON DELETE RESTRICT, -- author peut aussi etre le owner d'un serveur
 	FOREIGN KEY (serveur_id) REFERENCES serveur(id) ON DELETE SET NULL -- nous gardons les sanctions meme si le serveur est supprimé
 );

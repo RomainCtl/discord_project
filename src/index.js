@@ -121,7 +121,7 @@ client.on('message', msg => {
     console.log({command: msg.content});
 
     // une commande est envoyé sur le serveur (guild) par un joueur
-    cmd.check_and_run(msg.guild, msg.channel, msg.author, msg.content, msg.mentions)
+    cmd.check_and_run(msg.guild, msg.channel, msg.author, msg.content, msg.mentions, client.user)
     .then( res => {
         console.log(res);
         if ('field' in res) {

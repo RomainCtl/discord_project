@@ -3,8 +3,6 @@ const deaf = require('../model/deaf');
 const mute = require('../model/mute');
 const ban = require('../model/ban');
 
-// TODO remove overwrite permission on channels concerned from victim  (replacePermissionOverwrites)
-
 module.exports = function(res, guild, channel, author, content, mentions, bot) {
     return db.query('DELETE FROM sanction WHERE id=$1 RETURNING *', [res[1]]) // res[1] = id with regex
     .then (res => {

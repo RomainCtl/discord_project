@@ -1,14 +1,10 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
 const config = require('./web/config');
 const router = require('./web/router');
 var app = express();
 
 // use router
 app.use('/', router);
-
-// use cookie parser
-app.use(cookieParser());
 
 // on error, do :
 app.use(function (err, req, res, next) {

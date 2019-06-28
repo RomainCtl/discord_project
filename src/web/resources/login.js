@@ -14,25 +14,43 @@ function get_access_guilds(user) {
     });
 }
 
+function get_cookies(header_str_c) {
+    if (typeof header_str_c != "string") return {};
+    let cookies = header_str_c.split('; ').map(c => c.split("="));
+    let res = {};
+    for (let i=0 ; i<cookies.length ; i++)
+        res[cookies[i][0]] = cookies[i][1];
+    return res;
+}
+
 module.exports = function(req, res) {
-    if (!req.params.token) {
+    let token = undefined;
+    let cookies = get_cookies(req.headers.cookie);
+
+    if (req.params.token != undefined) {
+        token = req.params.token;
+        res.cookie('token', token);
+    } else if (cookies != {} && 'token' in cookies)
+        token = cookies.token;
+
+    if (!token) {
         // discord connection
         res.redirect(`${config.discord_base_api}oauth2/authorize?client_id=${config.auth.client_id}&scope=identify&response_type=code&redirect_uri=${config.redirect}`);
     } else {
         // get data from user (guilds data)
         fetch(`${config.discord_base_api}users/@me`, {
             headers: {
-                authorization: "Bearer "+req.params.token,
+                authorization: "Bearer "+token,
             },
         })
         .then( response => {
             return response.json();
         })
         .then( json => {
+            // TODO token was expired -> clear token cookie
             return get_access_guilds(json);
         })
         .then(access_guild => { // result of previous 'then'
-            console.log(access_guild);
             return Promise.all(
                 Array.from(access_guild, g => fetch(`${config.discord_base_api}v6/guilds/${g}`, {
                     headers: {
@@ -51,16 +69,17 @@ module.exports = function(req, res) {
             let usefull_data = [];
             for (let g in guilds)
                 usefull_data.push({
-                    id: g.id,
-                    name: g.name,
-                    icon: g.icon
+                    id: guilds[g].id,
+                    name: guilds[g].name,
+                    icon: `https://cdn.discordapp.com/icons/${guilds[g].id}/${guilds[g].icon}.png`
                 });
 
-            if (usefull_data.length == 1) {
+            if (usefull_data.length == 0) {
                 // go to manage
                 // res.redirect(301, '/manage');
             } else {
-                // choose guild
+                console.log(usefull_data);
+                res.render('index', { title: 'Administration Panel', page_to_include: './components/guild_choose', guilds: usefull_data });
             }
         })
         .catch( err => {

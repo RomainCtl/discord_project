@@ -31,7 +31,7 @@ La première partie de notre travail de création d'un bot Discord est évidemme
 
 On crée une application qui deviendra notre futur bot. Discord nous fournit ce portail afin de simplifier la création d'application sur leur plateforme. 
 
-On se rend ensuite dans l'onglet **"Bot"** afin de confirmer que notre application est un utilisateurs robot, une fois que l'on confirme la nature de notre application nous serons données par Discord un __`Token`__ qui sera utilisé par notre application node js afin d'appeler le bot sur un serveur.
+On se rend ensuite dans l'onglet **"Bot"** afin de confirmer que notre application est un utilisateur robot, une fois que l'on confirme la nature de notre application nous serons données par Discord un __`Token`__ qui sera utilisé par notre application node js afin d'appeler le bot sur un serveur.
 
 
 ## Mise en place du WebSocket
@@ -47,21 +47,21 @@ Le code originel du ping pong est disponible dans le fichier ***/pingpong/index.
 ### Fonctionnement du WebSocket :
 
 
-Le but du WebSocket est de mettre en place une liaison entre l'api Discord et notre fichier node js. Pour ce faire nous commencons par déclarer un webSocket `client`, ce webSocket nouis permet de faire le lien avec discord par le biais de la `gateway` discord.
+Le but du WebSocket est de mettre en place une liaison entre l'api Discord et notre fichier node js. Pour ce faire nous commençons par déclarer un webSocket `client`, ce webSocket nous permet de faire le lien avec discord par le biais de la `gateway` discord.
 
-Si la connexion est réussie, le webSocket va vérifier en permanence ce qu'il reçoit de la gateway et, en fonction de son résultat, appelera une fonction `message()` qui vérifiera le contenu du message et en fonction de ce dernier pourra effectuer diverse action.
+Si la connexion est réussie, le webSocket va vérifier en permanence ce qu'il reçoit de la gateway et, en fonction de son résultat, appellera une fonction `message()` qui vérifiera le contenu du message et en fonction de ce dernier pourra effectuer diverses actions.
 
 Si le message envoyé au WebSocket est un message écrit, il peut être comparé au sein de la fonction `onMessage()` afin de vérifier s'il s'agit d'une commande.
 
-On extrait avec `substring` pour vérifier la présence du caractère du commande '`!`'. En cas de présence du caractère, on passera par la commande ***RegExp***.
+On extrait avec `substring` pour vérifier la présence du caractère de commande '`!`'. En cas de présence du caractère, on passera par la commande ***RegExp***.
 
 
 ### RegExp
 
 
-Au vu de son importante capital dans notre projet, regExp méritait sa propre catégorie.
+Au vu de son importance capital dans notre projet, regExp nécessite une explication.
 
-RegExp est un constructeur JavaScript permettant de reconnaitre une chaine de caractère afin d'en extraire des informations nécessaire au bon déroulement de la commande :
+RegExp est un constructeur JavaScript permettant de reconnaitre une chaine de caractère afin d'en extraire des informations nécessaires au bon déroulement de la commande :
 
 > *Exemple :*
 > 
@@ -77,7 +77,7 @@ RegExp est un constructeur JavaScript permettant de reconnaitre une chaine de ca
 > `'i'` : on indique que le message doit être converti en minuscule, sans majuscule
 
 
-Avec ce que nous avons pu tirer de notre travail sur le webSocket et les différents composants nécessaire, nous avons enfin pu nous lancer sur la réalisation de notre bot d'administration Discord.
+Avec ce que nous avons pu tirer de notre travail sur le webSocket et les différents composants nécessaires, nous avons enfin pu nous lancer sur la réalisation de notre bot d'administration Discord.
 
 
 ## Conception du bot avec Discord.js
@@ -85,10 +85,10 @@ Avec ce que nous avons pu tirer de notre travail sur le webSocket et les différ
 
 > Afin de faciliter la réalisation de notre bot, nous avons choisi d'utiliser la bibliothèque __discord.js__.
 
-Grâce à l'outil discord.js, nous pouvons simplifier la mise en place du bot, à l'aide des différentes fonction déjà présente dans l'extension. Cependant la simplification ouvre la prote à l'étendu du problème de la réalisation de l'application et afin de la simplifier, nous avons découpé l'application en plusieurs dossiers, chacun devant traités un aspect spécifique du bot :
+Grâce à l'outil discord.js, nous pouvons simplifier la mise en place du bot, à l'aide des différentes fonction déjà présentes dans l'extension. Cependant la simplification ouvre la porte à l'étendue du problème de la réalisation de l'application et afin de la simplifier, nous avons découpé l'application en plusieurs dossiers, chacun devant traités un aspect spécifique du bot :
 
 
-### index.js
+### src/index.js
 
 
 Le fichier en charge de traiter la connexion du bot au serveur, ainsi que la récupération des messages addressé au bot avant de les envoyer vers un index de traitement. Cela inclut notamment la détection de si le message est destiné au bot et vient d'un autre bot (dans ce cas il est ignoré) ou d'un utilisateur humain. Dans ce cas le message est envoyé dans la commande __`check_and_run()`__ de src/command.index.js afin de vérifier si le message vient d'un propriétaire légitime ou non.
@@ -96,14 +96,14 @@ Le fichier en charge de traiter la connexion du bot au serveur, ainsi que la ré
 Le fichier index.js est disponible dans /src/
 
 
-### command/index.js
+### src/command/index.js
 
 
 Le fichier index.js dans ./src/command/ à pour but de traiter les commandes envoyées par un utilisateur. Il commence d'abord par vérifier si l'utilisateur est légitime dans sa demande en vérifiant s'il dispose des droits nécessaires. 
 
 S'il dispose des droits nécessaires la commande est passée au travers d'un moulinage de **Regex** afin de comprendre de quelle commande il s'agit. Si la commande est trouvée, elle est immédiatement exécutée par l'appel d'une fonction **`callfunc()`** qui traitera la fonction reçue.
 
-Si le match() ne retourne rien, alors il ne s'agit pas d'une fonction n'est pas traiter.  
+Si le match() ne retourne rien, alors il ne s'agit pas d'une fonction n'est pas traité.  
 
 
 ### Les commandes globales
@@ -159,15 +159,15 @@ Nous nous sommes très vite rendu compte que pour effectuer les commandes de man
 >
 >   En effet, afin de verrouiller les channels, il est nécessaire de bloquer les utilisateurs en leur retirant les droits de lecture, écriture sur le channel, cependant cela ne pouvait pas être fait sur le rôle @everyone car cela aurait posé beaucoup plus de travail sur lock.js pour le mettre en place.
 >
->   Au lieu de cela, nous avons créer un rôle lock, de priorité très forte et on le donne à tout le monde. Ainsi, ceux ayant ce rôle se voit incapable d'écrire/lire sur le channel. Bien sûr, l'administrateur et les modérateurs autorisés peuvent continuer à écrire/lire dessus.
+>   Au lieu de cela, nous avons créé un rôle lock, de priorité très forte et on le donne à tout le monde. Ainsi, ceux ayant ce rôle se voient incapables d'écrire/lire sur le channel. Bien sûr, l'administrateur et les modérateurs autorisés peuvent continuer à écrire/lire dessus.
 >
 
 
 >   *Description de `cancel.js` :*
 >
->   cancel.js est un fichier nous permettant d'annuler une sanction d'après son id dans la base de données. Après avoir exécuter une commande dans la bdd pour vérifier l'existence de la sanction, cette dernière est effacé de la base et en fonction de son type on applique différent traitement permettant d'annuler les punitions appliquées. 
+>   cancel.js est un fichier nous permettant d'annuler une sanction d'après son id dans la base de données. Après avoir exécuté une commande dans la bdd pour vérifier l'existence de la sanction, cette dernière est effacée de la base et en fonction de son type on applique différents traitements permettant d'annuler les punitions appliquées. 
 >
->   Noter que cancel.js efface aussi la commande des logs.
+>   Noter que cancel.js efface aussi la commande des logs, elle n'est plus retrouvable après.
 >
 
 
@@ -178,11 +178,13 @@ Nous nous sommes très vite rendu compte que pour effectuer les commandes de man
 >   Pour mettre en place ce channel, la commande accède à la base de données et à l'intérieur du serveur lui indique quel channel (donc l'id du channel) auquel il doit envoyer envoyer les logs du bot.
 >
 >   Si aucun channel de log n'est en place, alors le bot n'envoi aucun log.
+>   ![Portail Developers de Discord](./rapport_bot_picture/channel_log.png)
 >
 
 >   *Description de `help.js` :*
 >
 >   Une commande permettant de récupérer de la base de données l'ensemble des commandes présente sur le serveur. 
+> ![Portail Developers de Discord](./rapport_bot_picture/help.png)
 >
 
 
@@ -196,4 +198,11 @@ Le panel est la troisième et dernière partie de notre projet. Nous devons mett
 
 Cette interface comporte une page d'accueil par lequel nous nous connectons à discord ainsi que d'un lien permettant d'appeler le bot sur votre serveur Discord.
 
-Le panel est retrouvable dans le dossier /src/web et est composer de 
+Le panel est retrouvable dans le dossier /src/web et quand installé sur le serveur, présentes différentes pages :
+
+
+### Accueil
+
+
+
+### 

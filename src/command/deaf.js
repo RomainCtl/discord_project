@@ -4,7 +4,7 @@ const deaf = require('../model/deaf')
 const deaf_embed = {
 	color: 0xFFD000,
 	title: 'Alfred',
-    url: 'http://localhost/bot_panel',
+    url: 'http://localhost:4000/',
     author: {},
 	fields: [],
 	timestamp: new Date(),

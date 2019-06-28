@@ -4,7 +4,7 @@ const ban = require('../model/ban')
 const ban_embed = {
 	color: 0xFF0B00,
 	title: 'Alfred',
-    url: 'http://localhost/bot_panel',
+    url: 'http://localhost:4000/',
     author: {},
 	fields: [],
 	timestamp: new Date(),

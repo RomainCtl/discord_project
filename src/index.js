@@ -8,7 +8,7 @@ const client = new Discord.Client();
 const default_log_embed = {
 	color: 0x0099ff,
 	title: 'Alfred',
-	url: 'http://localhost/bot_panel',
+	url: 'http://localhost:4000/',
 	fields: [],
 	timestamp: new Date(),
 	footer: {

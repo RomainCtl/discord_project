@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= title %></title>
+
+    <link href="/public/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/css/custom.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+</head>
+<body>
+    <% include ./includes/header %>
+
+    <%- include(page_to_include) %>
+
+    <% include ./includes/footer %>
+
+    <!-- jQuery -->
+    <script src="/public/js/jquery-1.11.3.min.js"></script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="/public/js/bootstrap.min.js"></script>
+    <!-- Plugin JavaScript -->
+    <script src="/public/js/jquery.easing.min.js"></script>
+    <!-- Custom Javascript -->
+    <script src="/public/js/custom.js"></script>
+</body>
+</html>

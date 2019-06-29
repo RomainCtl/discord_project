@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 const config = require('../config');
 const db = require('../../model');
-const Cookies = require('cookies')
+const Cookies = require('cookies');
 
 /**
  * Get all guild that user can manage
@@ -20,32 +20,16 @@ function get_access_guilds(user) {
 }
 
 /**
- * Get cookies
- * @param {*} header_str_c from headers
- */
-function get_cookies(header_str_c) {
-    if (typeof header_str_c != "string") return {};
-    let cookies = header_str_c.split('; ').map(c => c.split("="));
-    let res = {};
-    for (let i=0 ; i<cookies.length ; i++)
-        res[cookies[i][0]] = cookies[i][1];
-    return res;
-}
-
-/**
  * Route Login (get user guilds access)
  */
 module.exports = function(req, res) {
-    var cookies = new Cookies(req, res);
-    let token = cookies.get('token');
-    // let cookies = get_cookies(req.headers.cookie);
+    let cookies = new Cookies(req, res);
+    let token = cookies.get('discord_token');
 
     if (req.params.token != undefined) {
         token = req.params.token;
-        // res.cookie('token', token);
-        cookies.set('token', token);
-    }//else if (cookies != {} && 'token' in cookies)
-    //     token = cookies.token;
+        cookies.set('discord_token', token);
+    }
 
     if (token == null) {
         // discord connection
@@ -89,12 +73,13 @@ module.exports = function(req, res) {
                 });
 
             if (usefull_data.length == 0) {
-                cookies.set('token', {expires: Date.now()}); // delete cookie
+                console.log("No one server to manage !");
+                cookies.set('discord_token', {expires: Date.now()}); // delete cookie
                 res.redirect(401, config.url+":"+config.port+'/');
             } else if (usefull_data.length == 1) {
                 // go to manage
-                // res.redirect(301, '/manage/'+usefull_data[0].id);
-            // } else {
+                res.redirect(301, '/manage/'+usefull_data[0].id);
+            } else {
                 console.log(usefull_data);
                 res.render('index', { title: 'Administration Panel', page_to_include: './components/guild_choose', guilds: usefull_data });
             }

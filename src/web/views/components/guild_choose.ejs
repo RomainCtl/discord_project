@@ -25,6 +25,8 @@
 
 .card button:hover {
     opacity: 0.7;
+}
+.card_link:hover {
     text-decoration: none;
 }
 </style>
@@ -35,15 +37,15 @@
     <div class="header-content">
         <div class="header-content-inner">
             <% for(let i=0; i < guilds.length; i++) { %>
-                <a href="/manage/<%= guilds[i].id %>">
             <div class="card">
-                <img src="<%= guilds[i].icon %>" alt="Icon" style="width:100%">
-                <div class="choose_container">
-                    <h4><b><%= guilds[i].name %></b></h4>
-                </div>
-                <p style="margin-bottom: 2px"><%= guilds[i].id %></p>
-                <!-- <button style="width: 100%;" data-href="/manage/<%= guilds[i].id %>">Manage</button> -->
-            </div></a>
+                <a class="card_link" href="/manage/<%= guilds[i].id %>">
+                    <img src="<%= guilds[i].icon %>" alt="Icon" style="width:100%">
+                    <div class="choose_container">
+                        <h4><b><%= guilds[i].name %></b></h4>
+                    </div>
+                    <p style="margin-bottom: 2px"><%= guilds[i].id %></p>
+                </a>
+            </div>
             <% } %>
         </div>
     </div>

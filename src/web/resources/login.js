@@ -1,7 +1,12 @@
 const fetch = require('node-fetch');
 const config = require('../config');
 const db = require('../../model');
+const Cookies = require('cookies')
 
+/**
+ * Get all guild that user can manage
+ * @param {dict} user from discord api
+ */
 function get_access_guilds(user) {
     return db.query('SELECT serveur_id AS id FROM panel_white_list WHERE user_id=$1 UNION SELECT id FROM serveur WHERE owner_id=$1;', [user.id])
     .then(res => {
@@ -14,6 +19,10 @@ function get_access_guilds(user) {
     });
 }
 
+/**
+ * Get cookies
+ * @param {*} header_str_c from headers
+ */
 function get_cookies(header_str_c) {
     if (typeof header_str_c != "string") return {};
     let cookies = header_str_c.split('; ').map(c => c.split("="));
@@ -23,17 +32,22 @@ function get_cookies(header_str_c) {
     return res;
 }
 
+/**
+ * Route Login (get user guilds access)
+ */
 module.exports = function(req, res) {
-    let token = undefined;
-    let cookies = get_cookies(req.headers.cookie);
+    var cookies = new Cookies(req, res);
+    let token = cookies.get('token');
+    // let cookies = get_cookies(req.headers.cookie);
 
     if (req.params.token != undefined) {
         token = req.params.token;
-        res.cookie('token', token);
-    } else if (cookies != {} && 'token' in cookies)
-        token = cookies.token;
+        // res.cookie('token', token);
+        cookies.set('token', token);
+    }//else if (cookies != {} && 'token' in cookies)
+    //     token = cookies.token;
 
-    if (!token) {
+    if (token == null) {
         // discord connection
         res.redirect(`${config.discord_base_api}oauth2/authorize?client_id=${config.auth.client_id}&scope=identify&response_type=code&redirect_uri=${config.redirect}`);
     } else {
@@ -75,9 +89,12 @@ module.exports = function(req, res) {
                 });
 
             if (usefull_data.length == 0) {
+                cookies.set('token', {expires: Date.now()}); // delete cookie
+                res.redirect(401, config.url+":"+config.port+'/');
+            } else if (usefull_data.length == 1) {
                 // go to manage
-                // res.redirect(301, '/manage');
-            } else {
+                // res.redirect(301, '/manage/'+usefull_data[0].id);
+            // } else {
                 console.log(usefull_data);
                 res.render('index', { title: 'Administration Panel', page_to_include: './components/guild_choose', guilds: usefull_data });
             }

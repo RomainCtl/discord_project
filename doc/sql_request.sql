@@ -10,7 +10,7 @@ SELECT * FROM role WHERE serveur_id=1;
 UPDATE moderateur SET role_id = 1 WHERE moderateur.id= 41771983423143937;
 
 -- 04 - Récupérer l’ensemble des modérateurs liés à un serveur Discord.
-SELECT * FROM moderateur WHERE serveur_id = ? AND lock_is_delete = 0;
+SELECT * FROM moderateur WHERE serveur_id = ?;
 
 -- 05 - Appliquer une sanction à un utilisateur sur un serveur Discord.
 INSERT INTO sanction (reason, duration, victim, author, cmd_id, serveur_id) VALUES

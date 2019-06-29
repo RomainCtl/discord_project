@@ -1,0 +1,164 @@
+<style>
+/* staff */
+.chip {
+    display: inline-block;
+    padding: 0 25px;
+    height: 50px;
+    font-size: 16px;
+    line-height: 50px;
+    border-radius: 25px;
+    background-color: #f1f1f1;
+}
+.chip img {
+    float: left;
+    margin: 0 10px 0 -25px;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+}
+
+/* Role and staff selecttion */
+/* Style the tab */
+#staff .tab,
+#roles .tab {
+    float: left;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    width: 30%;
+    height: 300px;
+}
+/* Style the buttons that are used to open the tab content */
+#staff .tab button,
+#roles .tab button {
+    display: block;
+    background-color: inherit;
+    color: black;
+    padding: 22px 16px;
+    width: 100%;
+    border: none;
+    outline: none;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.3s;
+}
+#staff .tab button.chip,
+#roles .tab button.chip {
+    display: inline-block;
+    padding: 0 25px;
+}
+/* Change background color of buttons on hover */
+#staff .tab button:hover,
+#roles .tab button:hover {
+    background-color: #ddd;
+}
+/* Create an active/current "tab button" class */
+#staff .tab button.active,
+#roles .tab button.active {
+    background-color: #ccc;
+}
+/* Style the tab content */
+#staff .tabcontent0,
+#staff .tabcontent1,
+#roles .tabcontent0,
+#roles .tabcontent1 {
+    float: left;
+    padding: 0px 12px;
+    border: 1px solid #ccc;
+    width: 70%;
+    border-left: none;
+    height: 300px;
+}
+
+#pres {
+    margin-top: 100px;
+}
+</style>
+
+<% include ../includes/header %>
+
+<!-- staff -->
+<div id="pres">
+    <div>
+        <img src="<%= guild.icon %>" alt="Person" width="96" height="96">
+        <%= guild.name %>
+    </div>
+    <p>ID: <%= guild.id %></p>
+    <p>Owner: <%= guild.owner_id %></p>
+    <p>Log channel: <%= guild.log_channel %></p>
+</div>
+
+
+<section id="roles">
+    <div class="tab">
+        <% for(let ro in guild.roles) { %>
+            <button class="tablinks0 chip" onclick="openCity(0, event, '<%= guild.roles[ro].id %>')">
+                <%= guild.roles[ro].name %>
+            </button>
+        <% } %>
+    </div>
+    <% for (let ro in guild.roles) { %>
+        <div id="<%= guild.roles[ro].id %>" class="tabcontent0">
+            <h3><%= guild.roles[ro].name %></h3>
+            <p>Priority: <%= guild.roles[ro].priority %></p>
+            <h4>Commands : </h4>
+            <ul>
+            <% for (let cmd in guild.roles[ro].commands) { %>
+                <li data-id="<%= guild.roles[ro].commands[cmd] %>"><%= guild.commands[guild.roles[ro].commands[cmd]].command %></li>
+            <% } %>
+            </ul>
+        </div>
+    <% } %>
+</section>
+
+<section id="staff">
+    <div class="tab">
+        <% for (let st in guild.staff) { %>
+            <button class="tablinks1 chip" onclick="openCity(1, event, '<%= guild.staff[st].id %>')">
+                <img src="<%= guild.staff[st].avatar %>" alt="Person" width="96" height="96">
+                <%= guild.staff[st].username %>
+            </button>
+        <% } %>
+    </div>
+    <% for (let st in guild.staff) { %>
+        <div id="<%= guild.staff[st].id %>" class="tabcontent1">
+            <h3><%= guild.staff[st].username %></h3>
+            <p>ID: <%= guild.staff[st].id %></p>
+            <h4>Roles : </h4>
+            <ul>
+            <% for (let ro in guild.staff[st].roles) { %>
+                <li data-id="<%= guild.staff[st].roles[ro] %>"><%= guild.roles[guild.staff[st].roles[ro]].name %></li>
+            <% } %>
+            </ul>
+        </div>
+    <% } %>
+</section>
+
+
+<script>
+function openCity(id, evt, cityName) {
+    // Declare all variables
+    var i, tabcontent, tablinks;
+
+    // Get all elements with class="tabcontent" and hide them
+    tabcontent = document.getElementsByClassName("tabcontent"+id);
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    // Get all elements with class="tablinks" and remove the class "active"
+    tablinks = document.getElementsByClassName("tablinks"+id);
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    // Show the current tab, and add an "active" class to the link that opened the tab
+    document.getElementById(cityName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+let tabs = document.getElementsByClassName("tab");
+for (let e in tabs)
+    if (tabs[e].hasChildNodes)
+        tabs[e].children[0].click();
+
+</script>

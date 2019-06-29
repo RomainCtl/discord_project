@@ -19,7 +19,9 @@ module.exports = function(req, res) {
             staff: {},
             roles: {},
             commands: {},
-            whitelist: []
+            whitelist: [],
+            members: {},
+            channels: {}
         };
         let cookies = new Cookies(req, res);
         let token = cookies.get('discord_token');
@@ -49,13 +51,42 @@ module.exports = function(req, res) {
             .then( response => {
                 return response.json();
             })
-            .then(json => {
+            .then(json => { // get guild channels from api
                 guild.owner = json;
-                guild.owner.avatar = "https://cdn.discordapp.com/avatars/"+guild.id+"/"+guild.owner.avatar+".png";
+                guild.owner.avatar = "https://cdn.discordapp.com/avatars/"+guild.owner.id+"/"+guild.owner.avatar+".png";
+
+                return fetch(`${config.discord_base_api}v6/guilds/${guild.id}/channels`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bot '+config.auth.token
+                    },
+                });
+            })
+            .then( response => {
+                return response.json();
+            })
+            .then(json => { // get guild members from api
+                for (let i in json)
+                    guild.channels[json[i].id] = json[i]
+
+                return fetch(`${config.discord_base_api}v6/guilds/${guild.id}/members?limit=1000`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bot '+config.auth.token
+                    },
+                });
+            })
+            .then( response => {
+                return response.json();
+            })
+            .then(json => { // get panel white list
+                for (let i in json)
+                    guild.members[json[i].user.id] = json[i]
+
                 return db.query('SELECT user_id FROM panel_white_list WHERE serveur_id = $1;', [guild.id]);
             })
             .then(whitelist => {
-                guild.whitelist = whitelist.rows;
+                guild.whitelist = Array.from(whitelist.rows, wl => wl.user_id);
                 return db.query('SELECT id_mod FROM staff WHERE serveur_id = $1;', [guild.id]);
             })
             .then(staff => { // get staff username and avatar from api
@@ -91,7 +122,7 @@ module.exports = function(req, res) {
                 for (let role in staff_role)
                     for (let r in staff_role[role].rows)
                         guild.staff[staff_role[role].rows[r].id_mod].roles.push(staff_role[role].rows[r].role_id);
-                return db.query('SELECT id, name, priority FROM role WHERE serveur_id=$1;', [guild.id]);
+                return db.query('SELECT id, name, priority FROM role WHERE serveur_id=$1 ORDER BY priority;', [guild.id]);
             })
             .then(roles => { // add roles
                 for (let r in roles.rows)

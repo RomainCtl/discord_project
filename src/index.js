@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const auth = require('../auth.json');
 const cmd = require('./command');
 const db  = require('./model');
+const antispam = require('./anti_spam.js');
 
 const client = new Discord.Client();
 
@@ -150,6 +151,9 @@ client.on('messageUpdate', (old_msg, new_msg) => {
 client.on('message', msg => {
     if (msg.author.bot) return; // it's a bot
     var log_channel = null;
+
+    //On vérifie d'abord que le message n'est pas issu d'un floodeur :
+    client.emit('checkMessage', msg);
 
     if (msg.content.substring(0,1) != '!') return; // it's not a command
 

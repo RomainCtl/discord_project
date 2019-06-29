@@ -33,7 +33,7 @@ module.exports = async (client, options) => {
   
       banned.push(m.author.id);
       message.content = `!warn <@!${message.author.id}> ${banMsg}`;
-      message.author = client.user.get;
+      message.author = client.user;
       
   }
   
@@ -42,7 +42,7 @@ module.exports = async (client, options) => {
    const warnUser = async (m, reply) => {
     warned.push(m.author.id);
     message.content = `!warn <@!${message.author.id}> ${reply}`;
-    message.author = client.user.get;
+    message.author = client.user;
    }
    
     //On vérifie que l'auteur n'est pas le bot (on ne veut pas que le bot se ban lui même)

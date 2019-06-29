@@ -68,6 +68,14 @@ client.on('ready', () => {
     client.user.setActivity(`on ${client.guilds.size} servers`);
     console.log("Bot is connected");
 
+    antispam(client, {
+        warnBuffer: 3, 
+        maxBuffer: 10, 
+        interval: 2000, 
+        maxDuplicatesWarning: 7,
+        maxDuplicatesBan: 10, 
+      });
+
     // settimeout pour la prochaine sanction a retirer, reset a chaque commande (si une nouvelle sanction est cree)
     auto_remove_sanction();
 });

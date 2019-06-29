@@ -17,8 +17,8 @@ module.exports = async (client, options) => {
   const warnBuffer = (options && options.warnBuffer) || 3; // Default Value: 3
   const maxBuffer = (options && options.maxBuffer) || 20; // Default Value: 20
   const interval = (options && options.interval) || 1000; //Default Time: 2000MS (2 Seconds in Miliseconds)
-  const warningMessage = (options && options.warningMessage) || "Attention, arrête de flood ou il y aura des conséquences..."; 
-  const banMessage = (options && options.banMessage) || "has been hit by ban hammer for spamming!"; 
+  const warningMessage = "Attention, arrête de flood ou il y aura des conséquences..."; 
+  const banMessage = "has been hit by ban hammer for spamming!"; 
   const maxDuplicatesWarning = (options && options.maxDuplicatesWarning || 7); // Default Value: 7
   const maxDuplicatesBan = (options && options. maxDuplicatesBan || 10); // Deafult Value: 7
   
@@ -41,7 +41,7 @@ module.exports = async (client, options) => {
    // On warn l'utilisateur :
    const warnUser = async (m, reply) => {
     warned.push(m.author.id);
-    message.content = `!warn <@!${message.author.id}> ${reply}`;
+    message.content = `!warn <@${message.author.id}> ${reply}`;
     message.author = client.user;
    }
    

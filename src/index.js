@@ -75,6 +75,7 @@ client.on('ready', () => {
  * Event triggered when bot join new guild
  */
 client.on("guildCreate", guild => {
+    client.user.setActivity(`on ${client.guilds.size} servers`);
     // le bot rejoint une guild
     console.log("Joined a new guild: " + guild.name +" | "+ guild.id);
 
@@ -93,6 +94,7 @@ client.on("guildCreate", guild => {
  * Event triggered when bot leave a guild
  */
 client.on("guildDelete", guild => {
+    client.user.setActivity(`on ${client.guilds.size} servers`);
     // le bot est supprimer d'une guild
     console.log("Left a guild: " + guild.name +" | "+ guild.id);
 

@@ -223,7 +223,7 @@ INSERT INTO command (id, command, regex, serveur_id) VALUES
 (7, '!cancel <id_sanction>', '', NULL),
 (8, '!rankup @<user> <role_id>', '', NULL),
 (9, '!derank @<user> <role_id>', '', NULL),
-(10, '!addrole <name>', '^!', NULL),
+(10, '!addrole <name> <priority>', '', NULL),
 (11, '!delrole <id>', '', NULL),
 (12, '!role add <role_id> <command_id>', '', NULL),
 (13, '!role del <role_id> <command_id>', '', NULL),

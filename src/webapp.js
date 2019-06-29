@@ -14,7 +14,7 @@ app.use(function (err, req, res, next) {
             return res.status(400).end(); //?error=access_denied&error_description=The+resource+owner+or+authorization+server+denied+the+request
         default:
             console.log("Error :", err.message);
-            return res.status(500).end();
+            next();
     }
 });
 

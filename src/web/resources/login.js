@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 const config = require('../config');
 const db = require('../../model');
-const Cookies = require('cookies')
+const Cookies = require('cookies');
 
 /**
  * Get all guild that user can manage
@@ -23,7 +23,7 @@ function get_access_guilds(user) {
  * Route Login (get user guilds access)
  */
 module.exports = function(req, res) {
-    var cookies = new Cookies(req, res);
+    let cookies = new Cookies(req, res);
     let token = cookies.get('discord_token');
 
     if (req.params.token != undefined) {

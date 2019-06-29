@@ -150,20 +150,20 @@ client.on('messageUpdate', (old_msg, new_msg) => {
 client.on('message', msg => {
     if (msg.author.bot) return; // it's a bot
     var log_channel = null;
-    // get log channel if exist
-    db.query('SELECT log_channel FROM serveur WHERE id=$1;', [msg.guild.id])
-    .then(res => {
-        if (res.rowCount == 1) log_channel = client.channels.get(res.rows[0]['log_channel']);
-    }).catch();
 
     if (msg.content.substring(0,1) != '!') return; // it's not a command
 
     console.log({command: msg.content});
 
-    // une commande est envoyé sur le serveur (guild) par un joueur
-    cmd.check_and_run(msg.guild, msg.channel, msg.author, msg.content, msg.mentions, client.user)
+    // get log channel if exist
+    db.query('SELECT log_channel FROM serveur WHERE id=$1;', [msg.guild.id])
+    .then(res => {
+        if (res.rowCount == 1) log_channel = client.channels.get(res.rows[0]['log_channel']);
+
+        // une commande est envoyé sur le serveur (guild) par un joueur
+        return cmd.check_and_run(msg.guild, msg.channel, msg.author, msg.content, msg.mentions, client.user)
+    })
     .then( res => {
-        // console.log(res);
         if ('field' in res)
             log(log_channel, res.field, msg.author.username, msg.author.avatarURL);
 
@@ -171,7 +171,6 @@ client.on('message', msg => {
         auto_remove_sanction();
     })
     .catch( err => {
-        // console.log(err);
         if ('field' in err)
             log(log_channel, err.field, msg.author.username, msg.author.avatarURL);
 

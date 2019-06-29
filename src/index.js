@@ -2,6 +2,7 @@ const Discord = require('discord.js');
 const auth = require('../auth.json');
 const cmd = require('./command');
 const db  = require('./model');
+const antispam = require('./anti_spam.js');
 
 const client = new Discord.Client();
 
@@ -153,6 +154,9 @@ client.on('message', msg => {
     .then(res => {
         if (res.rowCount == 1) log_channel = client.channels.get(res.rows[0]['log_channel']);
     }).catch();
+
+    //On vérifie d'abord que le message n'est pas issu d'un floodeur :
+    client.emit('checkMessage', msg);
 
     if (msg.content.substring(0,1) != '!') return; // it's not a command
 

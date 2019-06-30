@@ -146,9 +146,9 @@ Nous nous sommes très vite rendu compte que pour effectuer les commandes de man
 
 >   *Description de `lock.js` :*
 >
->   lock.js fût le premier nécessitant la création d'un rôle afin de le faire fonctionner.
+>   lock.js fût le premier (et le seul) nécessitant la création d'un rôle afin de le faire fonctionner.
 >
->   En effet, afin de verrouiller les channels, il est nécessaire de bloquer les utilisateurs en leur retirant les droits de lecture, écriture sur le channel, cependant cela ne pouvait pas être fait sur le rôle @everyone car cela aurait posé beaucoup plus de travail sur lock.js pour le mettre en place.
+>   En effet, afin de verrouiller les channels, il est nécessaire de bloquer les utilisateurs en leur retirant les droits de lecture, écriture sur le channel, cependant cela ne pouvait pas être fait sur le rôle @everyone car tout utilisateur ayant une pemission sur un channel est forcément supérieur à @everyone.
 >
 >   Au lieu de cela, nous avons créé un rôle lock, de priorité très forte et on le donne à tout le monde. Ainsi, ceux ayant ce rôle se voient incapables d'écrire/lire sur le channel. Bien sûr, l'administrateur et les modérateurs autorisés peuvent continuer à écrire/lire dessus.
 >
@@ -158,13 +158,13 @@ Nous nous sommes très vite rendu compte que pour effectuer les commandes de man
 >
 >   cancel.js est un fichier nous permettant d'annuler une sanction d'après son id dans la base de données. Après avoir exécuté une commande dans la bdd pour vérifier l'existence de la sanction, cette dernière est effacée de la base et en fonction de son type on applique différents traitements permettant d'annuler les punitions appliquées.
 >
->   Noter que cancel.js efface aussi la commande des logs, elle n'est plus retrouvable après.  
+>   Noter que cancel.js efface aussi la commande de la table, elle n'est plus retrouvable après. (peut être utiliser un 'lock' si nous voulons garder une trace)
 >
 
 
 >   *Description de `setlogchannel.js` :*
 >
->   Une commande particulière qui permet de transformer un channel en un channel de logs, cela signifie que le bot emploiera ce channel pour décrire toute les actions qu'il effectue.
+>   Une commande particulière qui permet de définir un channel comme le channel de logs, cela signifie que le bot emploiera ce channel pour décrire toute les actions qu'il effectue.
 >
 >   Pour mettre en place ce channel, la commande accède à la base de données et à l'intérieur du serveur lui indique quel channel (donc l'id du channel) auquel il doit envoyer envoyer les logs du bot.
 >
@@ -178,27 +178,25 @@ Nous nous sommes très vite rendu compte que pour effectuer les commandes de man
 > ![Portail Developers de Discord](./rapport_bot_picture/help.png)
 >
 
-Cependant, afin de faire fonctionner ces commandes, nous avons dû trouver un moyen de faire comprendre au bot la différence entre les différentes commandes, et pour cela nous avons finis par trouver les **regex** ou expression régulière.
+Cependant, afin de faire fonctionner ces commandes, nous avons dû trouver un moyen de faire comprendre au bot la différence entre les différentes commandes, et pour cela nous avons finis par utilisé les **regex** ou expression régulière.
 
-Les epxressions régulière sont des chaines de caractères de syntaxe précise, qui permettent notamment de pouvoir vérifier la validité d'une chaine de caractère qui peut contenir un nombre illimité de caractère, comme par exemple une commande de modération avec une raison. 
+Les epxressions régulière sont des chaines de caractères de syntaxe précise, qui permettent de reconnaitre une chaine de caractère qui peut contenir un nombre illimité de caractère, comme par exemple une commande de modération avec une raison.
 
-RegExp est un constructeur JavaScript permettant de reconnaitre une chaine de caractère afin d'en extraire des informations nécessaires au bon déroulement de la commande :
+RegExp est let constructeur JavaScript permettant de créer une regex :
 
 > *Exemple :*
 >
-> message.match( new RegExp('^!ping[ ]*$', 'i') ) )
+> `message.match( new RegExp('^!ping[ ]*$', 'i') ) )`
 >
 >
-> `message.match()` : Check si le message est correcte par rapport à la fonction en paramètre, il retourne vrai si l'expressino régulière est valide
+> `message.match()` : Check si le message est correcte par rapport à la regex en paramètre, il retourne un Array contenant les correspondances et les groupes capturés avec les parenthèses ou null s'il n'y a pas de correspondance.
 >
-> `RegExp()` : Check si le message correspond au string en paramètre en vérifiant son expression régulière
+> `RegExp()` : constructeur de la regex en question
 >
-> `'^!ping[ ]*$'` : si le message correspond à ce pattern alors le regExp retourne vrai
+> `'^!ping[ ]*$'` : si le message correspond à ce pattern alors le regExp retourne une Array
 >
-> `'i'` : on indique que le message doit être converti en minuscule, sans majuscule
+> `'i'` : options qui indique que le message doit être converti en minuscule, sans majuscule (permet de confondre majuscule et minuscule)
 
-
-C'est à partir de ces expressions régulières que nous analysons dans 
 
 
 #### Création dynamique de regex

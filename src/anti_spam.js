@@ -15,7 +15,8 @@ var warned = [];
 var banned = [];
 var messageLog = [];
 
-// TODO upgrade to anti-flood too !
+// TODO upgrade to anti-flood ! (just check one message and percentage of the same letters (40% ?))
+// TODO upgrade to anti-insult and vulgar words !
 
 module.exports = async (client, options) => {
     /* Option Definitions */

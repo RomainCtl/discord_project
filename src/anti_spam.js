@@ -175,22 +175,21 @@ module.exports = async (client, options) => {
             }
         }
 
-        
-        //On vérifie les insultes en comparant à une liste d'insulte :
-        console.log("Insulte ?");
-        for (var j = 0; j < insult.length; i++) {
-          if (message.content.includes(insult[j])) {
-            
-                if (!warned.includes(message.author.id)) {
-                    warnUser(message, warningMessageInsulte);
-                } else if (!banned.includes(message.author.id)) { // ne pas le rebannir s'il est deja ban (le temps que le tableau soit vidée, il peut etre detecté comme encore en trein de spam)
-                      banUser(message, banMessageInsulte);
-                }
-                
-            console.log("Insulte détecté : "+insult[j]);
-            break;
-          }
-        }
 
+        // FIXME a revoir, c'est pas du tout opti ca^^ (ca bouffe les ressources de ton serv de parcourir une liste aussi grande...)
+        //On vérifie les insultes en comparant à une liste d'insulte :
+        // console.log("Insulte ?");
+        // for (var j = 0; j < insult.length; i++) {
+        //     if (message.content.includes(insult[j])) {
+
+        //         if (!warned.includes(message.author.id)) {
+        //             warnUser(message, warningMessageInsulte);
+        //         } else if (!banned.includes(message.author.id)) { // ne pas le rebannir s'il est deja ban (le temps que le tableau soit vidée, il peut etre detecté comme encore en trein de spam)
+        //             banUser(message, banMessageInsulte);
+        //         }
+        //     console.log("Insulte détecté : "+insult[j]);
+        //     break;
+        //     }
+        // }
     });
 }

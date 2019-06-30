@@ -3,36 +3,11 @@ const auth = require('../auth.json');
 const cmd = require('./command');
 const db  = require('./model');
 const antispam = require('./anti_spam.js');
+const log = require('./logger');
 
 const client = new Discord.Client();
 
-const default_log_embed = {
-	color: 0x0099ff,
-	title: 'Alfred',
-	url: 'http://localhost:4000/',
-	fields: [],
-	timestamp: new Date(),
-	footer: {
-		text: 'Merci de votre confiance',
-		icon_url: '',
-	}
-};
-
 var timeout = null;
-
-/**
- * to log data on log channel
- * @param {TextChannel} channel
- * @param {Object} fields
- * @param {string} author_name
- * @param {string} author_avatar
- */
-function log(channel, fields, author_name, author_avatar){
-    if (channel == null) return;
-    default_log_embed.fields = fields;
-    default_log_embed.author = {name: author_name, icon_url: author_avatar}
-    channel.send({embed: default_log_embed});
-}
 
 /**
  * Function that remove all expired sanctions and that create timeout to the next sanctions to remove
@@ -68,13 +43,14 @@ client.on('ready', () => {
     client.user.setActivity(`on ${client.guilds.size} servers`);
     console.log("Bot is connected");
 
-    antispam(client, {
-        warnBuffer: 3, 
-        maxBuffer: 10, 
-        interval: 2000, 
+    // init antispam
+    antispam(client, { // FIXME may config it on panel ? (and stock in DB)
+        warnBuffer: 3,
+        maxBuffer: 10,
+        interval: 2000,
         maxDuplicatesWarning: 7,
-        maxDuplicatesBan: 10, 
-      });
+        maxDuplicatesBan: 10,
+    });
 
     // settimeout pour la prochaine sanction a retirer, reset a chaque commande (si une nouvelle sanction est cree)
     auto_remove_sanction();
@@ -159,21 +135,18 @@ client.on('messageUpdate', (old_msg, new_msg) => {
 client.on('message', msg => {
     if (msg.author.bot) return; // it's a bot
     var log_channel = null;
-
-    //On vérifie d'abord que le message n'est pas issu d'un floodeur :
-    client.emit('checkMessage', msg);
-
-    if (msg.content.substring(0,1) != '!') return; // it's not a command
-
-    console.log({command: msg.content});
-
-    // get log channel if exist
     db.query('SELECT log_channel FROM serveur WHERE id=$1;', [msg.guild.id])
     .then(res => {
         if (res.rowCount == 1) log_channel = client.channels.get(res.rows[0]['log_channel']);
 
-        // une commande est envoyé sur le serveur (guild) par un joueur
-        return cmd.check_and_run(msg.guild, msg.channel, msg.author, msg.content, msg.mentions, client.user)
+        //On vérifie d'abord que le message n'est pas issu d'un floodeur :
+        client.emit('checkMessage', msg, log_channel);
+
+        if (msg.content.substring(0,1) != '!') return; // it's not a command
+
+        console.log({command: msg.content});
+
+        return cmd.check_and_run(msg.guild, msg.channel, msg.author, msg.content, msg.mentions, client.user);
     })
     .then( res => {
         if ('field' in res)

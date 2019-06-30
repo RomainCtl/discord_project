@@ -100,12 +100,118 @@ C'est cette raison qui nous a poussé au début du projet à concevoir un ping-p
 
 // TODO gestion (rappel sur les commandes globals), la possibilité de créer des commandes, l'utilisation de regex, (et la création dynamic de regex), generiquen ...
 
+Nous nous sommes très vite rendu compte que pour effectuer les commandes de manière optimisée dans leurs traitements, il était nécessaire de créer des fichiers personalisés pour chaque commande globale. Les commandes globales traitent un problème de manière précise et unique en fonction de la commande global traité par un **regex**.
 
+> Voici la liste des commandes globales et leurs fichiers de traitement :
+
+* Bannir un utilisateur :\
+`ban.js`
+* Exclure un utilisateur :\
+`kick.js`
+* Rendre sourd un utilisateur :\
+`deaf.js`
+* Rendre muet un utilisateur :\
+`mute.js`
+* Avertir un utilisateur :\
+`warn.js`
+* Déclarer un channel comme channel de logs pour le bot :\
+`setlogchannel.js`
+* Annuler une sanction par son id :\
+`cancel.js`
+* Ajouter un role de moderation à un utilisateur :\
+`rankup.js`
+* Retirer un role de moderation à un utilisateur :\
+`delrank.js`
+* Ajouter un rôle (le créer) :\
+`addrole.js`
+* Supprimer un rôle :\
+`delrole.js`
+* Ajouter une commande à un rôle :\
+`role_add.js`
+* Retirer une commande à un rôle :\
+`role_del.js`
+* Récupérer les sanctions appliquées à un utilisateur :\
+`getto.js`
+* Récupérer les sanctions appliquées par un modérateur :\
+`getfrom.js`
+* Verouiller un ou des channels :\
+`lock.js`
+* Déverouiller un ou des channels :\
+`delock.js`
+* Supprimer les messages d'un channels (message d'un joueur et/ou depuis x sec) :\
+`delmsg.js`
+* Obtenir la liste des commandes sur le serveur :\
+`help.js`
+
+
+>   *Description de `lock.js` :*
+>
+>   lock.js fût le premier nécessitant la création d'un rôle afin de le faire fonctionner.
+>
+>   En effet, afin de verrouiller les channels, il est nécessaire de bloquer les utilisateurs en leur retirant les droits de lecture, écriture sur le channel, cependant cela ne pouvait pas être fait sur le rôle @everyone car cela aurait posé beaucoup plus de travail sur lock.js pour le mettre en place.
+>
+>   Au lieu de cela, nous avons créé un rôle lock, de priorité très forte et on le donne à tout le monde. Ainsi, ceux ayant ce rôle se voient incapables d'écrire/lire sur le channel. Bien sûr, l'administrateur et les modérateurs autorisés peuvent continuer à écrire/lire dessus.
+>
+
+
+>   *Description de `cancel.js` :*
+>
+>   cancel.js est un fichier nous permettant d'annuler une sanction d'après son id dans la base de données. Après avoir exécuté une commande dans la bdd pour vérifier l'existence de la sanction, cette dernière est effacée de la base et en fonction de son type on applique différents traitements permettant d'annuler les punitions appliquées.
+>
+>   Noter que cancel.js efface aussi la commande des logs, elle n'est plus retrouvable après.  
+>
+
+
+>   *Description de `setlogchannel.js` :*
+>
+>   Une commande particulière qui permet de transformer un channel en un channel de logs, cela signifie que le bot emploiera ce channel pour décrire toute les actions qu'il effectue.
+>
+>   Pour mettre en place ce channel, la commande accède à la base de données et à l'intérieur du serveur lui indique quel channel (donc l'id du channel) auquel il doit envoyer envoyer les logs du bot.
+>
+>   Si aucun channel de log n'est en place, alors le bot n'envoi aucun log.
+>   ![Portail Developers de Discord](./rapport_bot_picture/channel_log.png)
+>
+
+>   *Description de `help.js` :*
+>
+>   Une commande permettant de récupérer de la base de données l'ensemble des commandes présente sur le serveur.
+> ![Portail Developers de Discord](./rapport_bot_picture/help.png)
+>
+
+Cependant, afin de faire fonctionner ces commandes, nous avons dû trouver un moyen de faire comprendre au bot la différence entre les différentes commandes, et pour cela nous avons finis par trouver les **regex** ou expression régulière.
+
+Les epxressions régulière sont des chaines de caractères de syntaxe précise, qui permettent notamment de pouvoir vérifier la validité d'une chaine de caractère qui peut contenir un nombre illimité de caractère, comme par exemple une commande de modération avec une raison. 
+
+RegExp est un constructeur JavaScript permettant de reconnaitre une chaine de caractère afin d'en extraire des informations nécessaires au bon déroulement de la commande :
+
+> *Exemple :*
+>
+> message.match( new RegExp('^!ping[ ]*$', 'i') ) )
+>
+>
+> `message.match()` : Check si le message est correcte par rapport à la fonction en paramètre, il retourne vrai si l'expressino régulière est valide
+>
+> `RegExp()` : Check si le message correspond au string en paramètre en vérifiant son expression régulière
+>
+> `'^!ping[ ]*$'` : si le message correspond à ce pattern alors le regExp retourne vrai
+>
+> `'i'` : on indique que le message doit être converti en minuscule, sans majuscule
+
+
+C'est à partir de ces expressions régulières que nous analysons dans 
 
 
 #### Création dynamic de regex
 
-// TODO (voir les fichiers dans le dossier ./src/util)
+
+
+Afin de créer des commandes personnalisées, il est nécessaire de mettre en place des expressions dynamique. Les expressions dynamique sont des chaines de caractères analysable dans l'applicatino afin d'interagir avec les éléments contenu dedans.
+
+Les fichiers compris dans le dossier **`./src/util`** sont donc utilisé afin de créer des expressions régulières qui seront utilisées pour créer des commandes pour notre bot.
+
+Comme vu précédemment, les commandes fonctionnent grâce à des expressions régulière qui récupèrent le contenu des commandes pour agir dessus, grâce à `chan_list_regex_creation.js`, il nous est permis de créer une expressions régulière à l'aide de la commande !create pour le bot. 
+
+La **`fonction create_in`** et **`fonction create_not_in`** sont au coeur du fonctionnement de l'application. Elles reçoivent une variable text quel translate ensuite sous forme d'un regex quel place dans une constante.
 
 
 ### Base de données
@@ -305,7 +411,7 @@ RegExp est un constructeur JavaScript permettant de reconnaitre une chaine de ca
 >
 > `message.match()` : Check si le message est correcte par rapport à la fonction en paramètre
 >
-> `RegExp()` : Check si le message correspond au string en paramètre
+> `RegExp()` : Check si le message correspond au string en paramètre en vérifiant son expression régulière
 >
 > `'^!ping[ ]*$'` : si le message correspond à ce pattern alors le regExp retourne vrai
 >
@@ -344,7 +450,7 @@ Si le match() ne retourne rien, alors il ne s'agit pas d'une fonction n'est pas 
 ### Les commandes globales
 
 
-Nous nous sommes très vite rendu compte que pour effectuer les commandes de manière optimisée dans leurs traitements, il était nécessaire de créer des fichiers personalisés pour chaque commande globale. Les commandes globales traitent un problème de manière précise et unique en fonction de la commande global appelé par le **regex**.
+Nous nous sommes très vite rendu compte que pour effectuer les commandes de manière optimisée dans leurs traitements, il était nécessaire de créer des fichiers personalisés pour chaque commande globale. Les commandes globales traitent un problème de manière précise et unique en fonction de la commande global traité par un **regex**.
 
 > Voici la liste des commandes globales et leurs fichiers de traitement :
 

@@ -53,11 +53,11 @@ Le but des WebSockets est de mettre en place une liaison entre l'api Discord et 
 
 ### Discord.js
 
-// TODO avantage/inconvéniants ..., évenements : de quoi avons besoin (ready, message, delete, update, ...)
 
-Discord.js est la principal bibliothèque que nous avons employé durant la réalisation de notre application, il s'agit d'une application couramment utiliser afin de réaliser des bots sur Discord et permettant de simplifier la discussion entre notre code Javascript et Discord. 
 
-Disord.js s'articule autour d'événement, cela signifie que si certaine action sont détecter dans l'application Discord, alors le programme réagira. Nous présenterons ici deux des principaux événements de Discord.js :
+Discord.js est la principale bibliothèque que nous avons employée durant la réalisation de notre application, il s'agit d'une application couramment utiliser afin de réaliser des bots sur Discord et permettant de simplifier la discussion entre notre code Javascript et Discord. 
+
+Discord.js s'articule autour d'événement, cela signifie que si certaine action sont détectés dans l'application Discord, alors le programme réagira. Nous présenterons ici deux des principaux événements de Discord.js :
 
 **`Ready`** :
 
@@ -75,30 +75,32 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 client.on('message', msg => {/* Instructions */});
 ```
-Evenement lancé quand le bot détecte qu'un message a été posé sur le chat, **n'importe quel message**, cette commande est central à notre applicatino car elle est celle qui nous permet de traiter presque toutes les commandes, mais aussi l'anti-spam et l'anti-insulte.
+Événement lancé quand le bot détecte qu'un message a été posé sur le chat, **n'importe quel message**, cette commande est central à notre application car elle est celle qui nous permet de traiter presque toutes les commandes, mais aussi l'anti-spam et l'anti-insulte.
 
-Il est très important quand on utilise `message` de faire attention à ne pas signaler ou discuter avec un autre bot afin d'éviter les risques potentiels de boucle infini de discussion entre deux bots. Ainsi, `message` commence souvent par une condition afin de vérifier si celui qui à posté le message est bien humain :
+Il est très important quand on utilise `message` de faire attention à ne pas signaler ou discuter avec un autre bot afin d'éviter les risques potentiels de boucle infini de discussion entre deux bots. Ainsi, `message` commence souvent par une condition afin de vérifier si celui qui a posté le message est bien humain :
 
 ``` JS
 if (msg.author.bot) return;
 ```
 
-Puis nous procédons à la vérification si il ne s'agit pas d'un spam, d'une insulte et enfin d'une commande.
+Puis nous procédons à la vérification s'il ne s'agit pas d'un spam, d'une insulte et enfin d'une commande.
 
-Il existe beaucoup de type différent de gestion d'événement, certain que nous créons, d'autre déjà existant dans Discord.js que nous utilisons.
+Il existe beaucoup de types différents de gestion d'événement, certain que nous créons, d'autres déjà existant dans Discord.js que nous utilisons.
 
-Bien sûr, hormis les événements, Discord.js propose de nombreux autre avantage tel que l'écriture simplifié dans le chat, ou une gestion plus facile des rôles. Tout ces avantages le rende bien plus utile à employer que le Websocket que nous employons jusque là, ce qui fût notre principal raison pour privilégier cette bibliothèque.
+Bien sûr, hormis les événements, Discord.js propose de nombreux autres avantages tels que l'écriture simplifiée dans le chat, ou une gestion plus facile des rôles. Tous ces avantages le rendent bien plus utile à employer que le Websocket que nous employons jusque-là, ce qui fût notre principale raison pour privilégier cette bibliothèque.
 
 
 Bien évidemment, Discord.js n'est pas sans défaut, et le principal d'entre eux est la manière dont le code permettant la discussion entre Javascript et Discord est "caché".
-Discord.js ne permet pas de comprendre les mécanismes en arrière plan qui forme le lien JS et Discord et dès lors, nous sommes privés d'une partie de notre capacité à modifier ce dernier dans le cadre de l'utilisation de Discord.js.
+Discord.js ne permet pas de comprendre les mécanismes en arrière-plan qui forme le lien JS et Discord et dès lors, nous sommes privés d'une partie de notre capacité à modifier ce dernier dans le cadre de l'utilisation de Discord.js.
 
-C'est cette raisons qui nous a poussé au début du projet à concevoir un ping-pong en Websocket : comprendre le mécanisme de discussion entre Discord et node js.
+C'est cette raison qui nous a poussé au début du projet à concevoir un ping-pong en Websocket : comprendre le mécanisme de discussion entre Discord et node js.
 
 
 ### Commandes
 
 // TODO gestion (rappel sur les commandes globals), la possibilité de créer des commandes, l'utilisation de regex, (et la création dynamic de regex), generiquen ...
+
+
 
 
 #### Création dynamic de regex
@@ -108,13 +110,12 @@ C'est cette raisons qui nous a poussé au début du projet à concevoir un ping-
 
 ### Base de données
 
-*// TODO en parler un peut, (config dans le fichier src/model/index.js), comment on a mise en place (comment ca va etre utilise apres)*
 
-La base de données, issus de la première partie de notre projet, fût utilisé dans le cadre de notre application comme un piliers central auquel s'articule autour l'ensemble de notre application.
+La base de données, issus de la première partie de notre projet, fût utilisée dans le cadre de notre application comme un pilier central auquel s'articule autour l'ensemble de notre application.
 
-Par cela, il faut comprendre que chaque commande passe par notre base de données d'une manière ou d'une autre (ne serait-ce que pour vérifier la permission d'un utilisateur à l'exécution d'une commande), notre bot s'y refère toujours en cas de questionnement, ou à l'application d'une sanction.
+Par cela, il faut comprendre que chaque commande passe par notre base de données d'une manière ou d'une autre (ne serait-ce que pour vérifier la permission d'un utilisateur à l'exécution d'une commande), notre bot s'y réfère toujours en cas de questionnement, ou à l'application d'une sanction.
 
-Pour utiliser la base de données dans notre bot d'administration, nous avons employer la base **postgresql**, auquel nous accédons grâce à une librairie **pg**. Dans le dossier **`model`** nous avons mis dans le fichier **`index.js`** les composants permettant d'accéder à notre base de données. 
+Pour utiliser la base de données dans notre bot d'administration, nous avons employé la base **postgresql**, auquel nous accédons grâce à une librairie **pg**. Dans le dossier **`model`** nous avons mis dans le fichier **`index.js`** les composants permettant d'accéder à notre base de données. 
 
 Nous avons une constante qui enregistre les informations de connexions :
 
@@ -271,17 +272,17 @@ var guild = {
 
 
 
-Au final, ce projet fût pour nous d'un grand interêt, tant par l'ensemble des technologies que nous avons pu découvrir, que par le lien qu'il fait avec les technologies et problématiques moderne.
+Au final, ce projet fût pour nous d'un grand intérêt, tant par l'ensemble des technologies que nous avons pu découvrir, que par le lien qu'il fait avec les technologies et problématiques modernes.
 
-Nous avons pu concevoir une véritable application employant différente formes de méthodes et technologies, grâce à notre travail sur la base de données nous avons mis en place une architecture que nous avons pu ensuite utiliser au sein de notre application.
+Nous avons pu concevoir une véritable application employant différentes formes de méthodes et technologies, grâce à notre travail sur la base de données nous avons mis en place une architecture que nous avons pu ensuite utiliser au sein de notre application.
 
 L'emploi de **javascript** nous a aidé à mieux maitrisé ce langage, ainsi qu'à découvrir de nouvelle façon de l'utiliser, nous pouvons par exemple citer la fonction **regex**, ou bien la façon de réaliser l'architecture de notre programme afin de le rendre plus facile à comprendre, adapter ou corriger.
 
-La création d'un bot Discord nous a aussi appris à nous adapter au technologies en dehors de notre cadre de travail habituel. Devoir aller chercher l'information, résoudre les conflits avec l'api **Discord.js**, nous adapter dans notre démarche pour comprendre Discord, fût une expérience enrichissante.
+La création d'un bot Discord nous a aussi appris à nous adapter aux technologies en dehors de notre cadre de travail habituel. Devoir aller chercher l'information, résoudre les conflits avec l'api **Discord.js**, nous adapter dans notre démarche pour comprendre Discord, fût une expérience enrichissante.
 
-Enfin la mise en place d'un panel web, nous a permis de comprendre comment les différentes applications sur le web travail et s'articule l'une autour de l'autre, en réalisant un projet comme celui-ci, nous avons pu comprendre le fonctionnement d'outil tel que **Node Js**.
+Enfin la mise en place d'un panel web, nous a permis de comprendre comment les différentes applications sur le web travaillent et s'articule l'une autour de l'autre, en réalisant un projet comme celui-ci, nous avons pu comprendre le fonctionnement d'outil tel que **Node Js**.
 
-Au final, ce projet fût un grand enreichissement personnel, et nous espérons pouvoir utiliser les connaissances que nous en avons tirés soit dans notre vie professionel, soit à titre personnel.
+Au final, ce projet fût un grand enrichissement personnel, et nous espérons pouvoir utiliser les connaissances que nous en avons tirées soit dans notre vie professionelle, soit à titre personnel.
 
 
 

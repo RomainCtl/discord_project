@@ -238,21 +238,21 @@ La base de données, issus de la première partie de notre projet, fût utilisé
 
 Par cela, il faut comprendre que chaque commande passe par notre base de données d'une manière ou d'une autre (ne serait-ce que pour vérifier la permission d'un utilisateur à l'exécution d'une commande), notre bot s'y réfère toujours en cas de questionnement, ou à l'application d'une sanction.
 
-Pour utiliser la base de données dans notre bot d'administration, nous avons employé la base **postgresql**, auquel nous accédons grâce à une librairie **pg**. Dans le dossier **`model`** nous avons mis dans le fichier **`index.js`** les composants permettant d'accéder à notre base de données.
+Pour utiliser la base de données dans notre bot d'administration, nous avons employé le SGBD **postgresql**, auquel nous accédons grâce au module node **pg**. Dans le dossier **`model`** nous avons mis dans le fichier **`index.js`** les composants permettant d'accéder à notre base de données.
 
-Nous avons une constante qui enregistre les informations de connexions :
+Nous avons une constante qui enregistre les informations de connexions:
 
 ```JS
 const { Pool } = require('pg');
 const pool = new Pool({
-    user: 'postgres',
-    host: '127.0.0.1',
-    database: 'enssat_bot',
-    password: 'root',
-    port: '34035'
+    user: '<user_name>',
+    host: '<host>',
+    database: '<database>',
+    password: '<password>',
+    port: '<port>'
 });
 ```
-Et ensuite nous avons mis en place une fonction nous permettant d'exécuter des requêtes vers la base de données et retourner le résultat. 
+Et ensuite nous avons mis en place une fonction nous permettant d'exécuter des requêtes vers la base de données et retourner le résultat.
 
 ```JS
 module.exports = {

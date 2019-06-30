@@ -320,8 +320,12 @@ Cette interface comporte une page d'accueil par lequel nous nous connectons à d
 
 ### Identification
 
-// TODO utilisation de oauth2 avec l'api DISCORD (identifiants discords...) + whitelist en BDD
-// peut accéder à plusieurs serveurs si on est dans la whiteliste de plusieurs serveurs par exemple...
+
+Pour permettre l'utilisateur de se connecter sur notre panel de configuration de bot, nous avons récupéré de l'API Discord une fonction d'identification, permettant en t'autre de pouvoir se connecter sur notre panel avec son compte Discord.
+
+Une fois que l'utilisateur est connecté avec son compte Discord, nous lui demanderons s'il accepte de nous partager son identifiant de connexion afin de pouvoir lui donner accès à notre panel de configuration. Une fois accepter, l'utilisateur pourra accéder au panel de configuration du bot et aux serveurs disponibles.
+
+Bien sûr, tout cela nécessite à l'utilisateur d'être dans la Whitelist des serveurs proposés, la Whitelist est une table dans la base de données référençant l'ensemble des utilisateurs ayant des droits d'administrations sur chaque serveur. Cela nous permet de savoir si l'utilisateur a le droit ou non de configurer le bot sur un serveur. S'il a le droit, il verra le serveur dans sa liste personnelle.
 
 
 ### Panel
@@ -416,31 +420,6 @@ var guild = {
 
 
 
-## Conclusion
-
-
-
-Au final, ce projet fût pour nous d'un grand intérêt, tant par l'ensemble des technologies que nous avons pu découvrir, que par le lien qu'il fait avec les technologies et problématiques modernes.
-
-Nous avons pu concevoir une véritable application employant différentes formes de méthodes et technologies, grâce à notre travail sur la base de données nous avons mis en place une architecture que nous avons pu ensuite utiliser au sein de notre application.
-
-L'emploi de **javascript** nous a aidé à mieux maitrisé ce langage, ainsi qu'à découvrir de nouvelle façon de l'utiliser, nous pouvons par exemple citer la fonction **regex**, ou bien la façon de réaliser l'architecture de notre programme afin de le rendre plus facile à comprendre, adapter ou corriger.
-
-La création d'un bot Discord nous a aussi appris à nous adapter aux technologies en dehors de notre cadre de travail habituel. Devoir aller chercher l'information, résoudre les conflits avec l'api **Discord.js**, nous adapter dans notre démarche pour comprendre Discord, fût une expérience enrichissante.
-
-Enfin la mise en place d'un panel web, nous a permis de comprendre comment les différentes applications sur le web travaillent et s'articule l'une autour de l'autre, en réalisant un projet comme celui-ci, nous avons pu comprendre le fonctionnement d'outil tel que **Node Js**.
-
-Au final, ce projet fût un grand enrichissement personnel, et nous espérons pouvoir utiliser les connaissances que nous en avons tirées soit dans notre vie professionelle, soit à titre personnel.
-
-
-
-
-
-
-_________________________________________________________________
-
-
-
 
 ## Conception du bot avec Discord.js
 
@@ -469,27 +448,18 @@ Si le match() ne retourne rien, alors il ne s'agit pas d'une fonction n'est pas 
 
 
 
-
-<<<<<<< HEAD
-Chacune de ces commandes est retrouvable au sein du dossier ***/command/*** et dispose de sa propre manière de traiter l'information reçu en paramètre. Elle retourne toujours un message en cas d'erreur. 
+## Conclusion
 
 
 
-## Panel
+Au final, ce projet fût pour nous d'un grand intérêt, tant par l'ensemble des technologies que nous avons pu découvrir, que par le lien qu'il fait avec les technologies et problématiques modernes.
 
+Nous avons pu concevoir une véritable application employant différentes formes de méthodes et technologies, grâce à notre travail sur la base de données nous avons mis en place une architecture que nous avons pu ensuite utiliser au sein de notre application.
 
-Le panel est la troisième et dernière partie de notre projet. Nous devons mettre en place une interface afin de pouvoir administrer le bot depuis une page web.
+L'emploi de **javascript** nous a aidé à mieux maitrisé ce langage, ainsi qu'à découvrir de nouvelle façon de l'utiliser, nous pouvons par exemple citer la fonction **regex**, ou bien la façon de réaliser l'architecture de notre programme afin de le rendre plus facile à comprendre, adapter ou corriger.
 
-Cette interface comporte une page d'accueil par lequel nous nous connectons à discord ainsi que d'un lien permettant d'appeler le bot sur votre serveur Discord.
+La création d'un bot Discord nous a aussi appris à nous adapter aux technologies en dehors de notre cadre de travail habituel. Devoir aller chercher l'information, résoudre les conflits avec l'api **Discord.js**, nous adapter dans notre démarche pour comprendre Discord, fût une expérience enrichissante.
 
-Le panel est retrouvable dans le dossier /src/web et quand installé sur le serveur, présentes différentes pages :
+Enfin la mise en place d'un panel web, nous a permis de comprendre comment les différentes applications sur le web travaillent et s'articule l'une autour de l'autre, en réalisant un projet comme celui-ci, nous avons pu comprendre le fonctionnement d'outil tel que **Node Js**.
 
-
-### Accueil
-
-
-
-### 
-=======
-Chacune de ces commandes est retrouvable au sein du dossier ***/command/*** et dispose de sa propre manière de traiter l'information reçu en paramètre. Elle retourne toujours un message en cas d'erreur.
->>>>>>> 3763af221c5935e8ec96986964ce0658a0eda9d1
+Au final, ce projet fût un grand enrichissement personnel, et nous espérons pouvoir utiliser les connaissances que nous en avons tirées soit dans notre vie professionelle, soit à titre personnel.

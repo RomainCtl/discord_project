@@ -98,8 +98,6 @@ C'est cette raison qui nous a poussé au début du projet à concevoir un ping-p
 
 ### Commandes
 
-// TODO gestion (rappel sur les commandes globals), la possibilité de créer des commandes, l'utilisation de regex, (et la création dynamic de regex), generiquen ...
-
 Nous nous sommes très vite rendu compte que pour effectuer les commandes de manière optimisée dans leurs traitements, il était nécessaire de créer des fichiers personalisés pour chaque commande globale. Les commandes globales traitent un problème de manière précise et unique en fonction de la commande global traité par un **regex**.
 
 > Voici la liste des commandes globales et leurs fichiers de traitement :

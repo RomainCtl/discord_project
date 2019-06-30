@@ -22,7 +22,7 @@ Notre mission doit donc nous amener à comprendre le fonctionnement d'un serveur
 Au travers de ce rapport nous verrons la manière dont nous avons réalisé ces tâches, en commencant par l'élaboration d'un serveur node js utilisant des websocket afin de communiquer avec l'API discord, puis la réalisation du bot avec Discord.js et enfin la réalisation de notre panel de gestion du bot.
 
 
-Pour toutes questions en ce qui la base de données, vous pouvez vous référer à notre précédent rapport  __`rapport_conception_db.md`__ (Attention, la base de données a légèrement été modifié depuis).
+Pour toutes questions en ce qui la base de données, vous pouvez vous référer à notre précédent rapport  __`rapport_conception_db.md`__ (Attention, la base de données a légèrement été modifiée depuis).
 
 
 ## Création d'un bot Discord
@@ -59,7 +59,7 @@ Discord.js est la principale bibliothèque que nous avons employée durant la r�
 
 Discord.js s'articule autour d'événement, cela signifie que si certaine action sont détectés dans l'application Discord, alors le programme réagira. Nous présenterons ici deux des principaux événements de Discord.js :
 
-**`Ready`** :
+**`Ready`** 
 
 ``` JS
 const Discord = require('discord.js');
@@ -228,6 +228,31 @@ Par exemple :
 > Le 'schéma' de la commande est généré : `!ban @<user> <reason:text> [-d <duration: time(sec)<86400>, -c <channel: NOT IN .audio <#481862020543545344>>]`
 
 > Et la regex suivante est également généré : `^!ban[ ]+<@!?([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+(86400|86[0-3][0-9]{2}|8[0-5][0-9]{3}|[0-7][0-9]{4}|[0-9]{,4}))?([ ]*-c[ ]+(?:(?!\.audio[ ]*|<#481862020543545344>[ ]*)<#[0-9]+>[ ]*|\.text[ ]*)+)?[ ]*$`
+
+
+
+### Anti-spam
+
+
+Notre bot devait aussi pouvoir assurer une fonction de surveillant permanent de nos channels afin d'éviter la présence de spammeurs qui pourrait rendre le chat invivable en l'absence d'un modérateur humain.
+
+Ainsi nous avons donné à notre bot la possibilité d'analyser par lui-même le contenu des messages à l'aide d'une fonction **`checkmessage`** qui vérifie en permanence, non seulement si un utilisateur envoie trop de message à la suite et ainsi cherche à flooder le chat dans un intervalle précis, mais aussi vérifie pour chaque message la présence d'insultes ou de mot grossier.
+
+Une première offense vous donneras des warnings, cependant si l'utilisateur continu dans sa démarche, il sera banni.
+
+>   **Anti-spam**
+>
+>   Le bot récupère le dernier message du channel, il le place dans une liste puis continue ainsi de suite avec chaque message qu'il reçoit. Si un même utilisateur a écrit plusieurs messages dans un intervalle de temps très court, il recevra un warning car il spam. S'il reçoit trop de warning, ou que son spam est trop important du premier coup, il sera banni.
+>
+>   Le nombre de warning toléré, l'intervalle de temps pour que le message soit considéré comme du spam et le nombre de messages nécessaires pour être considéré comme tel, peuvent tous être configuré.
+
+
+
+>   **Anti-insulte**
+>
+>   Le bot récupère le dernier message du channel, puis il compare le contenu de ce message à une liste de mots grossiers et insulte. Si un mot grossier ou une insulte est détecté, il reçoit un warning. S'il recommence, il est banni.
+>
+>   Pour l'anti insulte, l'utilisateur n'a le droit qu'à un warning. S'il recommence, il est banni.
 
 
 
@@ -414,28 +439,7 @@ Au final, ce projet fût un grand enrichissement personnel, et nous espérons po
 
 _________________________________________________________________
 
-### RegExp
 
-
-Au vu de son importance dans notre projet, regExp nécessite une explication.
-
-RegExp est un constructeur JavaScript permettant de reconnaitre une chaine de caractère afin d'en extraire des informations nécessaires au bon déroulement de la commande :
-
-> *Exemple :*
->
-> message.match( new RegExp('^!ping[ ]*$', 'i') ) )
->
->
-> `message.match()` : Check si le message est correcte par rapport à la fonction en paramètre
->
-> `RegExp()` : Check si le message correspond au string en paramètre en vérifiant son expression régulière
->
-> `'^!ping[ ]*$'` : si le message correspond à ce pattern alors le regExp retourne vrai
->
-> `'i'` : on indique que le message doit être converti en minuscule, sans majuscule
-
-
-Avec ce que nous avons pu tirer de notre travail sur le webSocket et les différents composants nécessaires, nous avons enfin pu nous lancer sur la réalisation de notre bot d'administration Discord.
 
 
 ## Conception du bot avec Discord.js
@@ -464,110 +468,11 @@ S'il dispose des droits nécessaires la commande est passée au travers d'un mou
 Si le match() ne retourne rien, alors il ne s'agit pas d'une fonction n'est pas traité.
 
 
-### Les commandes globales
-
-
-Nous nous sommes très vite rendu compte que pour effectuer les commandes de manière optimisée dans leurs traitements, il était nécessaire de créer des fichiers personalisés pour chaque commande globale. Les commandes globales traitent un problème de manière précise et unique en fonction de la commande global traité par un **regex**.
-
-> Voici la liste des commandes globales et leurs fichiers de traitement :
-
-* Bannir un utilisateur :\
-`ban.js`
-* Exclure un utilisateur :\
-`kick.js`
-* Rendre sourd un utilisateur :\
-`deaf.js`
-* Rendre muet un utilisateur :\
-`mute.js`
-* Avertir un utilisateur :\
-`warn.js`
-* Déclarer un channel comme channel de logs pour le bot :\
-`setlogchannel.js`
-* Annuler une sanction par son id :\
-`cancel.js`
-* Ajouter un role de moderation à un utilisateur :\
-`rankup.js`
-* Retirer un role de moderation à un utilisateur :\
-`delrank.js`
-* Ajouter un rôle (le créer) :\
-`addrole.js`
-* Supprimer un rôle :\
-`delrole.js`
-* Ajouter une commande à un rôle :\
-`role_add.js`
-* Retirer une commande à un rôle :\
-`role_del.js`
-* Récupérer les sanctions appliquées à un utilisateur :\
-`getto.js`
-* Récupérer les sanctions appliquées par un modérateur :\
-`getfrom.js`
-* Verouiller un ou des channels :\
-`lock.js`
-* Déverouiller un ou des channels :\
-`delock.js`
-* Supprimer les messages d'un channels (message d'un joueur et/ou depuis x sec) :\
-`delmsg.js`
-* Obtenir la liste des commandes sur le serveur :\
-`help.js`
-
-
->   *Description de `lock.js` :*
->
->   lock.js fût le premier nécessitant la création d'un rôle afin de le faire fonctionner.
->
->   En effet, afin de verrouiller les channels, il est nécessaire de bloquer les utilisateurs en leur retirant les droits de lecture, écriture sur le channel, cependant cela ne pouvait pas être fait sur le rôle @everyone car cela aurait posé beaucoup plus de travail sur lock.js pour le mettre en place.
->
->   Au lieu de cela, nous avons créé un rôle lock, de priorité très forte et on le donne à tout le monde. Ainsi, ceux ayant ce rôle se voient incapables d'écrire/lire sur le channel. Bien sûr, l'administrateur et les modérateurs autorisés peuvent continuer à écrire/lire dessus.
->
-
-
->   *Description de `cancel.js` :*
->
->   cancel.js est un fichier nous permettant d'annuler une sanction d'après son id dans la base de données. Après avoir exécuté une commande dans la bdd pour vérifier l'existence de la sanction, cette dernière est effacée de la base et en fonction de son type on applique différents traitements permettant d'annuler les punitions appliquées.
->
->   Noter que cancel.js efface aussi la commande des logs, elle n'est plus retrouvable après.  
->
-
-
->   *Description de `setlogchannel.js` :*
->
->   Une commande particulière qui permet de transformer un channel en un channel de logs, cela signifie que le bot emploiera ce channel pour décrire toute les actions qu'il effectue.
->
->   Pour mettre en place ce channel, la commande accède à la base de données et à l'intérieur du serveur lui indique quel channel (donc l'id du channel) auquel il doit envoyer envoyer les logs du bot.
->
->   Si aucun channel de log n'est en place, alors le bot n'envoi aucun log.
->   ![Portail Developers de Discord](./rapport_bot_picture/channel_log.png)
->
-
->   *Description de `help.js` :*
->
->   Une commande permettant de récupérer de la base de données l'ensemble des commandes présente sur le serveur.
-> ![Portail Developers de Discord](./rapport_bot_picture/help.png)
->
 
 
 <<<<<<< HEAD
 Chacune de ces commandes est retrouvable au sein du dossier ***/command/*** et dispose de sa propre manière de traiter l'information reçu en paramètre. Elle retourne toujours un message en cas d'erreur. 
 
-
-### Anti-spam
-
-
-Notre bot devait aussi pouvoir assurer une fonction de surveillant permanent de nos channels afin d'éviter la présence de spammeur qui pourrait rendre le chat invivable en l'abscence d'un modérateur humain.
-
-Ainsi nous avons donné à notre bot la possibilité d'analyser par lui même le contenu des messages à l'aide d'une fonction **`checkmessage`** qui vérifie en permanence, non seulement si un utilisateur envoi trop de message à la suite et ainsi cherche à flooder le chat dans un intervalle précis, mais aussi vérifie pour chaque message la présence d'insulte ou de mot grossier.
-
-Une première offense vous occurera des warnings, cependant si l'utilisateur continu dans sa démarche, il sera banni.
-
->
->
->
->
-
->
->
->
->
 
 
 ## Panel

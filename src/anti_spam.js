@@ -9,11 +9,13 @@ const log = require('./logger');
 const ban = require('./command/ban');
 const warn = require('./command/warn');
 const delmsg = require('./command/delmsg');
+const insult = require('./insult')
 
 var authors = [];
 var warned = [];
 var banned = [];
 var messageLog = [];
+var motsInterdit = ['connard','abruti','idiot','fils de pute','fdp','tg','ips'];
 
 // TODO upgrade to anti-flood ! (just check one message and percentage of the same letters (40% ?))
 // TODO upgrade to anti-insult and vulgar words !
@@ -24,8 +26,10 @@ module.exports = async (client, options) => {
     const warnBuffer = (options && options.warnBuffer) || 3; // Default Value: 3
     const maxBuffer = (options && options.maxBuffer) || 20; // Default Value: 20
     const interval = (options && options.interval) || 1000; //Default Time: 2000MS (2 Seconds in Miliseconds)
-    const warningMessage = "Attention, il est interdit de spam sur ce serveur !";
-    const banMessage = "Vous venez d'être ban automatiquement pour spam !";
+    const warningMessageSpam = "Attention, il est interdit de spam sur ce serveur !";
+    const warningMessageInsulte = "Attention, il est interdit d'insulter sur ce serveur !";
+    const banMessageSpam = "Vous venez d'être ban automatiquement pour spam !";
+    const banMessageInsulte = "Vous venez d'être ban automatiquement pour être une personne très malpolie !";
     const maxDuplicatesWarning = (options && options.maxDuplicatesWarning || 7); // Default Value: 7
     const maxDuplicatesBan = (options && options. maxDuplicatesBan || 10); // Deafult Value: 7
 
@@ -43,7 +47,7 @@ module.exports = async (client, options) => {
         }
 
         // Ban the User
-        const banUser = async (m) => {
+        const banUser = async (m, banMessage) => {
             banned.push(m.author.id);
             Promise.all([
                 ban(
@@ -79,7 +83,7 @@ module.exports = async (client, options) => {
         }
 
         // Warn the User
-        const warnUser = async (m) => {
+        const warnUser = async (m, warningMessage) => {
             warned.push(m.author.id);
             Promise.all([
                 warn(
@@ -138,25 +142,25 @@ module.exports = async (client, options) => {
 
         //On averti l'utilisateur qu'il est interdit de spam si cela na pas deja ete fait
         if (msgMatch == maxDuplicatesWarning && !warned.includes(message.author.id)) {
-            warnUser(message);
+            warnUser(message, warningMessageSpam);
         }
 
         //Si il y a trop de spam on banni l'utilisateur
         if (msgMatch == maxDuplicatesBan && !banned.includes(message.author.id)) {
-            banUser(message);
+            banUser(message, banMessageSpam);
         }
 
         var matched = 0;
 
-        //On vérifie
+        //On vérifie le spam :
         for (var i = 0; i < authors.length; i++) {
             if (authors[i].time > currentTime - interval) { // temps entre les messages de la meme personne trop court (interval)
                 matched++;
                 if (matched == warnBuffer && !warned.includes(message.author.id)) {
-                    warnUser(message);
+                    warnUser(message, warningMessageSpam);
                 } else if (matched == maxBuffer) {
                     if (!banned.includes(message.author.id)) { // ne pas le rebannir s'il est deja ban (le temps que le tableau soit vidée, il peut etre detecté comme encore en trein de spam)
-                        banUser(message);
+                        banUser(message, banMessageSpam);
                     }
                 }
             } else if (authors[i].time < currentTime - interval) {
@@ -170,5 +174,23 @@ module.exports = async (client, options) => {
                 messageLog.shift(); // supprime
             }
         }
+
+        
+        //On vérifie les insultes en comparant à une liste d'insulte :
+        console.log("Insulte ?");
+        for (var j = 0; j < insult.length; i++) {
+          if (message.content.includes(insult[j])) {
+            
+                if (!warned.includes(message.author.id)) {
+                    warnUser(message, warningMessageInsulte);
+                } else if (!banned.includes(message.author.id)) { // ne pas le rebannir s'il est deja ban (le temps que le tableau soit vidée, il peut etre detecté comme encore en trein de spam)
+                      banUser(message, banMessageInsulte);
+                }
+                
+            console.log("Insulte détecté : "+insult[j]);
+            break;
+          }
+        }
+
     });
 }

@@ -167,7 +167,7 @@ Nous nous sommes très vite rendu compte que pour effectuer les commandes de man
 >
 >   cancel.js est un fichier nous permettant d'annuler une sanction d'après son id dans la base de données. Après avoir exécuté une commande dans la bdd pour vérifier l'existence de la sanction, cette dernière est effacée de la base et en fonction de son type on applique différents traitements permettant d'annuler les punitions appliquées. 
 >
->   Noter que cancel.js efface aussi la commande des logs, elle n'est plus retrouvable après.
+>   Noter que cancel.js efface aussi la commande des logs, elle n'est plus retrouvable après.  
 >
 
 
@@ -189,6 +189,26 @@ Nous nous sommes très vite rendu compte que pour effectuer les commandes de man
 
 
 Chacune de ces commandes est retrouvable au sein du dossier ***/command/*** et dispose de sa propre manière de traiter l'information reçu en paramètre. Elle retourne toujours un message en cas d'erreur. 
+
+
+### Anti-spam
+
+
+Notre bot devait aussi pouvoir assurer une fonction de surveillant permanent de nos channels afin d'éviter la présence de spammeur qui pourrait rendre le chat invivable en l'abscence d'un modérateur humain.
+
+Ainsi nous avons donné à notre bot la possibilité d'analyser par lui même le contenu des messages à l'aide d'une fonction **`checkmessage`** qui vérifie en permanence, non seulement si un utilisateur envoi trop de message à la suite et ainsi cherche à flooder le chat dans un intervalle précis, mais aussi vérifie pour chaque message la présence d'insulte ou de mot grossier.
+
+Une première offense vous occurera des warnings, cependant si l'utilisateur continu dans sa démarche, il sera banni.
+
+>
+>
+>
+>
+
+>
+>
+>
+>
 
 
 ## Panel

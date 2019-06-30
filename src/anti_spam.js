@@ -23,15 +23,15 @@ var motsInterdit = ['connard','abruti','idiot','fils de pute','fdp','tg','ips'];
 module.exports = async (client, options) => {
     /* Option Definitions */
 
-    const warnBuffer = (options && options.warnBuffer) || 3; // Default Value: 3
-    const maxBuffer = (options && options.maxBuffer) || 20; // Default Value: 20
-    const interval = (options && options.interval) || 1000; //Default Time: 2000MS (2 Seconds in Miliseconds)
+    const warnBuffer = (options && options.warnBuffer) || 3; // Par défaut : 3
+    const maxBuffer = (options && options.maxBuffer) || 20; // Par défaut : 20
+    const interval = (options && options.interval) || 1000; //Par défaut : 1000 ms (1s)
     const warningMessageSpam = "Attention, il est interdit de spam sur ce serveur !";
     const warningMessageInsulte = "Attention, il est interdit d'insulter sur ce serveur !";
     const banMessageSpam = "Vous venez d'être ban automatiquement pour spam !";
     const banMessageInsulte = "Vous venez d'être ban automatiquement pour être une personne très malpolie !";
-    const maxDuplicatesWarning = (options && options.maxDuplicatesWarning || 7); // Default Value: 7
-    const maxDuplicatesBan = (options && options. maxDuplicatesBan || 10); // Deafult Value: 7
+    const maxDuplicatesWarning = (options && options.maxDuplicatesWarning || 7); // Par défaut : 7
+    const maxDuplicatesBan = (options && options. maxDuplicatesBan || 10); // Par défaut : 10
 
     // Custom 'checkMessage' event that handles messages
     client.on("checkMessage", async (message, log_channel) => {

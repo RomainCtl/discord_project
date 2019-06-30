@@ -116,166 +116,109 @@ h2 {
     width:21.6px;
     margin-left: 6px;
 }
+main {
+    display: flex;
+    flex-direction: column;
+}
 </style>
 
 <% include ../includes/header %>
 
-<section id="pres">
-    <div class="col">
-        <h2>Guild :</h2>
-        <div class="chip">
-            <img src="<%= guild.icon %>" alt="Person" width="96" height="96">
-            <b><%= guild.name %></b> <em>(id: <%= guild.id %>)</em>
-        </div>
-        Owner :
-        <div class="chip">
-            <img src="<%= guild.owner.avatar %>" alt="avatar" width="96" height="96">
-            <b><%= guild.owner.username %></b> <em>(id: <%= guild.owner.id %>)</em>
-        </div>
-        <div class="input-group">
-            <span class="input-group-addon">Log channel</span>
-            <select id="log_channel_id" class="form-control">
-                <% for (let c in guild.channels) { %>
-                    <% if (guild.channels[c].type == 0) { %>
-                        <% if (guild.log_channel == c) { %>
-                            <option selected value="<%= c %>"><%= guild.channels[c].name+" ("+c+")" %></option>
-                        <% } else { %>
-                            <option value="<%= c %>"><%= guild.channels[c].name+" ("+c+")" %></option>
+<main>
+    <section id="pres">
+        <div class="col">
+            <h2>Guild :</h2>
+            <div class="chip">
+                <img src="<%= guild.icon %>" alt="Person" width="96" height="96">
+                <b><%= guild.name %></b> <em>(id: <%= guild.id %>)</em>
+            </div>
+            Owner :
+            <div class="chip">
+                <img src="<%= guild.owner.avatar %>" alt="avatar" width="96" height="96">
+                <b><%= guild.owner.username %></b> <em>(id: <%= guild.owner.id %>)</em>
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">Log channel</span>
+                <select id="log_channel_id" class="form-control">
+                    <% for (let c in guild.channels) { %>
+                        <% if (guild.channels[c].type == 0) { %>
+                            <% if (guild.log_channel == c) { %>
+                                <option selected value="<%= c %>"><%= guild.channels[c].name+" ("+c+")" %></option>
+                            <% } else { %>
+                                <option value="<%= c %>"><%= guild.channels[c].name+" ("+c+")" %></option>
+                            <% } %>
                         <% } %>
                     <% } %>
-                <% } %>
-            </select>
-            <div class="input-group-btn">
-                <button class=" my_border btn btn-success" type="button" onclick="save_guild(event)">Save</button>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <h4>Panel Whitelist :</h4>
-        <ul id="white_list_ul"></ul>
-        <div class="input-group">
-            <select id="white_list" class="form-control"></select>
-            <div class="input-group-btn">
-                <button class="my_border btn btn-default" type="button" onclick="add_to_white_list()">Add</button>
-            </div>
-        </div>
-        <button type="button" style="width: 100px;margin-top: 20px" class="btn_my btn btn-success" onclick="save_whitelist(event)">Save list</button>
-    </div>
-</section>
-
-
-<section id="roles">
-    <h2>Roles: </h2>
-    <div class="tab">
-        <% for(let ro in guild.roles) { %>
-            <button class="tablinks0 chip" onclick="openCity(0, event, '<%= guild.roles[ro].id %>')">
-                <%= guild.roles[ro].name %>
-            </button>
-        <% } %>
-        <div class="input-group" style="margin-left: 5px;margin-top: 5px">
-            <input type="text" placeholder="Name" class="form-control">
-            <span class="input-group-btn" style="width:0px;"></span>
-            <input type="number" placeholder="Priority" class="form-control">
-            <div class="input-group-append input-group-btn">
-                <button class=" my_border btn btn-default" type="button" onclick="">ADD</button>
-            </div>
-        </div>
-    </div>
-    <% for (let ro in guild.roles) { %>
-        <div id="<%= guild.roles[ro].id %>" class="tabcontent0">
-            <h3><%= guild.roles[ro].name %></h3>
-            <p>Priority: <%= guild.roles[ro].priority %></p>
-            <h4>Commands : </h4>
-            <ul>
-                <% for (let cmd in guild.roles[ro].commands) { %>
-                    <li><%= guild.commands[guild.roles[ro].commands[cmd]].command %> <button class="btn btn-danger btn-xs btn_remove" type="button" onclick="'<%= guild.roles[ro].commands[cmd] %>'">&times;</button></li>
-                <% } %>
-                <div class="input-group" style="margin-top: 8px">
-                    <select class="form-control">
-                        <option selected value=""></option>
-                        <% for (let cmd in guild.commands) { %>
-                            <option value="<%= cmd %>"><%= guild.commands[cmd].command %></option>
-                        <% } %>
-                    </select>
-                    <div class="input-group-btn">
-                        <button class=" my_border btn btn-default" type="button" onclick="">Add</button>
-                    </div>
+                </select>
+                <div class="input-group-btn">
+                    <button class=" my_border btn btn-success" type="button" onclick="save_guild(event)">Save</button>
                 </div>
-            </ul>
-            <button type="button" class="btn_my btn btn-warning" onclick="">Delete</button>
-            <button type="button" class="btn_my btn btn-success" onclick="">Save</button>
-        </div>
-    <% } %>
-</section>
-
-<section id="staff">
-    <h2>Staff :</h2>
-    <div class="tab">
-        <% for (let st in guild.staff) { %>
-            <button class="tablinks1 chip" onclick="openCity(1, event, '<%= guild.staff[st].id %>')">
-                <img src="<%= guild.staff[st].avatar %>" alt="Person" width="96" height="96">
-                <%= guild.staff[st].username %>
-            </button>
-        <% } %>
-        <div class="input-group" style="margin-left: 5px;margin-top: 5px">
-            <select class="form-control">
-                <option selected value=""></option>
-                <% for (let m in guild.members) { %>
-                    <option value="<%= guild.members[m].user.id %>"><%= (guild.members[m].nick || guild.members[m].user.username)+" ("+guild.members[m].user.id+")" %></option>
-                <% } %>
-            </select>
-            <div class="input-group-append input-group-btn">
-                <button class=" my_border btn btn-default" type="button" onclick="">ADD</button>
             </div>
         </div>
-    </div>
-    <% for (let st in guild.staff) { %>
-        <div id="<%= guild.staff[st].id %>" class="tabcontent1">
-            <h3><%= guild.staff[st].username %></h3>
-            <p>ID: <%= guild.staff[st].id %></p>
-            <h4>Roles : </h4>
-            <ul>
-                <% for (let ro in guild.staff[st].roles) { %>
-                    <li><%= guild.roles[guild.staff[st].roles[ro]].name %> <button class="btn btn-danger btn-xs btn_remove" type="button" onclick="'<%= guild.staff[st].roles[ro] %>'">&times;</button></li>
-                <% } %>
-                <div class="input-group" style="margin-top: 8px">
-                    <select class="form-control">
-                        <option selected value=""></option>
-                        <% for (let ro in guild.roles) {
-                            if (guild.staff[st].roles.indexOf(ro) == -1) { %>
-                            <option value="<%= ro %>"><%= guild.roles[ro].name %></option>
-                            <% }
-                        } %>
-                    </select>
-                    <div class="input-group-btn">
-                        <button class=" my_border btn btn-default" type="button" onclick="">Add</button>
-                    </div>
+        <div class="col">
+            <h4>Panel Whitelist :</h4>
+            <ul id="white_list_ul"></ul>
+            <div class="input-group">
+                <select id="white_list" class="form-control"></select>
+                <div class="input-group-btn">
+                    <button class="my_border btn btn-default" type="button" onclick="add_to_white_list()">Add</button>
                 </div>
-            </ul>
-            <button type="button" class="btn_my btn btn-warning" onclick="">Delete</button>
-            <button type="button" class="btn_my btn btn-success" onclick="">Save</button>
+            </div>
+            <button type="button" style="width: 100px;margin-top: 20px" class="btn_my btn btn-success" onclick="save_whitelist(event)">Save list</button>
         </div>
-    <% } %>
-</section>
+    </section>
+
+
+    <section id="roles">
+        <h2>Roles: </h2>
+        <div id="role_create" class="tab">
+            <div class="input-group" style="margin-left: 5px;margin-top: 5px">
+                <input id="role_name" type="text" placeholder="Name" class="form-control">
+                <span class="input-group-btn" style="width:0px;"></span>
+                <input id="role_priority" type="number" placeholder="Priority" class="form-control">
+                <div class="input-group-append input-group-btn">
+                    <button class=" my_border btn btn-info" type="button" onclick="create_role(event)">Create</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="staff">
+        <h2>Staff :</h2>
+        <div id="staff_create" class="tab">
+            <div class="input-group" style="margin-left: 5px;margin-top: 5px">
+                <select id="staff_id" class="form-control"></select>
+                <span class="input-group-btn" style="width:0px;"></span>
+                <select id="staff_role" class="form-control">
+                    <option value=""></option>
+                    <% for (let r in guild.roles) { %>
+                        <option value="<%= r %>"><%= guild.roles[r].name %></option>
+                    <% } %>
+                </select>
+                <div class="input-group-append input-group-btn">
+                    <button class=" my_border btn btn-info" type="button" onclick="create_staff(event)">Create</button>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
 
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
 var guild = JSON.parse('<%- JSON.stringify(guild) %>'); // current guild object
-console.log(guild);
 
 // api request UI result
 const result_success = '<div class="alert alert-success alert-dismissible"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Success!</strong></div>';
 const result_failure = '<div class="alert alert-danger alert-dismissible"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><strong>Failure!</strong></div>';
 
-// router.put('/api/staff/:guild',     ); // users_id: [] // with user roles
-// router.put('/api/roles/:guild',     ); // roles: [] // with role cmds
-// router.post('/api/staff',           );
-// router.post('/api/roles',           );
-// router.post('/api/commabds',        );
+// router.put('/api/commands/:guild/:id',  );
+// router.post('/api/commands',            );
+
 
 /*
  * Functions to save data (use api)
  */
+// log channel
 function save_guild(evt) {
     let channel_select = document.getElementById('log_channel_id'),
         channel_id = channel_select.options[channel_select.selectedIndex].value;
@@ -296,6 +239,7 @@ function save_guild(evt) {
         evt.target.parentElement.parentElement.parentElement.innerHTML += result_failure;
     });
 }
+// whitelist
 function save_whitelist(evt) {
     axios.put('/api/whitelist/'+guild.id, {
         users_id: guild.whitelist
@@ -311,8 +255,9 @@ function save_whitelist(evt) {
         evt.target.parentElement.parentElement.innerHTML += result_failure;
     });
 }
-
-
+/**
+ * Functions to update whitelist
+ */
 function add_to_white_list() {
     let select = document.getElementById('white_list'),
         id = select.options[select.selectedIndex].value;
@@ -321,7 +266,6 @@ function add_to_white_list() {
 function remove_from_white_list(id) {
     update_white_list(null, id);
 }
-
 function update_white_list(added=null, removed=null) {
     let select = document.getElementById('white_list'),
         list = document.getElementById('white_list_ul');
@@ -344,6 +288,350 @@ function update_white_list(added=null, removed=null) {
     }
 }
 
+/**************************************************************************/
+
+/* Create role */
+function create_role(evt) {
+    let roles = document.getElementById('role_create'),
+        role_name = document.getElementById('role_name').value,
+        role_priority = document.getElementById('role_priority').value;
+
+    axios.post('/api/roles', {
+        guild_id: guild.id,
+        name: role_name,
+        priority: role_priority
+    })
+    .then(res => {
+        if (res.status == 200) {
+            let id = res.data.id;
+
+            guild.roles[id] = {
+                id: id,
+                name: role_name,
+                priority: role_priority,
+                commands: []
+            }
+
+            update_roles();
+        } else {
+            evt.target.parentElement.parentElement.parentElement.innerHTML += result_failure;
+        }
+    })
+    .catch(err => {
+        evt.target.parentElement.parentElement.parentElement.innerHTML += result_failure;
+    });
+}
+/* Update role */
+function save_role(evt, id) {
+    axios.put('/api/roles/'+id, guild.roles[id])
+    .then(res => {
+        if (res.status == 200) {
+            evt.target.parentElement.innerHTML += result_success;
+        } else {
+            evt.target.parentElement.innerHTML += result_failure;
+        }
+    })
+    .catch(err => {
+        evt.target.parentElement.innerHTML += result_failure;
+    });
+}
+/* Delete role */
+function delete_role(evt, id) {
+    axios.delete('/api/roles/'+id)
+    .then(res => {
+        console.log(res);
+        if (res.status == 200) {
+            delete guild.roles[id];
+            update_roles();
+        } else {
+            evt.target.parentElement.innerHTML += result_failure;
+        }
+    })
+    .catch(err => {
+        console.log(err);
+        evt.target.parentElement.innerHTML += result_failure;
+    });
+}
+
+/**
+ * Delete role cmd
+ */
+function delete_role_cmd(role_id, cmd_id) {
+    guild.roles[role_id].commands.splice(guild.roles[role_id].commands.indexOf(cmd_id), 1);
+    update_role(role_id);
+}
+/**
+ * Add role cmd
+ */
+function add_role_cmd(evt, role_id) {
+    let select = evt.target.parentElement.parentElement.getElementsByTagName('select')[0],
+        cmd_id = select.options[select.selectedIndex].value;
+    if (guild.roles[role_id].commands.indexOf(cmd_id) === -1) guild.roles[role_id].commands.push(cmd_id);
+    update_role(role_id);
+}
+
+/**
+ * Functions to update Roles
+ */
+function update_roles() {
+    let roles = document.getElementById('role_create');
+
+    // clear
+    while (roles.firstElementChild.nodeName == "BUTTON")
+        roles.removeChild(roles.firstChild);
+
+    // display
+    for (let role in guild.roles) {
+        let new_item = document.createElement("button");
+        new_item.innerText = guild.roles[role].name;
+        new_item.setAttribute("class", "tablinks0 chip");
+        new_item.setAttribute("onclick", "openCity(0, event, "+role+")");
+
+        if (Object.keys(guild.roles).length-1 == Object.keys(guild.roles).indexOf(role)) new_item.setAttribute("class", "tablinks0 chip active");
+
+        roles.insertBefore(new_item, roles.children[roles.children.length-1]);
+
+        // add tabcontent
+        update_role(role);
+    }
+}
+
+/**
+ * Update role tabcontent
+ */
+function update_role(id) {
+    // clear
+    let tabcontent_node = document.getElementById(id);
+    if (tabcontent_node) document.getElementById('roles').removeChild( tabcontent_node );
+
+    // display new
+    let tabcontent = html_to_element("<div id='"+id+"' class='tabcontent0'></div>");
+    if (Object.keys(guild.roles).length-1 != Object.keys(guild.roles).indexOf(id)) tabcontent.setAttribute('style', 'display: none;');
+
+    tabcontent.appendChild( html_to_element("<h3>"+guild.roles[id].name+"</h3>"));
+    tabcontent.appendChild( html_to_element("<p>Priority : "+guild.roles[id].priority+"</p>"));
+    tabcontent.appendChild( html_to_element("<h4>Commands :</h4>"));
+
+    let ul = document.createElement('ul');
+
+    for (let cmd in guild.roles[id].commands) {
+        let li = document.createElement('li');
+        li.appendChild( document.createTextNode(guild.commands[guild.roles[id].commands[cmd]].command) );
+        li.appendChild(html_to_element("<button class='btn btn-danger btn-xs btn_remove' type='button' onclick=\"delete_role_cmd("+id+", "+guild.roles[id].commands[cmd]+")\">&times;</button>"))
+        ul.appendChild(li);
+    }
+
+    let div = html_to_element("<div class='input-group' style='margin-top:8px'></div>")
+    let select = html_to_element("<select class='form-control'></select>");
+    select.appendChild( html_to_element("<option selected value=''></value>") );
+
+    for (let cmd in guild.commands)
+        if (guild.roles[id].commands.indexOf(cmd) == -1)
+            select.appendChild( html_to_element("<option value='"+cmd+"'></option>") ).appendChild(document.createTextNode(guild.commands[cmd].command));
+
+    div.appendChild(select);
+    let s_div = html_to_element("<div class='input-group-btn'></div>");
+    s_div.appendChild( html_to_element("<button class='my_border btn btn-default' type='button' onclick=\"add_role_cmd(event, "+id+")\">Add</button>"));
+    div.appendChild(s_div);
+    ul.appendChild(div);
+
+    tabcontent.appendChild(ul);
+    tabcontent.appendChild( html_to_element("<button type='button' class='btn_my btn btn-warning' onclick=\"delete_role(event, "+id+")\">Delete</button>") );
+    tabcontent.appendChild( html_to_element("<button type='button' class='btn_my btn btn-success' onclick=\"save_role(event, "+id+")\">Save</button>") );
+
+    document.getElementById('roles').appendChild(tabcontent);
+
+    document.evaluate("//button[@onclick='openCity(0, event, "+id+")']", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();
+}
+
+/**************************************************************************/
+
+/* Create staff */
+function create_staff(evt) {
+    let staff = document.getElementById('staff_create'),
+        staff_id = document.getElementById('staff_id').value,
+        staff_role = document.getElementById('staff_role').value;
+
+    axios.post('/api/staff', {
+        id: staff_id,
+        guild_id: guild.id,
+        role_id : staff_role
+    })
+    .then(res => {
+        if (res.status == 200) {
+            let id = res.data.id;
+
+            guild.staff[staff_id] = {
+                id: staff_id,
+                username: ( guild.members[staff_id].nick || guild.members[staff_id].user.username ),
+                avatar: guild.members[staff_id].user.avatar,
+                roles: [staff_role]
+            }
+
+            update_staffs();
+        } else {
+            evt.target.parentElement.parentElement.parentElement.innerHTML += result_failure;
+        }
+    })
+    .catch(err => {
+        evt.target.parentElement.parentElement.parentElement.innerHTML += result_failure;
+    });
+}
+/* update staff */
+function save_staff(evt, id) {
+    axios.put('/api/staff/'+guild.id+"/"+id, guild.staff[id])
+    .then(res => {
+        if (res.status == 200) {
+            evt.target.parentElement.innerHTML += result_success;
+        } else {
+            evt.target.parentElement.innerHTML += result_failure
+        }
+    })
+    .catch(err => {
+        evt.target.parentElement.innerHTML += result_failure;
+    });
+}
+/* delete staff */
+function delete_staff(evt, id) {
+    axios.delete('/api/staff/'+guild.id+'/'+id)
+    .then(res => {
+        if (res.status == 200) {
+            delete guild.staff[id];
+            update_staffs();
+            update_staff(id);
+        } else {
+            evt.target.parentElement.innerHTML += result_failure
+        }
+    })
+    .catch(err => {
+        evt.target.parentElement.innerHTML += result_failure;
+    });
+}
+/**
+ * Functions to update Staff
+ */
+function update_staffs() {
+    let staffs = document.getElementById('staff_create');
+
+    // clear
+    while (staffs.firstElementChild.nodeName == "BUTTON")
+        staffs.removeChild(staffs.firstChild);
+
+    // display
+    for (let staff in guild.staff) {
+        let new_item = document.createElement("button"),
+            img = document.createElement('img');
+        img.setAttribute('src', guild.staff[staff].avatar);
+        img.setAttribute('alt', 'Avatar');
+        img.setAttribute('width', '96');
+        img.setAttribute('height', '96');
+        new_item.appendChild(img);
+        new_item.innerHTML += guild.staff[staff].username;
+        new_item.setAttribute("class", "tablinks1 chip");
+        new_item.setAttribute("onclick", "openCity(1, event, '"+staff+"')");
+
+        if (Object.keys(guild.staff).length-1 == Object.keys(guild.staff).indexOf(staff)) new_item.setAttribute("class", "tablinks1 chip active");
+
+        staffs.insertBefore(new_item, staffs.children[staffs.children.length-1]);
+
+        // add tabcontent
+        update_staff(staff);
+    }
+    update_no_staff_list();
+}
+/*
+ * Update staff tabcontent
+ */
+function update_staff(id) {
+    // clear
+    let tabcontent_node = document.getElementById(id);
+    if (tabcontent_node) document.getElementById('staff').removeChild( tabcontent_node );
+
+    // display new
+    let tabcontent = html_to_element("<div id='"+id+"' class='tabcontent1'></div>");
+    if (Object.keys(guild.staff).length-1 != Object.keys(guild.staff).indexOf(id)) tabcontent.setAttribute('style', 'display: none;');
+
+    tabcontent.appendChild( html_to_element("<h3>"+guild.staff[id].username+"</h3>"));
+    tabcontent.appendChild( html_to_element("<p>ID : "+guild.staff[id].id+"</p>"));
+    tabcontent.appendChild( html_to_element("<h4>Roles :</h4>"));
+
+    let ul = document.createElement('ul');
+
+    for (let ro in guild.staff[id].roles) {
+        let li = document.createElement('li');
+        li.appendChild( document.createTextNode(guild.roles[guild.staff[id].roles[ro]].name+" (priority: "+guild.roles[guild.staff[id].roles[ro]].priority+")") );
+        li.appendChild(html_to_element("<button class='btn btn-danger btn-xs btn_remove' type='button' onclick=\"delete_staff_role('"+id+"', "+ro+")\">&times;</button>"))
+        ul.appendChild(li);
+    }
+
+    let div = html_to_element("<div class='input-group' style='margin-top:8px'></div>")
+    let select = html_to_element("<select class='form-control'></select>");
+    select.appendChild( html_to_element("<option selected value=''></value>") );
+
+    for (let ro in guild.roles)
+        if (guild.staff[id].roles.indexOf(ro) == -1)
+            select.appendChild( html_to_element("<option value='"+ro+"'></option>") ).appendChild(document.createTextNode(guild.roles[ro].name));
+
+    div.appendChild(select);
+    let s_div = html_to_element("<div class='input-group-btn'></div>");
+    s_div.appendChild( html_to_element("<button class='my_border btn btn-default' type='button' onclick=\"add_staff_role(event, '"+id+"')\">Add</button>"));
+    div.appendChild(s_div);
+    ul.appendChild(div);
+
+    tabcontent.appendChild(ul);
+    tabcontent.appendChild( html_to_element("<button type='button' class='btn_my btn btn-warning' onclick=\"delete_staff(event, '"+id+"')\">Delete</button>") );
+    tabcontent.appendChild( html_to_element("<button type='button' class='btn_my btn btn-success' onclick=\"save_staff(event, '"+id+"')\">Save</button>") );
+
+    document.getElementById('staff').appendChild(tabcontent);
+
+    let path = "".concat('', '//button[@onclick="openCity(1, event, ', "'", id, "'", ')"]')
+    document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue.click();
+}
+
+/**
+ * Functions to update no staff list
+ */
+function update_no_staff_list() {
+    let select = document.getElementById('staff_id');
+
+    while(select.firstChild)
+        select.removeChild(select.firstChild);
+
+    select.innerHTML = "<option selected value=''></option>";
+
+    for (let m_id in guild.members) {
+        if (m_id != guild.owner.id && !guild.members[m_id].user.bot && Object.keys(guild.staff).indexOf(m_id) == -1) { // can't add owner and or bot to white list
+            select.innerHTML += "<option value='"+ guild.members[m_id].user.id+"'>"+ (guild.members[m_id].nick || guild.members[m_id].user.username)+' ('+guild.members[m_id].user.id+')' +"</option";
+        }
+    }
+}
+
+/**
+ * Delete staff role
+ */
+function delete_staff_role(staff, role_id) {
+    guild.staff[staff].roles.splice(guild.staff[staff].roles.indexOf(role_id), 1);
+    update_staff(staff);
+}
+/**
+ * Add staff role
+ */
+function add_staff_role(evt, staff) {
+    let select = evt.target.parentElement.parentElement.getElementsByTagName('select')[0],
+        role_id = select.options[select.selectedIndex].value;
+    if (guild.staff[staff].roles.indexOf(role_id) === -1) guild.staff[staff].roles.push(role_id);
+    update_staff(staff);
+}
+
+
+
+/**************************************************************************/
+
+/* Commands */
+
+/**************************************************************************/
+
+
 /*
  * Switch between elements (roles and staff members)
  */
@@ -364,16 +652,29 @@ function openCity(id, evt, cityName) {
     }
 
     // Show the current tab, and add an "active" class to the link that opened the tab
-    document.getElementById(cityName).style.display = "block";
+    document.getElementById(cityName.toString()).style.display = "block";
     evt.currentTarget.className += " active";
 }
 
-// set default menu selection
-let tabs = document.getElementsByClassName("tab");
-for (let e in tabs)
-    if (tabs[e].hasChildNodes)
-        tabs[e].children[0].click();
+/*
+ * Transform HTML string to Node Element
+ */
+function html_to_element(htmlString) {
+    let el = document.createElement('div');
+    el.innerHTML = htmlString.trim();
+    return el.firstChild;
+}
 
 /* Init each select and tab */
-update_white_list();
+window.addEventListener("DOMContentLoaded", (event) => {
+    update_white_list();
+    update_roles();
+    update_staffs();
+
+    // set default menu selection
+    let tabs = document.getElementsByClassName("tab");
+    for (let e in tabs)
+        if (tabs[e].hasChildNodes)
+            tabs[e].children[0].click();
+});
 </script>

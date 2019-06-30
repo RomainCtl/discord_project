@@ -54,6 +54,7 @@ module.exports = function(req, res) {
             .then(json => { // get guild channels from api
                 guild.owner = json;
                 guild.owner.avatar = "https://cdn.discordapp.com/avatars/"+guild.owner.id+"/"+guild.owner.avatar+".png";
+                if (guild.owner.avatar == null) guild.owner.avatar = "/public/images/discord_logo_black.png";
 
                 return fetch(`${config.discord_base_api}v6/guilds/${guild.id}/channels`, {
                     headers: {
@@ -80,8 +81,11 @@ module.exports = function(req, res) {
                 return response.json();
             })
             .then(json => { // get panel white list
-                for (let i in json)
+                for (let i in json) {
+                    if (json[i].user.avatar == null) json[i].user.avatar = "/public/images/discord_logo_black.png";
+                    else json[i].user.avatar = "https://cdn.discordapp.com/avatars/"+json[i].user.id+"/"+json[i].user.avatar+".png";
                     guild.members[json[i].user.id] = json[i]
+                }
 
                 return db.query('SELECT user_id FROM panel_white_list WHERE serveur_id = $1;', [guild.id]);
             })
@@ -121,7 +125,7 @@ module.exports = function(req, res) {
             .then(staff_role => { // add staff role
                 for (let role in staff_role)
                     for (let r in staff_role[role].rows)
-                        guild.staff[staff_role[role].rows[r].id_mod].roles.push(staff_role[role].rows[r].role_id);
+                        guild.staff[staff_role[role].rows[r].id_mod].roles.push(staff_role[role].rows[r].role_id.toString());
                 return db.query('SELECT id, name, priority FROM role WHERE serveur_id=$1 ORDER BY priority;', [guild.id]);
             })
             .then(roles => { // add roles
@@ -139,7 +143,7 @@ module.exports = function(req, res) {
             .then(role_cmd => { // add cmds role
                 for (let cmd in role_cmd)
                     for (let r in role_cmd[cmd].rows)
-                        guild.roles[role_cmd[cmd].rows[r].role_id].commands.push(role_cmd[cmd].rows[r].cmd_id);
+                        guild.roles[role_cmd[cmd].rows[r].role_id].commands.push(role_cmd[cmd].rows[r].cmd_id.toString());
 
                 return db.query('SELECT log_channel FROM serveur WHERE id = $1;', [guild.id]);
             })

@@ -9,6 +9,8 @@ const manage = require('./resources/manage');
 
 const guild = require('./resources/api/guild');
 const whitelist = require('./resources/api/whitelist');
+const roles = require('./resources/api/roles');
+const staff = require('./resources/api/staff');
 
 /**
  * Middleware that log each request with date
@@ -35,11 +37,14 @@ router.get('/discord/callback',     discord_callback);
  */
 router.put('/api/guild/:guild',         guild); // log_channel: ''
 router.put('/api/whitelist/:guild',     whitelist); // users_id: []
-router.put('/api/staff/:guild',         ); // users_id: [] // with user roles
-router.put('/api/roles/:guild',         ); // roles: [] // with role cmds
-router.post('/api/staff',               );
-router.post('/api/roles',               );
+router.put('/api/staff/:guild/:id',     staff.update); // staff: {}, guild_id: ''
+router.put('/api/roles/:id',            roles.update); // roles: {}
+router.put('/api/commands/:guild/:id',  );
+router.post('/api/staff',               staff.create); // staff: {}
+router.post('/api/roles',               roles.create); // guild_id: '', name: '', priority: ''
 router.post('/api/commands',            );
+router.delete('/api/staff/:guild/:id',  staff.delete); // guild_id:'', id:''
+router.delete('/api/roles/:id',         roles.delete); // id: ''
 
 // export router
 module.exports = router;

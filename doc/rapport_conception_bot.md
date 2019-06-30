@@ -1,72 +1,306 @@
-# Rapport sur la conception du bot et de l'interface pour le projet 'Bot de modération Discord'
+# Rapport de fin de projet Web et BDD
+## Alfred - 'Bot de modération Discord'
+___
 
 
 
-Dans le cadre de notre projet web, nous cherchons à mettre en place un bot sur l'application de chat en ligne __discord__, 
-le but étant de mettre en place un bot pouvant réaliser les tâches suivantes : 
+Dans le cadre de notre projet web, nous cherchons à mettre en place un bot sur l'application de chat en ligne __discord__,
+le but étant de mettre en place un bot pouvant réaliser les tâches suivantes :
 > - Gérer la modération en permettant au bot de créer ou supprimer des modérateurs sur le serveur Discord
 > - Gérer les sanctions en permettant au bot de punir des utilisateurs en recevant une commande d'un modérateur
-> - Détecter les comportements illicites tels que le spamming et le punir en conséquence sans passer par  le biais d'un modérateur.
+> - Détecter les comportements illicites tels que le spamming et le punir en conséquence sans passer par le biais d'un modérateur.
 
-En prime, nous mettrons en place une interface web permettant de gérer le bot sur un site à part, 
+En prime, nous mettrons en place une interface web permettant de gérer le bot sur un site à part,
 ce site web disposera des fonctionnalités suivantes :
-> - Permettre la diffusion publique du bot 
+> - Permettre la diffusion publique du bot
 > - Chaque utilisateur ayant le bot installé sur son serveur doit avoir accès à un panel
->d’administration. Ce panel d’administration doit permettre d’activer/désactiver ou/et de configurer
->certaines fonctionnalités du bot.
+> d’administration. Ce panel d’administration doit permettre d’activer/désactiver ou/et de configurer
+> certaines fonctionnalités du bot.
 
-Notre mission doit donc nous amener à comprendre le fonctionnement d'un serveur node js, et établir un lien entre notre application et un élément extérieur. 
+Notre mission doit donc nous amener à comprendre le fonctionnement d'un serveur node js, et établir un lien entre notre application et un élément extérieur.
 
-Au travers de ce rapport nous verrons la manière dont nous avons réalisé ces tâches, en commencant par l'élaboration d'un serveur node js avec un webSocket, puis la réalisation du bot avec Discord.js et enfin la réalisation de notre panel de gestion du bot. 
+Au travers de ce rapport nous verrons la manière dont nous avons réalisé ces tâches, en commencant par l'élaboration d'un serveur node js utilisant des websocket afin de communiquer avec l'API discord, puis la réalisation du bot avec Discord.js et enfin la réalisation de notre panel de gestion du bot.
 
 
-Pour toutes questions en ce qui la base de données, vous pouvez vous référer à notre précédent rapport  __`rapport_conception_db.md`__. 
+Pour toutes questions en ce qui la base de données, vous pouvez vous référer à notre précédent rapport  __`rapport_conception_db.md`__ (Attention, la base de données a légèrement été modifié depuis).
 
 
 ## Création d'un bot Discord
 
-
-La première partie de notre travail de création d'un bot Discord est évidemment de créer le bot. Pour ce faire nous nous renderons sur le portail Developers de discord à l'adresse : __'https://discordapp.com/developers/applications/'__ 
+La première partie de notre travail de création d'un bot Discord est évidemment de déclarer le bot. Pour ce faire nous nous renderons sur le portail Developers de discord à l'adresse : __'https://discordapp.com/developers/applications/'__
 ![Portail Developers de Discord](./rapport_bot_picture/developer_portal.png)
 
-On crée une application qui deviendra notre futur bot. Discord nous fournit ce portail afin de simplifier la création d'application sur leur plateforme. 
+On crée une application qui deviendra notre futur bot. Discord nous fournit ce portail afin de simplifier la création d'application sur leur plateforme et afin de répertorier les bots créé par la communauté.
 
-On se rend ensuite dans l'onglet **"Bot"** afin de confirmer que notre application est un utilisateur robot, une fois que l'on confirme la nature de notre application nous serons données par Discord un __`Token`__ qui sera utilisé par notre application node js afin d'appeler le bot sur un serveur.
+On se rend ensuite dans l'onglet **"Bot"** afin de confirmer que notre application est un utilisateur robot, une fois que l'on confirme la nature de notre application nous serons données par Discord un __`Token`__ qui sera utilisé par notre application node js afin de s'identifier sur discord.
 
 
 ## Mise en place du WebSocket
 
+Afin de comprendre le principe derrière la discussion entre node js et Discord. Nous avons commencé par mettre en place un webSocket qui nous permet d'établir une connection persistante avec le l'api discord. Ensuite, il suffit de s'identifier avec le __token__ unique et d'envoyer un signal tous les X temps afin d'annoncer que le bot est toujours en fonctionnement. Par manque de temps, nous avons simplement créer un micro-bot qui répond "Pong" lorsqu'un message "ping" est envoyé depuis un serveur discord.
 
-Afin de comprendre le principe derrière la discussion entre node js et Discord, nous avons commencé par établir un webSocket qui nous permettrait d'établir une discussion avec le serveur discord, mette en ligne notre bot et mettre en place une fonctionnalité qui retournerait un message __'Pong'__ en cas de réception d'un message __'Ping'__. 
+L'intérêt de cette partie est double, comprendre le fonctionnement des websockets car c'est quelque chose que nous n'avions jamais manipulé, et comprendre le fonctionnement de discord et de son API.
 
-L'intérêt de cette partie est double, comprendre la discussion entre node js et Discord par le biais de node js, et tester la fonctionnalité du bot vu précédemment.
+La solution développer pour ce ping-pong se trouve dans le dossier `./src/pingpong` et comprend deux fichiers, un pour la communication avec l'api (utilisations du module `axios`) et l'autre pour la gestion évenementielle.
 
-Le code originel du ping pong est disponible dans le fichier ***/pingpong/index.js***.
-
-
-### Fonctionnement du WebSocket :
+> Pour tester cette réalisation, il suffit d'utiliser la commande : `npm run pingpong` depuis un terminal.
 
 
-Le but du WebSocket est de mettre en place une liaison entre l'api Discord et notre fichier node js. Pour ce faire nous commençons par déclarer un webSocket `client`, ce webSocket nous permet de faire le lien avec discord par le biais de la `gateway` discord.
+### Fonctionnement des WebSockets
 
-Si la connexion est réussie, le webSocket va vérifier en permanence ce qu'il reçoit de la gateway et, en fonction de son résultat, appellera une fonction `message()` qui vérifiera le contenu du message et en fonction de ce dernier pourra effectuer diverses actions.
+Le but des WebSockets est de mettre en place une liaison entre l'api Discord et notre fichier serveur javascript (ici notre bot). Pour ce faire nous commençons par déclarer un objet webSocket `client`, ce qui nous permet d'initialiser la connection par le protocol `wss`. Puis il suffit de déclarer les fonctions à appelé lors de la réception d'un certain évennement.
 
-Si le message envoyé au WebSocket est un message écrit, il peut être comparé au sein de la fonction `onMessage()` afin de vérifier s'il s'agit d'une commande.
 
-On extrait avec `substring` pour vérifier la présence du caractère de commande '`!`'. En cas de présence du caractère, on passera par la commande ***RegExp***.
+### Discord.js
 
+// TODO avantage/inconvéniants ..., évenements : de quoi avons besoin (ready, message, delete, update, ...)
+
+Discord.js est la principal bibliothèque que nous avons employé durant la réalisation de notre application, il s'agit d'une application couramment utiliser afin de réaliser des bots sur Discord et permettant de simplifier la discussion entre notre code Javascript et Discord. 
+
+Disord.js s'articule autour d'événement, cela signifie que si certaine action sont détecter dans l'application Discord, alors le programme réagira. Nous présenterons ici deux des principaux événements de Discord.js :
+
+**`Ready`** :
+
+``` JS
+const Discord = require('discord.js');
+const client = new Discord.Client();
+client.on('ready', () =>{/* Instructions */});
+```
+Premier événement lancé quand le bot démarre et se connecte à un serveur, on lui donne des configurations au démarrage tel que l'antispam dans cet événement.
+
+**`Message`** :
+
+``` JS
+const Discord = require('discord.js');
+const client = new Discord.Client();
+client.on('message', msg => {/* Instructions */});
+```
+Evenement lancé quand le bot détecte qu'un message a été posé sur le chat, **n'importe quel message**, cette commande est central à notre applicatino car elle est celle qui nous permet de traiter presque toutes les commandes, mais aussi l'anti-spam et l'anti-insulte.
+
+Il est très important quand on utilise `message` de faire attention à ne pas signaler ou discuter avec un autre bot afin d'éviter les risques potentiels de boucle infini de discussion entre deux bots. Ainsi, `message` commence souvent par une condition afin de vérifier si celui qui à posté le message est bien humain :
+
+``` JS
+if (msg.author.bot) return;
+```
+
+Puis nous procédons à la vérification si il ne s'agit pas d'un spam, d'une insulte et enfin d'une commande.
+
+Il existe beaucoup de type différent de gestion d'événement, certain que nous créons, d'autre déjà existant dans Discord.js que nous utilisons.
+
+Bien sûr, hormis les événements, Discord.js propose de nombreux autre avantage tel que l'écriture simplifié dans le chat, ou une gestion plus facile des rôles. Tout ces avantages le rende bien plus utile à employer que le Websocket que nous employons jusque là, ce qui fût notre principal raison pour privilégier cette bibliothèque.
+
+
+Bien évidemment, Discord.js n'est pas sans défaut, et le principal d'entre eux est la manière dont le code permettant la discussion entre Javascript et Discord est "caché".
+Discord.js ne permet pas de comprendre les mécanismes en arrière plan qui forme le lien JS et Discord et dès lors, nous sommes privés d'une partie de notre capacité à modifier ce dernier dans le cadre de l'utilisation de Discord.js.
+
+C'est cette raisons qui nous a poussé au début du projet à concevoir un ping-pong en Websocket : comprendre le mécanisme de discussion entre Discord et node js.
+
+
+### Commandes
+
+// TODO gestion (rappel sur les commandes globals), la possibilité de créer des commandes, l'utilisation de regex, (et la création dynamic de regex), generiquen ...
+
+
+#### Création dynamic de regex
+
+// TODO (voir les fichiers dans le dossier ./src/util)
+
+
+### Base de données
+
+*// TODO en parler un peut, (config dans le fichier src/model/index.js), comment on a mise en place (comment ca va etre utilise apres)*
+
+La base de données, issus de la première partie de notre projet, fût utilisé dans le cadre de notre application comme un piliers central auquel s'articule autour l'ensemble de notre application.
+
+Par cela, il faut comprendre que chaque commande passe par notre base de données d'une manière ou d'une autre (ne serait-ce que pour vérifier la permission d'un utilisateur à l'exécution d'une commande), notre bot s'y refère toujours en cas de questionnement, ou à l'application d'une sanction.
+
+Pour utiliser la base de données dans notre bot d'administration, nous avons employer la base **postgresql**, auquel nous accédons grâce à une librairie **pg**. Dans le dossier **`model`** nous avons mis dans le fichier **`index.js`** les composants permettant d'accéder à notre base de données. 
+
+Nous avons une constante qui enregistre les informations de connexions :
+
+```JS
+const { Pool } = require('pg');
+const pool = new Pool({
+    user: 'postgres',
+    host: '127.0.0.1',
+    database: 'enssat_bot',
+    password: 'root',
+    port: '34035'
+});
+```
+Et ensuite nous avons mis en place une fonction nous permettant d'exécuter des requêtes vers la base de données et retourner le résultat. 
+
+```JS
+module.exports = {
+    query: (text, params) => {
+        return pool.connect()
+        .then(client => {
+            let start = Date.now();
+            client.query('SET search_path TO bot_moderation;'); // use bot_moderation schema
+
+            return client.query(text, params)
+            .then(res => {
+                client.release();
+                let duration = Date.now() - start;
+                console.log("executed query", {text, params, duration, rows: res.rowCount});
+                return res;
+            })
+            .catch(err => {
+                client.release();
+                let duration = Date.now() - start;
+                console.log("Fail to execute query", {text, params, duration, err});
+                throw err;
+            });
+        });
+    }
+}
+```
+
+Cette fonction sera vital par la suite pour notre projet.
+
+
+## Panel d'administration Web
+
+Le panel est la troisième et dernière partie de notre projet. Nous devons mettre en place une interface afin de pouvoir administrer le bot depuis une page web.
+
+Cette interface comporte une page d'accueil par lequel nous nous connectons à discord ainsi que d'un lien permettant d'appeler le bot sur votre serveur Discord.
+
+> Page d'accueil de notre application web :
+
+![home_page](./rapport_bot_picture/panel_home.png)
+
+### Identification
+
+// TODO utilisation de oauth2 avec l'api DISCORD (identifiants discords...) + whitelist en BDD
+// peut accéder à plusieurs serveurs si on est dans la whiteliste de plusieurs serveurs par exemple...
+
+
+### Panel
+
+Le panel est retrouvable dans le dossier `./src/web` mais il utilise les fonctions déjà défini dans le dossier `./src/command` puisque tout ce qui est fait sur le panel peut etre fait en ligne de commande sur le serveur discord.
+
+### Les données brut
+
+Pour l'affichage de la page d'administration d'un serveur, les données sont envoyées dans un seul objet :
+
+```JS
+var guild = {
+    id: 'snwoflake',
+    name: 'string',
+    icon: 'url',
+    owner: {
+        username: 'string',
+        locale: 'string',
+        mfa_enabled: false,
+        flags: 0,
+        avatar: 'url',
+        discriminator: 'int',
+        id: 'snowflake'
+    },
+    log_channel: '<snowflake:channel_id>',
+    staff: {
+        '<snowflake:user_id>': {
+            id: '<snowflake:user_id>',
+            username: 'string',
+            avatar: 'url',
+            roles: [Array<role:id>]
+        }
+    },
+    roles: {
+        '<int:id>':	{
+            id: 1,
+            name: 'ModerateurAlpha',
+            priority: 2,
+            commands: [Array<command:id>]
+        }
+    },
+    commands: {
+        '1': {
+            id: 1,
+            command: '<string:command_help>',
+            regex: 'string'
+        }
+    },
+    whitelist: [Array<user_id>],
+    members: {
+        '<snowflake:user_id>': {
+            nick: 'string',
+            user: [Object<Discord_api_user>],
+            roles: [Array<Discord_guild_roles>],
+            premium_since: null,
+            deaf: false,
+            mute: false,
+            joined_at: 'timestamp'
+        },
+    },
+    channels: {
+        '<snowflake:channel_id>': {
+            permission_overwrites: [Array],
+            name: 'string',
+            parent_id: null,
+            nsfw: false,
+            position: 0,
+            guild_id: '<snowflake:guild_id>',
+            type: 4,
+            id: '<snowflake:channe_id>'
+        },
+    },
+    owner_id: '<snowflake:user_id>'
+}
+```
+
+// TODO 2-3 explications
+
+### L'affichage
+
+![panel_top](./rapport_bot_picture/panel_1.png)
+![panel_bot](./rapport_bot_picture/panel_2.png)
+
+### API
+
+// TODO l'api créé pour l'édition des données, chaque 'partie' sur les interfaces sont indépendantes
+
+### Front
+
+// TODO vanilla pur (par manque de temps de prendre en mains une autre solution), module axios pour les requtes REST, affichage dynamique, ...
+
+
+
+
+## Conclusion
+
+
+
+Au final, ce projet fût pour nous d'un grand interêt, tant par l'ensemble des technologies que nous avons pu découvrir, que par le lien qu'il fait avec les technologies et problématiques moderne.
+
+Nous avons pu concevoir une véritable application employant différente formes de méthodes et technologies, grâce à notre travail sur la base de données nous avons mis en place une architecture que nous avons pu ensuite utiliser au sein de notre application.
+
+L'emploi de **javascript** nous a aidé à mieux maitrisé ce langage, ainsi qu'à découvrir de nouvelle façon de l'utiliser, nous pouvons par exemple citer la fonction **regex**, ou bien la façon de réaliser l'architecture de notre programme afin de le rendre plus facile à comprendre, adapter ou corriger.
+
+La création d'un bot Discord nous a aussi appris à nous adapter au technologies en dehors de notre cadre de travail habituel. Devoir aller chercher l'information, résoudre les conflits avec l'api **Discord.js**, nous adapter dans notre démarche pour comprendre Discord, fût une expérience enrichissante.
+
+Enfin la mise en place d'un panel web, nous a permis de comprendre comment les différentes applications sur le web travail et s'articule l'une autour de l'autre, en réalisant un projet comme celui-ci, nous avons pu comprendre le fonctionnement d'outil tel que **Node Js**.
+
+Au final, ce projet fût un grand enreichissement personnel, et nous espérons pouvoir utiliser les connaissances que nous en avons tirés soit dans notre vie professionel, soit à titre personnel.
+
+
+
+
+
+
+_________________________________________________________________
 
 ### RegExp
 
 
-Au vu de son importance capital dans notre projet, regExp nécessite une explication.
+Au vu de son importance dans notre projet, regExp nécessite une explication.
 
 RegExp est un constructeur JavaScript permettant de reconnaitre une chaine de caractère afin d'en extraire des informations nécessaires au bon déroulement de la commande :
 
 > *Exemple :*
-> 
+>
 > message.match( new RegExp('^!ping[ ]*$', 'i') ) )
-> 
+>
 >
 > `message.match()` : Check si le message est correcte par rapport à la fonction en paramètre
 >
@@ -99,17 +333,17 @@ Le fichier index.js est disponible dans /src/
 ### src/command/index.js
 
 
-Le fichier index.js dans ./src/command/ à pour but de traiter les commandes envoyées par un utilisateur. Il commence d'abord par vérifier si l'utilisateur est légitime dans sa demande en vérifiant s'il dispose des droits nécessaires. 
+Le fichier index.js dans ./src/command/ à pour but de traiter les commandes envoyées par un utilisateur. Il commence d'abord par vérifier si l'utilisateur est légitime dans sa demande en vérifiant s'il dispose des droits nécessaires.
 
 S'il dispose des droits nécessaires la commande est passée au travers d'un moulinage de **Regex** afin de comprendre de quelle commande il s'agit. Si la commande est trouvée, elle est immédiatement exécutée par l'appel d'une fonction **`callfunc()`** qui traitera la fonction reçue.
 
-Si le match() ne retourne rien, alors il ne s'agit pas d'une fonction n'est pas traité.  
+Si le match() ne retourne rien, alors il ne s'agit pas d'une fonction n'est pas traité.
 
 
 ### Les commandes globales
 
 
-Nous nous sommes très vite rendu compte que pour effectuer les commandes de manière optimisée dans leurs traitements, il était nécessaire de créer des fichiers personalisés pour chaque commande globale. Les commandes globales traitent un problème de manière précise et unique en fonction de la commande global appelé par le **regex**. 
+Nous nous sommes très vite rendu compte que pour effectuer les commandes de manière optimisée dans leurs traitements, il était nécessaire de créer des fichiers personalisés pour chaque commande globale. Les commandes globales traitent un problème de manière précise et unique en fonction de la commande global appelé par le **regex**.
 
 > Voici la liste des commandes globales et leurs fichiers de traitement :
 
@@ -155,7 +389,7 @@ Nous nous sommes très vite rendu compte que pour effectuer les commandes de man
 
 >   *Description de `lock.js` :*
 >
->   lock.js fût le premier nécessitant la création d'un rôle afin de le faire fonctionner. 
+>   lock.js fût le premier nécessitant la création d'un rôle afin de le faire fonctionner.
 >
 >   En effet, afin de verrouiller les channels, il est nécessaire de bloquer les utilisateurs en leur retirant les droits de lecture, écriture sur le channel, cependant cela ne pouvait pas être fait sur le rôle @everyone car cela aurait posé beaucoup plus de travail sur lock.js pour le mettre en place.
 >
@@ -165,7 +399,7 @@ Nous nous sommes très vite rendu compte que pour effectuer les commandes de man
 
 >   *Description de `cancel.js` :*
 >
->   cancel.js est un fichier nous permettant d'annuler une sanction d'après son id dans la base de données. Après avoir exécuté une commande dans la bdd pour vérifier l'existence de la sanction, cette dernière est effacée de la base et en fonction de son type on applique différents traitements permettant d'annuler les punitions appliquées. 
+>   cancel.js est un fichier nous permettant d'annuler une sanction d'après son id dans la base de données. Après avoir exécuté une commande dans la bdd pour vérifier l'existence de la sanction, cette dernière est effacée de la base et en fonction de son type on applique différents traitements permettant d'annuler les punitions appliquées.
 >
 >   Noter que cancel.js efface aussi la commande des logs, elle n'est plus retrouvable après.  
 >
@@ -173,7 +407,7 @@ Nous nous sommes très vite rendu compte que pour effectuer les commandes de man
 
 >   *Description de `setlogchannel.js` :*
 >
->   Une commande particulière qui permet de transformer un channel en un channel de logs, cela signifie que le bot emploiera ce channel pour décrire toute les actions qu'il effectue.  
+>   Une commande particulière qui permet de transformer un channel en un channel de logs, cela signifie que le bot emploiera ce channel pour décrire toute les actions qu'il effectue.
 >
 >   Pour mettre en place ce channel, la commande accède à la base de données et à l'intérieur du serveur lui indique quel channel (donc l'id du channel) auquel il doit envoyer envoyer les logs du bot.
 >
@@ -183,11 +417,12 @@ Nous nous sommes très vite rendu compte que pour effectuer les commandes de man
 
 >   *Description de `help.js` :*
 >
->   Une commande permettant de récupérer de la base de données l'ensemble des commandes présente sur le serveur. 
+>   Une commande permettant de récupérer de la base de données l'ensemble des commandes présente sur le serveur.
 > ![Portail Developers de Discord](./rapport_bot_picture/help.png)
 >
 
 
+<<<<<<< HEAD
 Chacune de ces commandes est retrouvable au sein du dossier ***/command/*** et dispose de sa propre manière de traiter l'information reçu en paramètre. Elle retourne toujours un message en cas d'erreur. 
 
 
@@ -226,3 +461,6 @@ Le panel est retrouvable dans le dossier /src/web et quand installé sur le serv
 
 
 ### 
+=======
+Chacune de ces commandes est retrouvable au sein du dossier ***/command/*** et dispose de sa propre manière de traiter l'information reçu en paramètre. Elle retourne toujours un message en cas d'erreur.
+>>>>>>> 3763af221c5935e8ec96986964ce0658a0eda9d1

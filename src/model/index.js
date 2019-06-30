@@ -2,9 +2,9 @@ const { Pool } = require('pg');
 const pool = new Pool({
     user: 'postgres',
     host: '127.0.0.1',
-    database: 'ENSSAT',
+    database: 'enssat_bot',
     password: 'root',
-    port: '5432'
+    port: '34035'
 });
 
 

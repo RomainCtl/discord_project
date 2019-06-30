@@ -62,7 +62,6 @@ client.on('connect', function(connection) {
                     api.sendMessage(channel_id, 'Pong');
                     break;
                 default:
-                    console.log( message.match( new RegExp('^!ping[ ]*$', 'i') ) );
                     api.sendMessage(channel_id, "Commande inconnu !");
             }
         }
@@ -113,7 +112,7 @@ client.on('connect', function(connection) {
                     dispatchEvent(receive_data);
                     break;
                 case 1: // Heartbeat
-                    console.log("Hearbeat : ping checking");
+                    console.log("Heartbeat : ping checking");
                     sendBeat();
                     break;
                 case 7: // Reconnect

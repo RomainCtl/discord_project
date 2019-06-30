@@ -2,128 +2,82 @@
 
 Bot de modération en NodeJS + site web/panel d’administration pour Discord
 
+
+## Structure du projet
 ```
-.
+./discord_project
+├── doc/
+│── src/
+│   ├── command/
+│   ├── model/
+│   ├── pingpong/
+│   │   ├── api.js
+│   │   └── index.js
+│   ├── util/
+│   ├── web/
+│   │   ├── public/
+│   │   │   ├── css/
+│   │   │   ├── fonts/
+│   │   │   ├── images/ener.jpg
+│   │   │   │   └── writing.jpg
+│   │   │   └── js/
+│   │   ├── resources/
+│   │   ├── views/
+│   │   │   ├── components/
+│   │   │   ├── includes/
+│   │   │   └── index.ejs
+│   │   ├── config.js
+│   │   └── router.js
+│   ├── anti_spam.js
+│   ├── index.js
+│   ├── logger.js
+│   └── webapp.js
 ├── auth.json
-├── doc
-│   ├── ChantrelR-LE_GALA-Rapport_conception.tar.gz
-│   ├── command.md
-│   ├── data_example.sql
-│   ├── dictionnaire_data.csv
-│   ├── Énoncé-Projet-Web-et-Base-de-Donnée.pdf
-│   ├── init.sql
-│   ├── legend.png
-│   ├── rapport_bot_picture
-│   │   ├── channel_log.png
-│   │   ├── developer_portal.png
-│   │   └── help.png
-│   ├── rapport_conception_bot.md
-│   ├── rapport_conception_bot.pdf
-│   ├── rapport_conception_db.md
-│   ├── rapport_conception_db.pdf
-│   ├── schema_associatif.drawio
-│   ├── schema_associatif.png
-│   ├── schema_logique.drawio
-│   ├── schema_logique.png
-│   └── sql_request.sql
-├── package.json
 ├── package-lock.json
-├── README.md
-└── src
-    ├── anti_spam.js
-    ├── command
-    │   ├── addrole.js
-    │   ├── ban.js
-    │   ├── cancel.js
-    │   ├── create.js
-    │   ├── deaf.js
-    │   ├── delmsg.js
-    │   ├── delock.js
-    │   ├── delrole.js
-    │   ├── derank.js
-    │   ├── getfrom.js
-    │   ├── getto.js
-    │   ├── help.js
-    │   ├── index.js
-    │   ├── kick.js
-    │   ├── lock.js
-    │   ├── mute.js
-    │   ├── rankup.js
-    │   ├── role_add.js
-    │   ├── role_del.js
-    │   ├── setlogchannel.js
-    │   └── warn.js
-    ├── index.js
-    ├── logger.js
-    ├── model
-    │   ├── ban.js
-    │   ├── deaf.js
-    │   ├── index.js
-    │   ├── lock.js
-    │   └── mute.js
-    ├── pingpong
-    │   ├── api.js
-    │   └── index.js
-    ├── util
-    │   ├── chan_list_regex_creation.js
-    │   └── number_regex_creation.js
-    ├── web
-    │   ├── config.js
-    │   ├── public
-    │   │   ├── css
-    │   │   │   ├── bootstrap.css
-    │   │   │   ├── bootstrap.min.css
-    │   │   │   └── custom.css
-    │   │   ├── fonts
-    │   │   │   ├── glyphicons-halflings-regular.eot
-    │   │   │   ├── glyphicons-halflings-regular.svg
-    │   │   │   ├── glyphicons-halflings-regular.ttf
-    │   │   │   ├── glyphicons-halflings-regular.woff
-    │   │   │   └── glyphicons-halflings-regular.woff2
-    │   │   ├── images
-    │   │   │   ├── concert.jpg
-    │   │   │   ├── discord_logo_black.png
-    │   │   │   ├── discord_logo_white.png
-    │   │   │   ├── header.jpg
-    │   │   │   ├── iphone.jpg
-    │   │   │   ├── microphone.jpg
-    │   │   │   ├── pencil_sharpener.jpg
-    │   │   │   └── writing.jpg
-    │   │   └── js
-    │   │       ├── bootstrap.js
-    │   │       ├── bootstrap.min.js
-    │   │       ├── custom.js
-    │   │       ├── ie10-viewport-bug-workaround.js
-    │   │       ├── jquery-1.11.3.min.js
-    │   │       └── jquery.easing.min.js
-    │   ├── resources
-    │   │   ├── api
-    │   │   │   ├── guild.js
-    │   │   │   ├── roles.js
-    │   │   │   ├── staff.js
-    │   │   │   └── whitelist.js
-    │   │   ├── discord_callback.js
-    │   │   ├── home.js
-    │   │   ├── login.js
-    │   │   └── manage.js
-    │   ├── router.js
-    │   └── views
-    │       ├── components
-    │       │   ├── guild_choose.ejs
-    │       │   ├── home.ejs
-    │       │   └── manage.ejs
-    │       ├── includes
-    │       │   ├── footer.ejs
-    │       │   ├── header.ejs
-    │       │   └── header_home.ejs
-    │       └── index.ejs
-    └── webapp.js
+├── package.json
+└── README.md
 
 18 directories, 96 files
 ```
 
-> To run bot : `npm run start`
+On peut diviser la structure du projet en trois parties :
+* __Ping-pong__ :\
+micro-bot utilisant les websockets et n'utilisant que l'api discord. \
+*dossier `./src/pingpong`*
 
-> To run bot in dev mod (restart on each edit) : `npm run debug`
+* __Bot__ :\
+Version final de notre bot, développé à l'aide `discord.js`. \
+*dossier ./src (sauf `./src/pingpong` et `./src/web`)*
 
-> To run 'Ping Pong' test with websocket and without Discord.js : `npm run pingpong`
+* __Panel Web__ :\
+Panel d'administration afin de compléter notre bot, développé avec `express`. \
+*dossier ./src/web mais il utilise aussi ce qui a ete développé pour le bot (`./src/command`, `./src/model`)*
+
+
+## Base de données
+
+> Nous utilisons PostgreSQL v10 (liens : [page de téléchargement](https://www.enterprisedb.com/fr/downloads/postgres-postgresql-downloads))
+
+> Et vous trouverez un fichier `./doc/init.sql` qui permet d'initialiser le projet.
+
+> Les identifiants à configurer sont dans le fichier `./src/model/index.js` \
+*(host, port, username, password, database)*
+
+
+## Commandes utiles au projet
+
+```JSON
+"scripts": {
+    "pingpong": "node ./src/pingpong/index.js",
+    "dev": "nodemon ./src/index.js",
+    "start": "node ./src/index.js",
+    "webdev": "nodemon ./src/webapp.js",
+    "web": "node ./src/webapp.js"
+},
+```
+
+> Avant toutes chose, intaller les dépendances : `npm install`
+
+> Lancer le bot : `npm run start`
+
+> Lancer le serveur web : `npm run web`

@@ -203,7 +203,7 @@ C'est à partir de ces expressions régulières que nous analysons dans
 
 #### Création dynamique de regex
 
-Les commandes personnalisées sont des commandes de sanctions avec des atomes respectant certaines contraintes. Il y a donc deux contraintes personnalisable, la durée de la sanction et la liste des channels dans lesquels elle prend effet.
+Les commandes personnalisées sont des commandes de sanctions avec des atomes respectant certaines contraintes. Il y a donc deux contraintes personnalisables, la durée de la sanction et la liste des channels dans lesquels elle prend effet.
 
 * Contrainte sur la durée : \
 Elle est sous deux formes, soit inférieur, soit supérieur à la durée spécifier lors de la création de la commande. \
@@ -214,14 +214,14 @@ Exemple :
 * Contrainte sur les channels : \
 Elle permet également deux choses, soit que la sanction prenne effet sur un channel spécifié dans la liste, soit elle ne doit pas être dans la liste. \
 Exemple :
-    1. Le ou les channel(s) dans lequel/lesquels la sanction prend effet doit appartenir à la liste des channels suivant : `IN <#1245641> <#75431545741> .audio`
-    2. Le ou les channel(s) dans lequel/lesquels la sanction ne doit pas prendre effet doit appartenir à la liste des channels suivant : `NOT IN <#1245641> <#75431545741> .audio`
+    1. Le ou les channel(s) dans lequel/lesquels la sanction prend effet doit appartenir à la liste des channels suivants : `IN <#1245641> <#75431545741> .audio`
+    2. Le ou les channel(s) dans lequel/lesquels la sanction ne doit pas prendre effet doit appartenir à la liste des channels suivants : `NOT IN <#1245641> <#75431545741> .audio`
 
-Afin d'assurer que ces contraintes soient reconnues, nous avons créé un algorithme permettant de créer des regex dynamiquement (`./src/utils/chan_list_regex_creation.js` pour les channels et `./src/utils/number_regex_creation.js` pour la durée). Ces regex assure donc que la commandes respecte les contraintes spécifiées, et le traitement de cette sanction se fait via les mêmes méthodes que pour les sanctions de base (ex: un ban sur les channels de la catégorie 'RP' sera traité de la même manière qu'un ban du serveur).
+Afin d'assurer que ces contraintes soient reconnues, nous avons créé un algorithme permettant de créer des regex dynamiquement (`./src/utils/chan_list_regex_creation.js` pour les channels et `./src/utils/number_regex_creation.js` pour la durée). Ces regex assure donc que la commande respecte les contraintes spécifiées, et le traitement de cette sanction se fait via les mêmes méthodes que pour les sanctions de base (ex: un ban sur les channels de la catégorie 'RP' sera traité de la même manière qu'un ban du serveur).
 
 Par exemple :
 
-    Si l'on créer une commande de ban qui doit avoir une durée inférieur à 1 jour et qui ne doit pas prendre effet sur un channel audio et sur les channels de la catégorie '#Salons textuels' :
+    Si l'on veut créer une commande de ban qui doit avoir une durée inférieur à 1 jour et qui ne doit pas prendre effet sur un channel audio et sur les channels de la catégorie '#Salons textuels' :
 
 > On execute la commande de création suivante : `!create ban -d <86400 -c NOT IN .audio <#481862020543545344>`
 
@@ -253,6 +253,9 @@ Une première offense vous donneras des warnings, cependant si l'utilisateur con
 >   Le bot récupère le dernier message du channel, puis il compare le contenu de ce message à une liste de mots grossiers et insulte. Si un mot grossier ou une insulte est détecté, il reçoit un warning. S'il recommence, il est banni.
 >
 >   Pour l'anti insulte, l'utilisateur n'a le droit qu'à un warning. S'il recommence, il est banni.
+
+
+Malheureusement, nous n'avons pas pu finaliser dans les temps notre fonction anti-flood (punir les utilisateurs qui répéteraient une lettre ou un mot en trop grand nombre) par manque de temps et par priorisation des fonctionnalitées.
 
 
 
@@ -318,14 +321,14 @@ Cette interface comporte une page d'accueil par lequel nous nous connectons à d
 
 ![home_page](./rapport_bot_picture/panel_home.png)
 
+
 ### Identification
 
+Pour permettre l'utilisateur de se connecter sur notre panel de'administrations, nous utilisons l'identification via l'API Discord (OAuth2), ce qui permet à l'utilisateur d'utiliser les mêmes identifiants que pour Discord.
 
-Pour permettre l'utilisateur de se connecter sur notre panel de configuration de bot, nous avons récupéré de l'API Discord une fonction d'identification, permettant en t'autre de pouvoir se connecter sur notre panel avec son compte Discord.
+Une fois que l'utilisateur est connecté avec son compte Discord, Il lui est demandé s'il accepte de partager ses informations (username et avatar car nous n'avons pas besoin de plus) avec notre serveur afin de pouvoir lui donner accès à notre panel de configuration. Une fois accepter, l'utilisateur pourra accéder au panel de configuration du bot et aux serveurs qu'ils peut administrer, s'il est présent dans la whitlist de plusieurs serveur, il aura une fenetre en plus lui permettant d'accéder à n'importe lequel d'entre eux.
 
-Une fois que l'utilisateur est connecté avec son compte Discord, nous lui demanderons s'il accepte de nous partager son identifiant de connexion afin de pouvoir lui donner accès à notre panel de configuration. Une fois accepter, l'utilisateur pourra accéder au panel de configuration du bot et aux serveurs disponibles.
-
-Bien sûr, tout cela nécessite à l'utilisateur d'être dans la Whitelist des serveurs proposés, la Whitelist est une table dans la base de données référençant l'ensemble des utilisateurs ayant des droits d'administrations sur chaque serveur. Cela nous permet de savoir si l'utilisateur a le droit ou non de configurer le bot sur un serveur. S'il a le droit, il verra le serveur dans sa liste personnelle.
+Bien sûr, tout cela nécessite à l'utilisateur d'être dans la Whitelist des serveurs proposés, la Whitelist est une table dans la base de données référençant l'ensemble des utilisateurs ayant des droits d'administrations sur chaque serveur. Cela nous permet de savoir si l'utilisateur a le droit ou non de configurer le bot sur un serveur. S'il a le droit, il verra le serveur dans sa liste personnelle. L'ajout d'un utilisateur à la whitelist se fait tout simplement via le panel.
 
 
 ### Panel
@@ -446,14 +449,14 @@ Par contrainte de temps, nous n'avons pas géré les commandes 'custom' (créé 
 
 ## Conclusion
 
-Au final, ce projet fût pour nous d'un grand intérêt, tant par l'ensemble des technologies que nous avons pu découvrir, que par le lien qu'il fait avec les technologies et problématiques modernes.
+Au final, ce projet fût pour nous d'un grand intérêt, tant par l'ensemble des technologies que nous avons pu découvrir, que par le lien qui unis ces technologies et problématiques modernes.
 
-Nous avons pu concevoir une véritable application employant différentes formes de méthodes et technologies, grâce à notre travail sur la base de données nous avons mis en place une architecture que nous avons pu ensuite utiliser au sein de notre application.
+Nous avons pu concevoir une application employant différentes formes de méthodes et technologies, grâce à notre travail sur la base de données nous avons mis en place une architecture que nous avons pu ensuite utiliser au sein de notre application.
 
-L'emploi de **javascript** nous a aidé à mieux maitrisé ce langage, ainsi qu'à découvrir de nouvelle façon de l'utiliser, nous pouvons par exemple citer la fonction **regex**, ou bien la façon de réaliser l'architecture de notre programme afin de le rendre plus facile à comprendre, adapter ou corriger.
+L'emploi de **javascript** nous a aidés à mieux maitrisé ce langage, ainsi qu'à découvrir de nouvelle façon de l'utiliser, nous pouvons par exemple citer la fonction **regex**, ou bien la façon de réaliser l'architecture de notre programme afin de le rendre plus facile à comprendre, adapter ou corriger.
 
 La création d'un bot Discord nous a aussi appris à nous adapter aux technologies en dehors de notre cadre de travail habituel. Devoir aller chercher l'information, résoudre les conflits avec l'api **Discord.js**, nous adapter dans notre démarche pour comprendre Discord, fût une expérience enrichissante.
 
 Enfin la mise en place d'un panel web, nous a permis de comprendre comment les différentes applications sur le web travaillent et s'articule l'une autour de l'autre, en réalisant un projet comme celui-ci, nous avons pu comprendre le fonctionnement d'outil tel que **Node Js**.
 
-Au final, ce projet fût un grand enrichissement personnel, et nous espérons pouvoir utiliser les connaissances que nous en avons tirées soit dans notre vie professionelle, soit à titre personnel.
+Au final, ce projet fût un enrichissement personnel conséquent, et nous espérons pouvoir utiliser les connaissances que nous en avons tirées dans notre vie professionelle, voir à titre personnel.

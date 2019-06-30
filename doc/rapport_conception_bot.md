@@ -201,17 +201,34 @@ RegExp est un constructeur JavaScript permettant de reconnaitre une chaine de ca
 C'est à partir de ces expressions régulières que nous analysons dans 
 
 
-#### Création dynamic de regex
+#### Création dynamique de regex
 
+Les commandes personnalisées sont des commandes de sanctions avec des atomes respectant certaines contraintes. Il y a donc deux contraintes personnalisable, la durée de la sanction et la liste des channels dans lesquels elle prend effet.
 
+* Contrainte sur la durée : \
+Elle est sous deux formes, soit inférieur, soit supérieur à la durée spécifier lors de la création de la commande. \
+Exemple :
+    1. La durée doit être inférieur à 60 secondes : `<60`
+    2. La durée doit êter supérieur à 60 secondes : `>60`
 
-Afin de créer des commandes personnalisées, il est nécessaire de mettre en place des expressions dynamique. Les expressions dynamique sont des chaines de caractères analysable dans l'applicatino afin d'interagir avec les éléments contenu dedans.
+* Contrainte sur les channels : \
+Elle permet également deux choses, soit que la sanction prenne effet sur un channel spécifié dans la liste, soit elle ne doit pas être dans la liste. \
+Exemple :
+    1. Le ou les channel(s) dans lequel/lesquels la sanction prend effet doit appartenir à la liste des channels suivant : `IN <#1245641> <#75431545741> .audio`
+    2. Le ou les channel(s) dans lequel/lesquels la sanction ne doit pas prendre effet doit appartenir à la liste des channels suivant : `NOT IN <#1245641> <#75431545741> .audio`
 
-Les fichiers compris dans le dossier **`./src/util`** sont donc utilisé afin de créer des expressions régulières qui seront utilisées pour créer des commandes pour notre bot.
+Afin d'assurer que ces contraintes soient reconnues, nous avons créé un algorithme permettant de créer des regex dynamiquement (`./src/utils/chan_list_regex_creation.js` pour les channels et `./src/utils/number_regex_creation.js` pour la durée). Ces regex assure donc que la commandes respecte les contraintes spécifiées, et le traitement de cette sanction se fait via les mêmes méthodes que pour les sanctions de base (ex: un ban sur les channels de la catégorie 'RP' sera traité de la même manière qu'un ban du serveur).
 
-Comme vu précédemment, les commandes fonctionnent grâce à des expressions régulière qui récupèrent le contenu des commandes pour agir dessus, grâce à `chan_list_regex_creation.js`, il nous est permis de créer une expressions régulière à l'aide de la commande !create pour le bot. 
+Par exemple :
 
-La **`fonction create_in`** et **`fonction create_not_in`** sont au coeur du fonctionnement de l'application. Elles reçoivent une variable text quel translate ensuite sous forme d'un regex quel place dans une constante.
+    Si l'on créer une commande de ban qui doit avoir une durée inférieur à 1 jour et qui ne doit pas prendre effet sur un channel audio et sur les channels de la catégorie '#Salons textuels' :
+
+> On execute la commande de création suivante : `!create ban -d <86400 -c NOT IN .audio <#481862020543545344>`
+
+> Le 'schéma' de la commande est généré : `!ban @<user> <reason:text> [-d <duration: time(sec)<86400>, -c <channel: NOT IN .audio <#481862020543545344>>]`
+
+> Et la regex suivante est également généré : `^!ban[ ]+<@!?([0-9]+)>[ ]+((?:(?!-d|-c).)+)(-d[ ]+(86400|86[0-3][0-9]{2}|8[0-5][0-9]{3}|[0-7][0-9]{4}|[0-9]{,4}))?([ ]*-c[ ]+(?:(?!\.audio[ ]*|<#481862020543545344>[ ]*)<#[0-9]+>[ ]*|\.text[ ]*)+)?[ ]*$`
+
 
 
 ### Base de données
@@ -221,7 +238,7 @@ La base de données, issus de la première partie de notre projet, fût utilisé
 
 Par cela, il faut comprendre que chaque commande passe par notre base de données d'une manière ou d'une autre (ne serait-ce que pour vérifier la permission d'un utilisateur à l'exécution d'une commande), notre bot s'y réfère toujours en cas de questionnement, ou à l'application d'une sanction.
 
-Pour utiliser la base de données dans notre bot d'administration, nous avons employé la base **postgresql**, auquel nous accédons grâce à une librairie **pg**. Dans le dossier **`model`** nous avons mis dans le fichier **`index.js`** les composants permettant d'accéder à notre base de données. 
+Pour utiliser la base de données dans notre bot d'administration, nous avons employé la base **postgresql**, auquel nous accédons grâce à une librairie **pg**. Dans le dossier **`model`** nous avons mis dans le fichier **`index.js`** les composants permettant d'accéder à notre base de données.
 
 Nous avons une constante qui enregistre les informations de connexions :
 

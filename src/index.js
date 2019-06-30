@@ -14,11 +14,12 @@ var timeout = null;
  */
 function auto_remove_sanction() {
     if (timeout != null) client.clearTimeout(timeout);
-    db.query("SELECT id FROM sanction WHERE date + duration *interval'1 second' < now()")
+    db.query("SELECT id, serveur_id FROM sanction WHERE date + duration *interval'1 second' < now()")
     .then( res => {
         // retirer toutes les sanctions terminées
         for (let i=0 ; i<res.rowCount ; i++) {
             let id = res.rows[i].id;
+            let guild = client.guilds.get(res.rows[i].serveur_id);
             require('./command/cancel')(['', id], guild, null, null, '!cancel '+id, null, null);
         }
 

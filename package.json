@@ -9,9 +9,10 @@
   },
   "scripts": {
     "pingpong": "node ./src/pingpong/index.js",
-    "debug": "nodemon ./src/index.js",
+    "dev": "nodemon ./src/index.js",
     "start": "node ./src/index.js",
-    "web": "nodemon ./src/webapp.js"
+    "webdev": "nodemon ./src/webapp.js",
+    "web": "node ./src/webapp.js"
   },
   "repository": {
     "type": "git",

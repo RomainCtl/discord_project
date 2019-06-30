@@ -1,12 +1,14 @@
 const config = require('../config');
 const fetch = require('node-fetch');
 const btoa = require('btoa');
+const Cookies = require('cookies');
 
 /**
  * Discord login callback
  */
 module.exports = function(req, res) {
     if (!req.query.code) throw new Error('NoAuthCode'); // means that user cancel authorization to use his token
+    let cookies = new Cookies(req, res);
 
     let code = req.query.code;
     // get token
@@ -20,6 +22,8 @@ module.exports = function(req, res) {
     ).then( response => {
         return response.json();
     }).then( json => {
+        cookies.set('access_token', json.access_token);
+        cookies.set('refresh_token', json.refresh_token);
         res.redirect(301, `/login/${json.access_token}`);
     }).catch( err => {
         throw err;

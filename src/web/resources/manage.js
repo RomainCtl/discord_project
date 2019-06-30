@@ -24,7 +24,7 @@ module.exports = function(req, res) {
             channels: {}
         };
         let cookies = new Cookies(req, res);
-        let token = cookies.get('discord_token');
+        let token = cookies.get('access_token');
 
         if (token == null) res.redirect(`${config.discord_base_api}oauth2/authorize?client_id=${config.auth.client_id}&scope=identify&response_type=code&redirect_uri=${config.redirect}`);
         else {
@@ -49,7 +49,12 @@ module.exports = function(req, res) {
                 });
             })
             .then( response => {
-                return response.json();
+                if (response.status == 401) {
+                    cookies.set('access_token', {expires: Date.now()}); // delete cookie
+                    cookies.set('refresh_token', {expires: Date.now()}); // FIXME revoke
+                    res.redirect(301, '/login').end();
+                } else
+                    return response.json();
             })
             .then(json => { // get guild channels from api
                 guild.owner = json;

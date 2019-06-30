@@ -24,12 +24,10 @@ function get_access_guilds(user) {
  */
 module.exports = function(req, res) {
     let cookies = new Cookies(req, res);
-    let token = cookies.get('discord_token');
+    let token = cookies.get('access_token');
 
-    if (req.params.token != undefined) {
+    if (req.params.token != undefined)
         token = req.params.token;
-        cookies.set('discord_token', token);
-    }
 
     if (token == null) {
         // discord connection
@@ -42,50 +40,62 @@ module.exports = function(req, res) {
             },
         })
         .then( response => {
-            return response.json();
-        })
-        .then( json => {
-            // TODO token was expired -> clear token cookie
-            return get_access_guilds(json);
-        })
-        .then(access_guild => { // result of previous 'then'
-            return Promise.all(
-                Array.from(access_guild, g => fetch(`${config.discord_base_api}v6/guilds/${g}`, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bot '+config.auth.token
-                    }
-                }))
-            );
-        })
-        .then( response => {
-            return Promise.all(
-                Array.from(response, re => re.json())
-            );
-        })
-        .then(guilds => {
-            let usefull_data = [];
-            for (let g in guilds)
-                usefull_data.push({
-                    id: guilds[g].id,
-                    name: guilds[g].name,
-                    icon: `https://cdn.discordapp.com/icons/${guilds[g].id}/${guilds[g].icon}.png`
-                });
+            if (response.status == 401) {
+                cookies.set('access_token', {expires: Date.now()}); // delete cookie
+                cookies.set('refresh_token', {expires: Date.now()}); // FIXME revoke
 
-            if (usefull_data.length == 0) {
-                console.log("No one server to manage !");
-                cookies.set('discord_token', {expires: Date.now()}); // delete cookie
-                res.redirect(401, config.url+":"+config.port+'/');
-            } else if (usefull_data.length == 1) {
-                // go to manage
-                res.redirect(301, '/manage/'+usefull_data[0].id);
+                res.redirect(`${config.discord_base_api}oauth2/authorize?client_id=${config.auth.client_id}&scope=identify&response_type=code&redirect_uri=${config.redirect}`);
+                throw new Error('401 Unauthorized');
             } else {
-                console.log(usefull_data);
-                res.render('index', { title: 'Administration Panel', page_to_include: './components/guild_choose', guilds: usefull_data });
+                response.json()
+                .then( json => {
+                    return get_access_guilds(json);
+                })
+                .then(access_guild => { // result of previous 'then'
+                    return Promise.all(
+                        Array.from(access_guild, g => fetch(`${config.discord_base_api}v6/guilds/${g}`, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': 'Bot '+config.auth.token
+                            }
+                        }))
+                    );
+                })
+                .then( response => {
+                    return Promise.all(
+                        Array.from(response, re => re.json())
+                    );
+                })
+                .then(guilds => {
+                    let usefull_data = [];
+                    for (let g in guilds)
+                        usefull_data.push({
+                            id: guilds[g].id,
+                            name: guilds[g].name,
+                            icon: `https://cdn.discordapp.com/icons/${guilds[g].id}/${guilds[g].icon}.png`
+                        });
+
+                    if (usefull_data.length == 0) {
+                        console.log("No one server to manage !");
+                        cookies.set('access_token', {expires: Date.now()}); // delete cookie
+                        cookies.set('refresh_token', {expires: Date.now()});
+
+                        res.redirect(401, config.url+":"+config.port+'/');
+                    } else if (usefull_data.length == 1) {
+                        // go to manage
+                        res.redirect(301, '/manage/'+usefull_data[0].id);
+                    } else {
+                        console.log(usefull_data);
+                        res.render('index', { title: 'Administration Panel', page_to_include: './components/guild_choose', guilds: usefull_data });
+                    }
+                })
+                .catch( err => {
+                    throw err;
+                });
             }
         })
-        .catch( err => {
-            throw err;
+        .catch(() => {
+            // 401 Unauthorized
         });
     }
 }

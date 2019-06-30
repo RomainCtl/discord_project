@@ -320,8 +320,12 @@ Cette interface comporte une page d'accueil par lequel nous nous connectons à d
 
 ### Identification
 
-// TODO utilisation de oauth2 avec l'api DISCORD (identifiants discords...) + whitelist en BDD
-// peut accéder à plusieurs serveurs si on est dans la whiteliste de plusieurs serveurs par exemple...
+
+Pour permettre l'utilisateur de se connecter sur notre panel de configuration de bot, nous avons récupéré de l'API Discord une fonction d'identification, permettant en t'autre de pouvoir se connecter sur notre panel avec son compte Discord.
+
+Une fois que l'utilisateur est connecté avec son compte Discord, nous lui demanderons s'il accepte de nous partager son identifiant de connexion afin de pouvoir lui donner accès à notre panel de configuration. Une fois accepter, l'utilisateur pourra accéder au panel de configuration du bot et aux serveurs disponibles.
+
+Bien sûr, tout cela nécessite à l'utilisateur d'être dans la Whitelist des serveurs proposés, la Whitelist est une table dans la base de données référençant l'ensemble des utilisateurs ayant des droits d'administrations sur chaque serveur. Cela nous permet de savoir si l'utilisateur a le droit ou non de configurer le bot sur un serveur. S'il a le droit, il verra le serveur dans sa liste personnelle.
 
 
 ### Panel
@@ -417,6 +421,29 @@ Afin de rendre les modifications via le panel plus souple, nous avons créé une
 Comme vue dans la partie précédente, la partie front (juste le panel) reste indépendante du serveur. Par manque de temps pour prendre en mains un nouvelle solution, nous avons développé cette partie en Vanilla JS. Nous avons donc créé un ensemble de fonction permettant de modifier l'interface sans intervention du serveur. Les requêtes vers l'API sont faites avec le module `axios`. Il s'agit d'un module qui permet de faire des requêtes API respectant les conventions REST.
 
 
+## Conception du bot avec Discord.js
+
+> Afin de faciliter la réalisation de notre bot, nous avons choisi d'utiliser la bibliothèque __discord.js__.
+
+Grâce à l'outil discord.js, nous pouvons simplifier la mise en place du bot, à l'aide des différentes fonction déjà présentes dans l'extension. Cependant la simplification ouvre la porte à l'étendue du problème de la réalisation de l'application et afin de la simplifier, nous avons découpé l'application en plusieurs dossiers, chacun devant traités un aspect spécifique du bot :
+
+
+### src/index.js
+
+Le fichier en charge de traiter la connexion du bot au serveur, ainsi que la récupération des messages addressé au bot avant de les envoyer vers un index de traitement. Cela inclut notamment la détection de si le message est destiné au bot et vient d'un autre bot (dans ce cas il est ignoré) ou d'un utilisateur humain. Dans ce cas le message est envoyé dans la commande __`check_and_run()`__ de src/command/index.js afin de vérifier si le message vient d'un propriétaire légitime ou non.
+
+
+### src/command/index.js
+
+Le fichier index.js dans ./src/command/ à pour but de traiter les commandes envoyées par un utilisateur. Il commence d'abord par vérifier si l'utilisateur est légitime dans sa demande en vérifiant s'il dispose des droits nécessaires.
+
+S'il dispose des droits nécessaires la commande est passée au travers d'un moulinage de **Regex** afin de comprendre de quelle commande il s'agit. Si la commande est trouvée, elle est immédiatement exécutée par l'appel d'une fonction qui traitera la commande reçue. Il s'agit d'une fonction avec une entête générique, ce qui permet de l'appelé dynamiquement sans connaitre la commande éxécuté.
+
+Si le match() ne retourne rien, alors il ne s'agit pas d'une commande et un message d'erreur est renvoyé.
+
+Par contrainte de temps, nous n'avons pas géré les commandes 'custom' (créé par un utilisteur et lié à un serveur). Celles-ci peuvent être créée et peuvent être ajouter à la liste des commandes d'un rôle. Elles aurait été géré de la même manière que les autres sanctions (les mêmes fonctions), ce qu'il nous manque, c'est tout simplement la vérification des permissions d'un utilisateur pour ces commandes.
+
+
 ## Conclusion
 
 Au final, ce projet fût pour nous d'un grand intérêt, tant par l'ensemble des technologies que nous avons pu découvrir, que par le lien qu'il fait avec les technologies et problématiques modernes.
@@ -430,65 +457,3 @@ La création d'un bot Discord nous a aussi appris à nous adapter aux technologi
 Enfin la mise en place d'un panel web, nous a permis de comprendre comment les différentes applications sur le web travaillent et s'articule l'une autour de l'autre, en réalisant un projet comme celui-ci, nous avons pu comprendre le fonctionnement d'outil tel que **Node Js**.
 
 Au final, ce projet fût un grand enrichissement personnel, et nous espérons pouvoir utiliser les connaissances que nous en avons tirées soit dans notre vie professionelle, soit à titre personnel.
-
-
-
-
-
-
-_________________________________________________________________
-
-
-
-
-## Conception du bot avec Discord.js
-
-
-> Afin de faciliter la réalisation de notre bot, nous avons choisi d'utiliser la bibliothèque __discord.js__.
-
-Grâce à l'outil discord.js, nous pouvons simplifier la mise en place du bot, à l'aide des différentes fonction déjà présentes dans l'extension. Cependant la simplification ouvre la porte à l'étendue du problème de la réalisation de l'application et afin de la simplifier, nous avons découpé l'application en plusieurs dossiers, chacun devant traités un aspect spécifique du bot :
-
-
-### src/index.js
-
-
-Le fichier en charge de traiter la connexion du bot au serveur, ainsi que la récupération des messages addressé au bot avant de les envoyer vers un index de traitement. Cela inclut notamment la détection de si le message est destiné au bot et vient d'un autre bot (dans ce cas il est ignoré) ou d'un utilisateur humain. Dans ce cas le message est envoyé dans la commande __`check_and_run()`__ de src/command.index.js afin de vérifier si le message vient d'un propriétaire légitime ou non.
-
-Le fichier index.js est disponible dans /src/
-
-
-### src/command/index.js
-
-
-Le fichier index.js dans ./src/command/ à pour but de traiter les commandes envoyées par un utilisateur. Il commence d'abord par vérifier si l'utilisateur est légitime dans sa demande en vérifiant s'il dispose des droits nécessaires.
-
-S'il dispose des droits nécessaires la commande est passée au travers d'un moulinage de **Regex** afin de comprendre de quelle commande il s'agit. Si la commande est trouvée, elle est immédiatement exécutée par l'appel d'une fonction **`callfunc()`** qui traitera la fonction reçue.
-
-Si le match() ne retourne rien, alors il ne s'agit pas d'une fonction n'est pas traité.
-
-
-
-
-<<<<<<< HEAD
-Chacune de ces commandes est retrouvable au sein du dossier ***/command/*** et dispose de sa propre manière de traiter l'information reçu en paramètre. Elle retourne toujours un message en cas d'erreur. 
-
-
-
-## Panel
-
-
-Le panel est la troisième et dernière partie de notre projet. Nous devons mettre en place une interface afin de pouvoir administrer le bot depuis une page web.
-
-Cette interface comporte une page d'accueil par lequel nous nous connectons à discord ainsi que d'un lien permettant d'appeler le bot sur votre serveur Discord.
-
-Le panel est retrouvable dans le dossier /src/web et quand installé sur le serveur, présentes différentes pages :
-
-
-### Accueil
-
-
-
-### 
-=======
-Chacune de ces commandes est retrouvable au sein du dossier ***/command/*** et dispose de sa propre manière de traiter l'information reçu en paramètre. Elle retourne toujours un message en cas d'erreur.
->>>>>>> 3763af221c5935e8ec96986964ce0658a0eda9d1

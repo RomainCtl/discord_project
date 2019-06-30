@@ -398,7 +398,9 @@ var guild = {
 }
 ```
 
-// TODO 2-3 explications
+Cet objet contient toutes les informations nécessaires à l'administration d'un serveur, et permet l'affichage et la modifications de ces informations très simplement.
+C'est tout simplement l'ensemble des informations que nous avons sur une serveur et que nous avons complété avec l'API discord.
+
 
 ### L'affichage
 
@@ -407,18 +409,15 @@ var guild = {
 
 ### API
 
-// TODO l'api créé pour l'édition des données, chaque 'partie' sur les interfaces sont indépendantes
+Afin de rendre les modifications via le panel plus souple, nous avons créé une partie API REST à notre panel. Cela permet tout simplement, comme le monter les screens ci-dessus, de modifier les données du serveur au fur et à mesure et sans attendre la fin d'une requete pour faire d'autres modifications. Notre interface est donc indépendante et réagit en fonctions des reponses de l'api.
+
 
 ### Front
 
-// TODO vanilla pur (par manque de temps de prendre en mains une autre solution), module axios pour les requtes REST, affichage dynamique, ...
-
-
+Comme vue dans la partie précédente, la partie front (juste le panel) reste indépendante du serveur. Par manque de temps pour prendre en mains un nouvelle solution, nous avons développé cette partie en Vanilla JS. Nous avons donc créé un ensemble de fonction permettant de modifier l'interface sans intervention du serveur. Les requêtes vers l'API sont faites avec le module `axios`. Il s'agit d'un module qui permet de faire des requêtes API respectant les conventions REST.
 
 
 ## Conclusion
-
-
 
 Au final, ce projet fût pour nous d'un grand intérêt, tant par l'ensemble des technologies que nous avons pu découvrir, que par le lien qu'il fait avec les technologies et problématiques modernes.
 

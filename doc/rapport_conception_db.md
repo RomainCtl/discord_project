@@ -20,9 +20,9 @@ Pour finir, notre solution doit proposer un panel d'administration accessible de
 |:-:|:-:|:-:|:--|
 | __serveur__ | id | bigint | identifiant d'un serveur |
 |  | owner_id | bigint | identifiant de proprietaire du serveur |
+|  | log_channel | bigint | identifiant du channel de log (null par default) |
 |  |  |  |  |
 | __moderateur__ | id | bigint | identifiant du membre moderateur |
-|  | username | varchar | nom du moderateur |
 |  |  |  |  |
 | __command__ | id | integer | identifiant de la command |
 |  | command | varchar | command et ses parametres, on se servira de regex pour l'identification des commandes par la suite |
@@ -38,7 +38,7 @@ Pour finir, notre solution doit proposer un panel d'administration accessible de
 |  | duration | timestamp | dure de cette sanction (NULL s'il n'y a pas de duree) |
 |  | reason | varchar | raison de la sanction |
 |  | channels | varchar | liste des channels où la sanction pren de l'effet |
-|  | cmd | varchar | commande effectué pour cette sanction |
+|  | s_type | varchar | correspond au type de sanction et est inclu dans ('BAN', 'KICK', 'DEAF', 'MUTE', 'WARN') |
 |  |  |  |  |
 | __panel_white_list__ | user_id | bigint | identifiant de l'utilisateur pouvant accéder au panel d'administration web |
 
@@ -47,7 +47,7 @@ Pour finir, notre solution doit proposer un panel d'administration accessible de
 
 ![legend](./legend.png)
 
-> Vous pourrez trouver le fichier de création de ce schéma de base de données dans le fichier `init.sql` joint à ce rapport (le fichier fourni également des données en exemple).
+> Vous pourrez trouver le fichier de création de ce schéma de base de données dans le fichier `init.sql` joint à ce rapport (le fichier `data_example` fourni également des données en exemple).
 
 
 ## Listes des commandes globale
@@ -90,6 +90,10 @@ Pour finir, notre solution doit proposer un panel d'administration accessible de
 `!delock <channels:list>`
 * Supprimer les messages d'un channels (message d'un joueur et/ou depuis x sec) :\
 `!delmsg <channel> [-d <duration>, -u @<user>]`
+* Définir le channel de log :\
+`!setlogchannel <channel>`
+* Obtenir de l'aide sur les commandes :\
+`!help`
 
 ### Syntaxe du paramètre `channels`
 
@@ -126,13 +130,13 @@ il doit y avoir au moins une restriction et pour la creation d'un *kick*, il ne 
 #### Exemple
 ```C
 // création d'une commande de `ban` d'une durée maximum de 1 heure (3600 sec) et valable au maximum sur les channels `153648912`,`9845311` et tous les channels de la catégorie `897463245`
-!create ban -d <3600 -c IN (153648912,9845311,897463245)
+!create ban -d <3600 -c IN <#153648912> <#9845311> <#897463245>
 
 // Création d'une commande `kick` qui est valable sur les channels textuel
-!create kick -c IN (.text)
+!create kick -c IN .text
 
 // création d'une commande `mute` qui dure 60 secondes et qui n'est pas valable dans les channels textuel
-!create mute -d >60 -c NOT IN (.text)
+!create mute -d >60 -c NOT IN .text
 ```
 
 ## Requêtes utiles
